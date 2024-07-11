@@ -1,2 +1,3 @@
 # some useful terminal command
 netstat -tulnp # show usage port
+> grep -o done logfile.log | wc -l # count done in log file
