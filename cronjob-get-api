@@ -3,4 +3,3 @@
 > crontab -e # Edit cronjobs
 # Get api every minute
 * * * * * curl -X GET https://example.com >> /path/to/logfile.log 2>&1
-> grep -o done logfile.log | wc -l # count done in log file
