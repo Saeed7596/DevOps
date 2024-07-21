@@ -6,6 +6,23 @@ Run container after reboot:
 docker run -d --restart unless-stopped <container name>
 docker update --restart unless-stopped <container name>
 ----------------------------------
+docker cp <container_name>:<path_inside_container> <path_on_host>
+docker cp <path_on_host> <container_name>:<path_inside_container>
+----------------------------------
 docker system df
 docker builder prune
 ----------------------------------
+usermod -aG docker NEWUSER
+----------------------------------
+for ssh with ci cd
+in Destination server
+~/.ssh$ cat id_rsa.pub > authorized_keys
+and copy id_rsa in gitlab variables
+----------------------------------
+nano /etc/docker/daemon.json
+{ "insecure-registries" : [ "IPNexus:port" ] 
+}
+-----------------------------------
+nano /etc/hosts
+Example ==> 127.0.0.1 example.domain.com
+-----------------------------------
