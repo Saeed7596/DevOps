@@ -21,7 +21,7 @@ I welcome contributions! If you have something valuable to add or improve, pleas
 
 ## Connect with Me
 
-If you want to connect or discuss any topic in more detail, you can reach me at [your email] or follow me on [your social media handle].
+If you want to connect or discuss any topic in more detail, you can reach me at [saeedl1375@gmail.com] or follow me on [t.me/SaeedJ7596].
 
 Thank you for visiting my repository. Happy DevOps-ing!
 
