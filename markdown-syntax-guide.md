@@ -25,10 +25,3 @@
 | `:---:` | Align column to center in tables |
 | `---:` | Align column to right in tables |
 
-## Examples
-
-### Headings
-```markdown
-# Heading level 1
-## Heading level 2
-### Heading level 3
