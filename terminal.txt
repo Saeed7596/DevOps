@@ -1,6 +1,7 @@
 # some useful terminal command
-ubuntu version   ===>    lsb_release -a
-ubuntu architect is arm or amd    ===>     dpkg --print-architecture
+ubuntu version   ===>   lsb_release -a
+ubuntu architect is arm or amd   ===>   dpkg --print-architecture
+du -sh /path/to/directory   ===>   show size of a folder & file
 ----------------------------------
 netstat -tulnp # show usage port
 > grep -o done logfile.log | wc -l # count done in log file
