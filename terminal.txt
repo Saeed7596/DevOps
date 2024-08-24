@@ -1,7 +1,7 @@
 # some useful terminal command
 ubuntu version   ===>   lsb_release -a
 ubuntu architect is arm or amd   ===>   dpkg --print-architecture
-du -sh /path/to/directory   ===>   show size of a folder & file
+du -sh /path/to/directory   ===>   show size of a folder & file 
 ----------------------------------
 netstat -tulnp # show usage port
 > grep -o done logfile.log | wc -l # count done in log file
@@ -31,7 +31,8 @@ nano /etc/hosts
 Example ==> 127.0.0.1 example.domain.com
 -----------------------------------
 git command
-git config --global user.email "you@example.com"                                                                                                    git config --global user.name "Your Name"  
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"  
 git commit -a -m 'Some message about the change'
 git push origin 'branch-name'
 ------------------------------------
