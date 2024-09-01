@@ -1,6 +1,6 @@
 #ssl
 #first it should be happened with the user the create the app for example gitlab_ssh
-#docker compose file =>file name is  ``` docker-nginx.compose ```
+#docker compose file =>file name is  ** docker-nginx.compose **
 =====================================================================================
 ```
 version: "3.3"
@@ -71,7 +71,7 @@ server {
 }
 ```
 =====================================================================================
-#pay attention to the comment line \n
+> pay attention to the comment line
 #first time run the docker compose with this command line
 ``` docker compose -f docker-nginx.compose up -d ```
 #after that check the logs of certbot container and certbot directory to see the files 
