@@ -64,14 +64,14 @@ server {
         proxy_set_header        X-Frame-Options     SAMEORIGIN;
         proxy_pass http://172.17.0.1:app port;
     }
-    #ssl_certificate /etc/letsencrypt/live/mahyatajhiz.com/fullchain.pem;
-    #ssl_certificate_key /etc/letsencrypt/live/mahyatajhiz.com/privkey.pem;
+    #ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+    #ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
     #include /etc/letsencrypt/options-ssl-nginx.conf;
     #ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 }
 ```
 =====================================================================================
-#pay attention to the comment line
+#pay attention to the comment line \n
 #first time run the docker compose with this command line
 ``` docker compose -f docker-nginx.compose up -d ```
 #after that check the logs of certbot container and certbot directory to see the files 
