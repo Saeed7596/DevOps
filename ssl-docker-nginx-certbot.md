@@ -72,7 +72,7 @@ server {
 ```
 =====================================================================================
 > pay attention to the comment line
-#first time run the docker compose with this command line
+> first time run the docker compose with this command line
 ``` docker compose -f docker-nginx.compose up -d ```
 #after that check the logs of certbot container and certbot directory to see the files 
 #and the must have the permission of the user of app (gitlab_ssh)
