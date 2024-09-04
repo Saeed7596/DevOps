@@ -23,6 +23,7 @@ services:
   certbot:
     image: certbot:v2.6.0
     command: 'certonly --reinstall --webroot --webroot-path=/var/www/certbot --email < youremail@gmail.com > --agree-tos --no-eff-email -d example.com'
+    # --force-renewal " can use this at the end of command line to renewal a new ssl key without check the expire time"
     depends_on:
       - nginx
     volumes:
@@ -69,6 +70,64 @@ server {
     #include /etc/letsencrypt/options-ssl-nginx.conf;
     #ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 }
+----------------------------------------------------
+# Redirect from www.example.com to example.com
+server {
+    listen 80;
+    server_name www.example.com;
+    
+    return 301 http://example.com$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name www.example.com;
+    
+    #ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+    #ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+    #include /etc/letsencrypt/options-ssl-nginx.conf;
+    #ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    return 301 https://example.com$request_uri;
+}
+
+# Main server block
+server {
+    listen 80;
+    server_name example.com;
+    
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    #listen 443 ssl;
+    server_name example.com;
+    client_max_body_size 32M;
+
+    location / {
+        proxy_read_timeout      300;
+        proxy_connect_timeout   300;
+        proxy_redirect          off;
+
+        proxy_set_header        Host                $http_host;
+        proxy_set_header        X-Real-IP           $remote_addr;
+        proxy_set_header        X-Forwarded-For     $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto   https;
+        proxy_set_header        X-Frame-Options     SAMEORIGIN;
+        proxy_pass http://172.17.0.1:3030;
+    }
+    
+    #ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+    #ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+    #include /etc/letsencrypt/options-ssl-nginx.conf;
+    #ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+
 ```
 =====================================================================================
 # pay attention to the comment line
