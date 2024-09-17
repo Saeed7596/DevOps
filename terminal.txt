@@ -3,6 +3,11 @@ ubuntu version   ===>   lsb_release -a
 ubuntu architect is arm or amd   ===>   dpkg --print-architecture
 du -sh /path/to/directory   ===>   show size of a folder & file 
 ----------------------------------
+# check the service
+systemctl list-units --type=service
+systemctl list-units --type=service --state=running
+service --status-all
+----------------------------------
 netstat -tulnp # show usage port
 > grep -o done logfile.log | wc -l # count done in log file
 ----------------------------------
