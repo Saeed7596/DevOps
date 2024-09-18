@@ -3,7 +3,7 @@
 all step should be happened with the user that create the app for example `gitlab_ssh` user
 
 > first step => **nano `docker-nginx.compose`**
-```
+```yml
 version: "3.3"
 services:
   nginx:
