@@ -4,6 +4,7 @@ ubuntu architect is arm or amd   ===>   dpkg --print-architecture
 du -sh /path/to/directory   ===>   show size of a folder & file 
 ----------------------------------
 # check the service
+systemctl list-unit-files
 systemctl list-units --type=service
 systemctl list-units --type=service --state=running
 service --status-all
