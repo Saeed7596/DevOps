@@ -70,3 +70,18 @@ git commit -a -m 'Some message about the change'
 git push origin 'branch-name'
 ```
 ------------------------------------
+# Compress
+```bash
+tar -czvf archive_name.tar.gz /path/to/directory
+zip -r archive_name.zip /path/to/directory
+# open
+tar -xzvf archive_name.tar.gz
+unzip archive_name.zip
+```
+------------------------------------
+# Send file
+```bash
+scp /path/to/local/file username@remote_host:/path/to/remote/directory
+scp -r /path/to/local/directory username@remote_host:/path/to/remote/directory
+```
+------------------------------------
