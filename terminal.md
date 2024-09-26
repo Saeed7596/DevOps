@@ -53,6 +53,9 @@ nano /etc/docker/daemon.json
 { "insecure-registries" : [ "IPNexus:port" ] 
 }
 ```
+```bash
+sudo systemctl restart docker
+```
 -----------------------------------
 # Add local hosts
 ```bash
