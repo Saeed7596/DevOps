@@ -54,6 +54,9 @@ nano /etc/docker/daemon.json
 }
 ```
 ```bash
+sudo docker login registry.example.com
+```
+```bash
 sudo systemctl restart docker
 ```
 -----------------------------------
