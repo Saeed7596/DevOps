@@ -118,7 +118,7 @@ docker exec -it <gitlab container_id> /bin/bash
 gitlab-backup create #this commmand create a backup in /var/opt/gitlab/backups path
 exit #exit the gitlab container
 docker cp <gitlab container_id>:/var/opt/gitlab/backups /path/to/local/backup
-#whit scp can move this backup to new server
+#with scp can move this backup to new server
 #in new server run the docker compose of gitlab
 docker cp /path/to/local/backup <gitlab container_id>:/var/opt/gitlab/backups
 docker exec -it <gitlab container_id> /bin/bash
@@ -172,3 +172,8 @@ shutdown_timeout = 0
     volumes = ["/cache:/cache", "/var/run/docker.sock:/var/run/docker.sock"]
     shm_size = 0
 ```
+-------------------------------------------
+# Upgrade
+Change the image of docker-compose.yml file, but you should pay attention the [upgrade-path](https://gitlab-com.gitlab.io/support/toolbox/upgrade-path/), change image step by step.
+For example upgrade 16.1.2 to 17.3.4:
+16.3.9 > 16.7.10 > 16.11.10 > 17.3.4
