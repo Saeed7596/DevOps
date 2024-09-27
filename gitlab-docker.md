@@ -111,3 +111,64 @@ nano /nginx/default.conf
 #uncomment the ssl comment line
 docker compose -f docker-compose.yml up -d
 ```
+-------------------------------------------
+# Move gitlab
+```bash
+docker exec -it <gitlab container_id> /bin/bash
+gitlab-backup create #this commmand create a backup in /var/opt/gitlab/backups path
+exit #exit the gitlab container
+docker cp <gitlab container_id>:/var/opt/gitlab/backups /path/to/local/backup
+#whit scp can move this backup to new server
+#in new server run the docker compose of gitlab
+docker cp /path/to/local/backup <gitlab container_id>:/var/opt/gitlab/backups
+docker exec -it <gitlab container_id> /bin/bash
+chown git:git /var/opt/gitlab/backups/<backup_file>
+chmod 600 /var/opt/gitlab/backups/<backup_file>
+gitlab-backup restore BACKUP=<backup_file_timestamp> #just the timestamp
+#like this "gitlab-backup restore BACKUP=1727362106_2024_09_26_16.1.2"
+gitlab-ctl reconfigure
+gitlab-ctl restart
+#if you have error 500 in CI/CD copy the gitlab-secrets.json from old server to new server
+#in new server remove gitlab-secrets.json
+docker compose -f docker-compose.yml down
+rm gitlab-secrets.json
+#in old server
+scp /srv/gitlab/config/gitlab-secrets.json username@remote_host:/srv/gitlab/config/
+```
+-------------------------------------------
+# gitlab-runner 
+### install with docker
+```bash
+docker run -d --name gitlab-runner --restart always -v /var/run/docker.sock:/var/run/docker.sock -v gitlab-runner-config:/etc/gitlab-runner gitlab-runner:16.1.0
+```
+* config file in /etc/gitlab-runner/config.toml
+```vim
+concurrent = 1
+check_interval = 0
+shutdown_timeout = 0
+
+[session_server]
+  session_timeout = 1800
+
+[[runners]]
+  name = "My Runner"
+  url = "https://git.example.ir"
+  id = 2
+  token = "Your Token" #when create the runner
+  token_obtained_at = 2023-07-20T19:31:18Z
+  token_expires_at = 0001-01-01T00:00:00Z
+  executor = "docker"
+  cache_dir = "/cache"
+  [runners.cache]
+    MaxUploadedArchiveSize = 0
+  [runners.docker]
+    tls_verify = false
+    pull_policy = ["if-not-present"]
+    image = "docker:24.0.2"
+    privileged = false
+    disable_entrypoint_overwrite = false
+    oom_kill_disable = false
+    disable_cache = false
+    volumes = ["/cache:/cache", "/var/run/docker.sock:/var/run/docker.sock"]
+    shm_size = 0
+```
