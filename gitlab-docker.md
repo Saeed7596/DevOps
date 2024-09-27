@@ -174,6 +174,6 @@ shutdown_timeout = 0
 ```
 -------------------------------------------
 # Upgrade
-Change the image of docker-compose.yml file, but you should pay attention the [upgrade-path](https://gitlab-com.gitlab.io/support/toolbox/upgrade-path/), change image step by step.
-For example upgrade 16.1.2 to 17.3.4:
-16.3.9 > 16.7.10 > 16.11.10 > 17.3.4
+## Change the image of docker-compose.yml file, but you should pay attention the [upgrade-path](https://gitlab-com.gitlab.io/support/toolbox/upgrade-path/), change image step by step.
+* For example upgrade 16.1.2 to 17.3.4:
+`16.3.9 > 16.7.10 > 16.11.10 > 17.3.4`
