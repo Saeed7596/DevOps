@@ -1,0 +1,11 @@
+network:
+  ethernets:
+    ens161:
+      addresses: []
+      dhcp4: true
+      optional: true
+      nameservers:
+        addresses:
+          - 78.157.42.100
+          - 78.157.42.101
+  version: 2
