@@ -27,12 +27,12 @@ services:
       - ./nginx/:/etc/nginx/conf.d/
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
-    deploy:
-      restart_policy:
-        condition: any
-        delay: 10s
-        max_attempts: 5
-        window: 120s
+    #deploy:
+    #  restart_policy:
+    #    condition: on-failure
+    #    delay: 10s
+    #    max_attempts: 5
+    #    window: 120s
     restart: unless-stopped
   certbot:
     image: certbot:v2.6.0
