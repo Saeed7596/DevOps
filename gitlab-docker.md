@@ -177,3 +177,50 @@ shutdown_timeout = 0
 ## Change the image of docker-compose.yml file, but you should pay attention the [upgrade-path](https://gitlab-com.gitlab.io/support/toolbox/upgrade-path/), change image step by step.
 * For example upgrade 16.1.2 to 17.3.4:
 `16.3.9 > 16.7.10 > 16.11.10 > 17.3.4`
+First pull the image, then change the *docker-compose.yml* image and:
+```bash
+docker pull gitlab-ce:version
+docker compose -f docker-compose.yml down
+docker compose -f docker-compose.yml up -d
+```
+**Note:** I didn't need these commands, but you might.
+### Running the Database Migration
+After the update, it's necessary to migrate the GitLab database to the new version. This step is crucial, and if not performed, you may encounter data inconsistency errors.
+
+To run the database migration, use the following command:
+
+```bash
+docker exec -it <gitlab-container-name> gitlab-rake db:migrate
+```
+This command prepares the database for use with the new version.
+
+### Reconfiguring GitLab
+After migrating the database, you need to reconfigure GitLab to align the new settings with the updated version.
+
+```bash
+docker exec -it <gitlab-container-name> gitlab-ctl reconfigure
+```
+This command updates the internal GitLab settings.
+
+### Restarting the GitLab Service
+To ensure GitLab is running properly, restart the GitLab service:
+
+```bash
+docker exec -it <gitlab-container-name> gitlab-ctl restart
+```
+
+### Checking Logs and GitLab Status
+To make sure everything is functioning correctly, check GitLab's logs:
+
+```bash
+docker logs <gitlab-container-name>
+```
+You can also check the GitLab status with this command:
+
+```bash
+docker exec -it <gitlab-container-name> gitlab-rake gitlab:check SANITIZE=true
+```
+
+### Recovering Sensitive Files in Case of Errors (e.g., `gitlab-secrets.json`)
+If you encounter a 500 error after the update, you may need to restore sensitive files like `gitlab-secrets.json` from a backup. This file contains sensitive keys that might need to be restored for the new version.
+
