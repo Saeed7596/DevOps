@@ -9,7 +9,7 @@ services:
       MYSQL_PASSWORD: zabbix_password
       MYSQL_ROOT_PASSWORD: root_password
     volumes:
-      - mysql_data:/var/lib/mysql
+      - ./mysql_data/:/var/lib/mysql
     networks:
       - zabbix-network
     restart: unless-stopped
@@ -23,7 +23,7 @@ services:
       MYSQL_PASSWORD: zabbix_password
       MYSQL_ROOT_PASSWORD: root_password
     volumes:
-      - zabbix_server_data:/var/lib/zabbix
+      - ./zabbix_server_data/:/var/lib/zabbix
     ports:
       - "10051:10051"
     depends_on:
@@ -42,7 +42,7 @@ services:
       MYSQL_PASSWORD: zabbix_password
       MYSQL_ROOT_PASSWORD: root_password
     volumes:
-      - zabbix_web_data:/var/lib/zabbix
+      - ./zabbix_web_data/:/var/lib/zabbix
     ports:
       - "8080:8080"
       #- "443:8443"
