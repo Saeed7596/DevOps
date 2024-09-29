@@ -1,4 +1,3 @@
-```vim
 version: '3.7'
 
 services:
@@ -62,4 +61,3 @@ volumes:
   zabbix_server_data:
   zabbix_web_data:
 
-```
