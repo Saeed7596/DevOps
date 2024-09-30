@@ -40,6 +40,61 @@ sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 ------------------------------------
+
+# Manual Docker Installation on Ubuntu using .deb Packages
+
+If you cannot use Docker's `apt` repository to install Docker Engine, you can download and manually install the `.deb` files for your Ubuntu release. You need to download a new file each time you want to upgrade Docker Engine.
+
+## Steps to Install Docker Engine from a Package
+
+### 1. Go to the Docker Downloads Page
+Go to the following URL to find the Docker packages for your Ubuntu version:
+[https://download.docker.com/linux/ubuntu/dists/](https://download.docker.com/linux/ubuntu/dists/)
+
+### 2. Select Your Ubuntu Version
+From the list, select your Ubuntu version (e.g., `focal` for Ubuntu 20.04).
+
+### 3. Navigate to the Stable Pool Directory
+Go to `pool/stable/` and select the applicable architecture:
+- `amd64`
+- `armhf`
+- `arm64`
+- `s390x`
+
+### 4. Download the Required `.deb` Files
+Download the following `.deb` files for Docker Engine, CLI, containerd, and Docker Compose packages:
+- `containerd.io_<version>_<arch>.deb`
+- `docker-ce_<version>_<arch>.deb`
+- `docker-ce-cli_<version>_<arch>.deb`
+- `docker-buildx-plugin_<version>_<arch>.deb`
+- `docker-compose-plugin_<version>_<arch>.deb`
+
+### 5. Install the `.deb` Packages
+Use the `dpkg` command to install the downloaded packages. Replace the `<version>` and `<arch>` with the corresponding values from the files you downloaded:
+```bash
+sudo dpkg -i ./containerd.io_<version>_<arch>.deb \
+  ./docker-ce_<version>_<arch>.deb \
+  ./docker-ce-cli_<version>_<arch>.deb \
+  ./docker-buildx-plugin_<version>_<arch>.deb \
+  ./docker-compose-plugin_<version>_<arch>.deb
+```
+
+### 6. Start the Docker Daemon
+The Docker daemon should start automatically after installation. If not, you can start it manually:
+```bash
+sudo service docker start
+```
+
+### 7. Verify Docker Installation
+To verify that Docker Engine has been installed successfully, run the following command to test it with the `hello-world` image:
+```bash
+sudo docker run hello-world
+```
+This command downloads a test image, runs it in a container, and prints a confirmation message.
+
+### Conclusion
+If everything works as expected, you have successfully installed and started Docker Engine manually using `.deb` packages.
+------------------------------------
 # Check
 ```bash
 docker version
