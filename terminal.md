@@ -87,7 +87,11 @@ unzip archive_name.zip
 ------------------------------------
 # Send file
 ```bash
+# Upload
 scp /path/to/local/file username@remote_host:/path/to/remote/directory
 scp -r /path/to/local/directory username@remote_host:/path/to/remote/directory
+# Download 
+scp username@remote_host:/path/to/remote/file /path/to/local/directory
+scp -r username@remote_host:/path/to/remote/directory /path/to/local/directory
 ```
 ------------------------------------
