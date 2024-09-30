@@ -190,4 +190,23 @@ In this example, the container will restart up to 3 times if it encounters a fai
 | `always`        | Container always restarts, even after manual stop.             |
 | `unless-stopped`| Container restarts unless manually stopped by the user.        |
 | `on-failure`    | Container restarts only if it fails (non-zero exit code).      |
+---------------------------------------------------------------------------------
+# Volume
+**Default path = `/var/lib/docker/volumes/`**
+# Docker Volume Commands
+```bash
+#Create a Volume:
+docker volume create my_volume
 
+#List Volumes:
+docker volume ls
+
+#Inspect a Volume:
+docker volume inspect my_volume
+
+#Remove a Volume:
+docker volume rm my_volume
+
+#Remove All Unused Volumes:
+docker volume prune
+```
