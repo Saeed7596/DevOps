@@ -1,7 +1,7 @@
 ```bash
 docker network create mongodb-net
 ```
-```vim
+```yaml
 version: "3.3"
 services:
   mongodb:
