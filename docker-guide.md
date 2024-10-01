@@ -149,6 +149,18 @@ docker cp <path_on_host> <container_name>:<path_inside_container>
 ```bash
 docker system df
 docker builder prune
+
+docker volume prune
+docker system prune
+docker system prune --volumes
+#WARNING! This will remove:
+        - all stopped containers
+        - all networks not used by at least one container
+        - all volumes not used by at least one container
+        - all dangling images
+        - all build cache
+
+Are you sure you want to continue? [y/N] y
 ```
 ----------------------------------
 ### Accses docker to new user:
