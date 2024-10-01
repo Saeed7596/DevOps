@@ -1,5 +1,5 @@
 ```bash
- docker network create mongodb-net
+docker network create mongodb-net
 ```
 ```vim
 version: "3.3"
@@ -26,7 +26,7 @@ volumes:
   dbdata:
 ```
 * Maybe you need to install this on server:
-mongodb-database-tools-ubuntu2204-x86_64-100.10.0.deb
+`mongodb-database-tools-ubuntu2204-x86_64-100.10.0.deb`
 ```sh
 #!/bin/bash
 echo "dumping started" &&
