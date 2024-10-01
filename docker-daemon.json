@@ -1,0 +1,22 @@
+{
+  "registry-mirrors": [
+    "https://dockerhub.firstvds.ru",
+    "https://dockerhub.timeweb.cloud",
+    "https://huecker.io",
+    "https://mirror.gcr.io",
+    "https://c.163.com",
+    "https://registry.docker-cn.com",
+    "https://daocloud.io"
+  ],
+  "insecure-registries": [
+    "IPNexus:port",
+    "IPNexus:port",
+    "IPNexus:port",
+    "IPNexus:port"
+  ],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3"
+  }
+}
