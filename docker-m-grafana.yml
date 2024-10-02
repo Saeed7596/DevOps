@@ -1,0 +1,22 @@
+version: '3.7'
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    user: '0'
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_INSTALL_PLUGINS=alexanderzobnin-zabbix-app
+    volumes:
+      - ./grafana_data:/var/lib/grafana
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+networks:
+  monitoring:
+    external: true  # The network must already be created
+    
+volumes:
+  grafana_data:
