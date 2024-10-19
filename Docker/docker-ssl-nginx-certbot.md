@@ -156,5 +156,23 @@ now run the **`docker-nginx.compose`** again
 
 **` docker compose -f docker-nginx.compose up -d `**
 
+# Use cloudfare zero trust for ssl
+* in tunnel use http and point ip to port 80 *
+Change nginx `default.conf`
+```conf
+server {
+    listen 80;
+    server_name example.ir;
 
-
+    location / {
+        proxy_pass http://172.17.0.1:app port;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+```sh
+docker compose - f docker - nginx.compose restart nginx
+```
