@@ -173,6 +173,32 @@ server {
     }
 }
 ```
-```sh
-docker compose - f docker - nginx.compose restart nginx
+```bash
+docker compose - f docker-nginx.compose restart nginx
+```
+
+# Count header with nginx
+# First line of default.conf
+```conf 
+log_format custom '$remote_addr - $remote_user [$time_local] "$request" '
+                '$status $body_bytes_sent "$http_referer" '
+                '"$http_user_agent" "$http_my_header"';
+# or save just this headers
+log_format custom '$status $body_bytes_sent "$http_host"';
+```
+```conf
+# add this if in location / part
+
+        if ($http_referer = "https://daneshmand.branchteam.ir/") {
+            access_log /var/log/nginx/danesh-access.log custom;
+        }
+```
+# Add volume in `docker-compose.yml`
+```yml
+volumes:
+  - ./nginx_logs:/var/log/nginx
+```
+```bash
+docker compose - f docker-nginx.compose down
+docker compose - f docker-nginx.compose up -d
 ```
