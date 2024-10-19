@@ -178,7 +178,7 @@ docker compose - f docker-nginx.compose restart nginx
 ```
 
 # Count header with nginx
-# First line of default.conf
+* First line of `default.conf`
 ```conf 
 log_format custom '$remote_addr - $remote_user [$time_local] "$request" '
                 '$status $body_bytes_sent "$http_referer" '
