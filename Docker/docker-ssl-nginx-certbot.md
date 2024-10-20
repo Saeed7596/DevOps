@@ -237,6 +237,8 @@ zabbix_sender -z ip-zabbix-server -s "hostname-zabbix" -k "http.requests.count" 
 ```
 > in zabbix dashbord > select host > create item > type item:Zabbix trapper > key=http.requests.count
 ```bash
+chmod +x count_requests.sh
+./count_requests.sh
 crontab -e
 ```
 ```bash
