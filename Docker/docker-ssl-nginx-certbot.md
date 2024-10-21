@@ -235,8 +235,8 @@ zabbix_sender -z ip-zabbix-server-or-proxy -s "hostname-zabbix" -k "http.request
 
 > "$LOG_FILE"
 ```
-> in zabbix dashbord > select host > create item > type item:Zabbix trapper > key=http.requests.count
-> select item > Create dependet item > add Preprocessing > JSONPath = $.['example.ir']
+*in zabbix dashbord > select host > create item > type item:Zabbix trapper > key=http.requests.count*
+*select item > Create dependet item > add Preprocessing > JSONPath = $.['example.ir']*
 ```bash
 chmod +x count_requests.sh
 ./count_requests.sh
