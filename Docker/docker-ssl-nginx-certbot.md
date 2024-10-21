@@ -190,7 +190,7 @@ log_format custom '$http_host';
 ```conf
 # add this if in location / part
         if ($http_referer = "https://example.ir/") {
-            access_log /var/log/nginx/danesh-access.log custom;
+            access_log /var/log/nginx/website-access.log custom;
         }
 ```
 # Add volume in `docker-compose.yml`
@@ -231,7 +231,7 @@ json_output="${json_output%,}}"
 
 #echo "$json_output"
 
-zabbix_sender -z ip-zabbix-server -s "hostname-zabbix" -k "http.requests.count" -o "$json_output"
+zabbix_sender -z ip-zabbix-server-or-proxy -s "hostname-zabbix" -k "http.requests.count" -o "$json_output"
 
 > "$LOG_FILE"
 ```
