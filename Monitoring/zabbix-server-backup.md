@@ -53,3 +53,15 @@ else
 fi
 
 ```
+# Restore Zabbix MySQL 
+```bash
+docker compose stop zabbix-server
+docker exec -i mysql mysql -u zabbix -pzabbix_password zabbix < /path/to/backup/zabbix_db_backup.sql
+docker compose start zabbix-server
+```
+# Restore Zabbix MySQL & Docker Volume
+```bash
+docker compose down
+tar -xvzf /path/to/backup/zabbix_volumes_backup.tar.gz -C /path/to/compose/project
+docker compose up -d
+```
