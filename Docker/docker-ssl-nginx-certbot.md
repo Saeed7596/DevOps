@@ -2,7 +2,7 @@
 
 all step should be happened with the user that create the app for example `gitlab_ssh` user
 
-> first step => **nano `docker-nginx.compose`**
+> first step => **nano `docker-nginx.yml`**
 ```yml
 version: "3.3"
 services:
@@ -16,6 +16,7 @@ services:
       - TZ=Asia/Tehran
     volumes:
       - ./nginx/:/etc/nginx/conf.d/
+      - ./nginx_logs:/var/log/nginx
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     restart: unless-stopped
@@ -136,14 +137,14 @@ server {
 
 > first time run the docker compose with this command line
 
-**` docker compose -f docker-nginx.compose up -d `**
+**` docker compose -f docker-nginx.yml up -d `**
 
 after that check the logs of certbot container and certbot directory to see the files, and the must have the permission of the user of app "`gitlab_ssh`"
 for check use "`ls -l`" and if the files have anthoer user permission use "`chown -R gitlab_ssh:gitlab_ssh certbot`" to change the permission.
 
 > Now run this commands:
 
-**` docker compose -f docker-nginx.compose down `**
+**` docker compose -f docker-nginx.yml down `**
 
 maybe the *"/certbot/conf"* don't have the **` ssl-dhparams.pem ` & ` options-ssl-nginx.conf `**.
 So with **nano `ssl-dhparams.pem` & nano `options-ssl-nginx.conf`**
@@ -152,9 +153,9 @@ create this file **(with vauleable content!)**
 
 then nano `./nginx/default.conf` and **uncomment the comment line**
 
-now run the **`docker-nginx.compose`** again
+now run the **`docker-nginx.yml`** again
 
-**` docker compose -f docker-nginx.compose up -d `**
+**` docker compose -f docker-nginx.yml up -d `**
 
 # Use cloudfare zero trust for ssl
 * in tunnel use http and point ip to port 80 *
@@ -174,7 +175,7 @@ server {
 }
 ```
 ```bash
-docker compose - f docker-nginx.compose restart nginx
+docker compose - f docker-nginx.yml restart nginx
 ```
 
 # Count header with nginx
@@ -200,10 +201,10 @@ volumes:
 ```
 ```bash
 #for frirst time because can't create nginx_logs directory
-docker compose - f docker-nginx.compose down
-docker compose - f docker-nginx.compose up -d
+docker compose - f docker-nginx.yml down
+docker compose - f docker-nginx.yml up -d
 #after any change in default.conf
-docker compose - f docker-nginx.compose restart nginx
+docker compose - f docker-nginx.yml restart nginx
 ```
 # To send this logs to zabbix
 ```bash
