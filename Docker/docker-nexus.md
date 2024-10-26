@@ -38,3 +38,38 @@ docker pull image:tag
 docker tag image:tag nesxusURL:8084/image:tag
 docker push nesxusURL:8084/image:tag
 ```
+# nginx conf
+```conf
+server {
+    listen 80;
+    server_name nexus.ir;
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+server {
+    listen 443 ssl;
+    server_name nexus.ir;
+    client_max_body_size 32M;
+
+    location / {
+        proxy_read_timeout      300;
+        proxy_connect_timeout   300;
+        proxy_redirect          off;
+
+        proxy_set_header        Host                $http_host;
+        proxy_set_header        X-Real-IP           $remote_addr;
+        proxy_set_header        X-Forwarded-For     $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto   https;
+        proxy_set_header        X-Frame-Options     SAMEORIGIN;
+        proxy_pass http://172.17.0.1:8081;
+    }
+    ssl_certificate /etc/letsencrypt/live/nexus.ir/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/nexus.ir/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+```
