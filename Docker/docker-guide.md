@@ -64,8 +64,8 @@ Go to `pool/stable/` and select the applicable architecture:
 ### 4. Download the Required `.deb` Files
 Download the following `.deb` files for Docker Engine, CLI, containerd, and Docker Compose packages:
 - `containerd.io_<version>_<arch>.deb`
-- `docker-ce_<version>_<arch>.deb`
 - `docker-ce-cli_<version>_<arch>.deb`
+- `docker-ce_<version>_<arch>.deb`
 - `docker-buildx-plugin_<version>_<arch>.deb`
 - `docker-compose-plugin_<version>_<arch>.deb`
 
