@@ -73,8 +73,8 @@ Download the following `.deb` files for Docker Engine, CLI, containerd, and Dock
 Use the `dpkg` command to install the downloaded packages. Replace the `<version>` and `<arch>` with the corresponding values from the files you downloaded:
 ```bash
 sudo dpkg -i ./containerd.io_<version>_<arch>.deb \
-  ./docker-ce_<version>_<arch>.deb \
   ./docker-ce-cli_<version>_<arch>.deb \
+  ./docker-ce_<version>_<arch>.deb \
   ./docker-buildx-plugin_<version>_<arch>.deb \
   ./docker-compose-plugin_<version>_<arch>.deb
 ```
