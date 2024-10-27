@@ -5,6 +5,15 @@ dpkg --print-architecture   ===>   #show ubuntu architect  (arm or amd)
 du -sh /path/to/directory   ===>   #show size of a folder & file 
 ```
 ----------------------------------
+# Create user
+```bash
+sudo useradd -m -s /bin/bash username
+sudo passwd username
+sudo usermod -aG sudo username
+sudo -u username -i   ===>   #switch to user
+ssh-keygen
+```
+----------------------------------
 # Check the service
 ```bash
 systemctl list-unit-files
@@ -93,5 +102,7 @@ scp -r /path/to/local/directory username@remote_host:/path/to/remote/directory
 # Download 
 scp username@remote_host:/path/to/remote/file /path/to/local/directory
 scp -r username@remote_host:/path/to/remote/directory /path/to/local/directory
+# if use another port
+scp -P port number
 ```
 ------------------------------------
