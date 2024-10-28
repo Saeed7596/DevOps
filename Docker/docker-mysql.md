@@ -10,7 +10,7 @@ services:
     ports:
       - 8889:3306
     volumes:
-      - ./mysql_data:/var/lib/mysql  # ذخیره volume به صورت محلی
+      - ./mysql_data:/var/lib/mysql
     restart: unless-stopped
     networks:
       - network-name
