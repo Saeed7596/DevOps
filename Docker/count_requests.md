@@ -59,6 +59,20 @@ zabbix_sender -z ip-zabbix-server-or-proxy -s "hostname-zabbix" -k "http.request
 *in zabbix dashbord > select host > create item > type item:Zabbix trapper > key=http.requests.count*
 ----
 *select item > Create dependet item > add Preprocessing > JSONPath = $.['example.ir']*
+*or use this js file instead of JSONPath*
+```js
+var site1 = 'site1.com';
+var site2 = 'site2.net';
+var site3 = 'site3.ir';
+
+var data = JSON.parse(value);
+
+var count1 = data[site1] ? data[site1] : 0;
+var count2 = data[site2] ? data[site2] : 0;
+var count3 = data[site3] ? data[site3] : 0;
+
+return count1 + count2 + count3;
+```
 ```bash
 chmod +x count_requests.sh
 ./count_requests.sh
