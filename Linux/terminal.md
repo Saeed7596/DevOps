@@ -87,10 +87,10 @@ git push origin 'branch-name'
 ------------------------------------
 # Compress
 ```bash
-tar -czvf archive_name.tar.gz /path/to/directory
+tar -czvf archive_name.tar.gz -C /path/to/directory .
 zip -r archive_name.zip /path/to/directory
 # open
-tar -xzvf archive_name.tar.gz
+tar -xzvf archive_name.tar.gz -C directory
 unzip archive_name.zip
 ```
 ------------------------------------
