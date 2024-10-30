@@ -40,6 +40,17 @@ networks:
 > second step **mkdir `nginx`** directory and **nano `default.conf`** file
 ```
 server {
+    listen 80 default_server;
+    server_name _;
+
+    location / {
+        #return 444;  # Drops the connection
+        deny all;
+    }
+}
+```
+```
+server {
     listen 80;
     server_name example.com www.example.com;
     location /.well-known/acme-challenge/ {
