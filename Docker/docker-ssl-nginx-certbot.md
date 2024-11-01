@@ -257,3 +257,62 @@ crontab -e
 ```bash
 * * * * * /path/to/your/script/count_requests.sh
 ```
+# Change some config in nginx.conf
+```bash
+docker cp nginx:/etc/nginx/nginx.conf /home/path/nginx.conf
+# edit file and save
+docker cp /home/path/nginx.conf nginx:/etc/nginx/nginx.conf
+```
+```conf
+user  nginx;
+worker_processes  auto;
+
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
+
+
+events {
+    worker_connections  4096;
+}
+
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    client_header_buffer_size 1024;
+    server_tokens off; # disable signature
+    large_client_header_buffers 4 8192;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    keepalive_timeout  65;
+
+    gzip on;
+    gzip_types text/plain text/css application/javascript application/json image/svg+xml;
+    gzip_vary on;
+    gzip_min_length 10240;
+    gzip_comp_level 5;
+    gzip_proxied any;
+
+    # Enable Brotli compression
+    brotli on;
+    brotli_comp_level 4;
+    brotli_types text/plain text/css application/json application/javascript application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+
+    include /etc/nginx/conf.d/*.conf;
+}
+```
+```bash
+docker exec -it nginx /bin/bash # nginx is container name
+nginx -t # check new config
+exit # from container
+docker compose -f docker-nginx.yml restart nginx # nginx is service name in docker-nginx.yml file
+```
