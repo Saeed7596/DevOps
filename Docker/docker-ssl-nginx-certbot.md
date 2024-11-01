@@ -186,7 +186,7 @@ server {
 }
 ```
 ```bash
-docker compose - f docker-nginx.yml restart nginx
+docker compose -f docker-nginx.yml restart nginx
 ```
 
 # Count header with nginx
@@ -212,10 +212,10 @@ volumes:
 ```
 ```bash
 #for frirst time because can't create nginx_logs directory
-docker compose - f docker-nginx.yml down
-docker compose - f docker-nginx.yml up -d
+docker compose -f docker-nginx.yml down
+docker compose -f docker-nginx.yml up -d
 #after any change in default.conf
-docker compose - f docker-nginx.yml restart nginx
+docker compose -f docker-nginx.yml restart nginx
 ```
 # To send this logs to zabbix
 ```bash
