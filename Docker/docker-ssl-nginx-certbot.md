@@ -264,6 +264,7 @@ docker cp nginx:/etc/nginx/nginx.conf /home/path/nginx.conf
 # edit file and save
 docker cp /home/path/nginx.conf nginx:/etc/nginx/nginx.conf
 ```
+*nginx.conf*
 ```conf
 user  nginx;
 worker_processes  auto;
@@ -309,6 +310,13 @@ http {
     brotli_types text/plain text/css application/json application/javascript application/x-javascript text/xml application/xml application/xml+rss text/javascript;
 
     include /etc/nginx/conf.d/*.conf;
+}
+```
+*default.conf*
+```vim
+location ~* \.(webp|jpg|jpeg|png|gif|ico)$ {
+    expires 30d;
+    add_header Cache-Control "public, no-transform";
 }
 ```
 ```bash
