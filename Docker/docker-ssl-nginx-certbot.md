@@ -325,3 +325,37 @@ nginx -t # check new config
 exit # from container
 docker compose -f docker-nginx.yml restart nginx # nginx is service name in docker-nginx.yml file
 ```
+# If you want use brotli use image openresty
+### `mkdri nginx-conf` and `nano *nginx.conf*`
+```yml
+services:
+  nginx:
+    container_name: nginx
+    image: openresty/openresty:1.21.4.1-0-jammy
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - TZ=Asia/Tehran
+    volumes:
+      - ./nginx/:/etc/nginx/conf.d/
+      - ./nginx_logs:/var/log/nginx
+      - ./nginx-conf/nginx.conf:/etc/nginx/nginx.conf  # Volume for nginx.conf
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    restart: unless-stopped
+    networks:
+      - net-name
+  certbot:
+    container_name: certbot
+    image: certbot/certbot:v2.11.0
+    command: 'certonly --reinstall --webroot --webroot-path=/var/www/certbot --email youremail@gmail.com --agree-tos --no-eff-email -d example.com'
+    depends_on:
+      - nginx
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+networks:
+  net-name:
+    external: true
+```
