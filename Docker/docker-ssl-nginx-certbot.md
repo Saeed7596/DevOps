@@ -317,6 +317,7 @@ http {
 location ~* \.(webp|jpg|jpeg|png|gif|ico)$ {
     expires 30d;
     add_header Cache-Control "public, no-transform";
+    try_files $uri $uri/ =404;
 }
 ```
 ```bash
