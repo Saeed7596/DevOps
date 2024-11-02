@@ -279,7 +279,8 @@ events {
 
 
 http {
-    include       /etc/nginx/mime.types;
+    #include       /etc/nginx/mime.types;
+    include /usr/local/openresty/nginx/conf/mime.types; #if use image openresty
     default_type  application/octet-stream;
 
     client_header_buffer_size 1024;
