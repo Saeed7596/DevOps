@@ -228,7 +228,7 @@ nano count_requests.sh
 ```
 ```sh
 #!/bin/bash
-LOG_FILE="/your-path/nginx_logs/access.log"
+LOG_FILE="/your-path/nginx_logs/website-access.log"
 
 declare -A count
 
