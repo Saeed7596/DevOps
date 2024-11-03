@@ -342,7 +342,7 @@ services:
     volumes:
       - ./nginx/:/etc/nginx/conf.d/
       - ./nginx_logs:/var/log/nginx
-      - ./nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro # Volume for nginx.conf for image openresty
+      - ./nginx-conf/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro # Volume for nginx.conf for image openresty
       #- ./nginx-conf/nginx.conf:/etc/nginx/nginx.conf  # Volume for nginx.conf for image nginx
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
