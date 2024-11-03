@@ -3,6 +3,7 @@ version: '3.7'
 services:
   mysql:
     image: mysql:8.0
+    container_name: mysql
     environment:
       MYSQL_DATABASE: zabbix
       MYSQL_USER: zabbix
@@ -16,6 +17,7 @@ services:
 
   zabbix-server:
     image: zabbix/zabbix-server-mysql:latest
+    container_name: zabbix-server
     environment:
       DB_SERVER_HOST: mysql
       MYSQL_DATABASE: zabbix
@@ -34,6 +36,7 @@ services:
 
   zabbix-web-nginx-mysql:
     image: zabbix/zabbix-web-nginx-mysql:latest
+    container_name: zabbix-nginx
     environment:
       ZBX_SERVER_HOST: zabbix-server
       DB_SERVER_HOST: mysql
