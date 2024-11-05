@@ -1,4 +1,7 @@
 # Zabbix MySQL BackUps
+```
+docker compose -f docker-zabbix-server.yml stop
+```
 ```bash
 #!/bin/bash
 
@@ -55,14 +58,14 @@ fi
 ```
 # Restore Zabbix MySQL 
 ```bash
-docker compose -f docker-zabbix-server.yml stop mysql-service
+docker compose -f docker-zabbix-server.yml stop
 docker exec -i mysql mysql -u zabbix -pzabbix_password zabbix < /path/to/backup/zabbix_db_backup.sql
 
 docker exec -i <mysql_container_name> mysql -u zabbix -p'zabbix_pass' -e "DROP DATABASE IF EXISTS zabbix; CREATE DATABASE zabbix;"
 docker exec -i <mysql_container_name> mysql -u zabbix -p'zabbix_pass' zabbix < /path/to/your/backup_file.sql
 docker exec -i <mysql_container_name> mysql -u root -p'root_pass' zabbix < /path/to/your/backup_file.sql
 
-docker compose -f docker-zabbix-server.yml start mysql-service
+docker compose -f docker-zabbix-server.yml start
 ```
 # Restore Zabbix MySQL & Docker Volume
 ```bash
