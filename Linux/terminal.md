@@ -10,8 +10,10 @@ du -sh /path/to/directory   ===>   #show size of a folder & file
 sudo useradd -m -s /bin/bash username
 sudo passwd username
 sudo usermod -aG sudo username
-sudo -u username -i   ===>   #switch to user
+sudo -u username -i   ===>   # switch to user
 ssh-keygen
+sudo -s # switch to super user
+# in Linux $ means normal user access and # means super user (root) access
 ```
 ----------------------------------
 # Move file
