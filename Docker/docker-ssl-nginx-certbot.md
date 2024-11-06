@@ -273,14 +273,18 @@ error_log  /var/log/nginx/error.log notice;
 pid        /var/run/nginx.pid;
 
 
+# Enables the use of JIT for regular expressions to speed-up their processing.
+pcre_jit on;
+
 events {
     worker_connections  4096;
 }
 
 
 http {
+    #include       mime.types;
     #include       /etc/nginx/mime.types;
-    include /usr/local/openresty/nginx/conf/mime.types; #if use image openresty
+    include /usr/local/openresty/nginx/conf/mime.types;
     default_type  application/octet-stream;
 
     client_header_buffer_size 1024;
@@ -298,6 +302,7 @@ http {
 
     keepalive_timeout  65;
 
+    #gzip  on;
     gzip on;
     gzip_types text/plain text/css application/javascript application/json image/svg+xml;
     gzip_vary on;
@@ -309,6 +314,10 @@ http {
     brotli on;
     brotli_comp_level 4;
     brotli_types text/plain text/css application/json application/javascript application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+
+    #more_clear_headers      server;
+    #more_set_headers        "server: hidden";
+    #proxy_pass_header       server;
 
     include /etc/nginx/conf.d/*.conf;
 }
