@@ -179,6 +179,6 @@ scp -r /path/to/local/directory username@remote_host:/path/to/remote/directory
 scp username@remote_host:/path/to/remote/file /path/to/local/directory
 scp -r username@remote_host:/path/to/remote/directory /path/to/local/directory
 # if use another port
-scp -P port number
+scp -P <ssh port number>
 ```
 ------------------------------------
