@@ -4,7 +4,7 @@ apt install openssh-server
 systemctl status sshd
 systemctl enable sshd
 ```
-\```bash
+```bash
 ssh-keygen
 ssh -p <prot-number> username@remote_host
 # In local machine:
@@ -18,7 +18,7 @@ Host myserver
     IdentityFile ~/.ssh/id_rsa
 \```
 ssh myserver
-\```
+```
 ```bash
 ls .ssh # Each user in the home directory has a .ssh directory, and the owner of this directory should be the user themselves.
 ```
