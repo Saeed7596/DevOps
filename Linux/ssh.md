@@ -10,13 +10,13 @@ ssh -p <prot-number> username@remote_host
 # In local machine:
 ssh-copy-id -p 2222 username@remote_host # copy ~/.ssh/id_rsa.pub local machine to authorized_keys remote_host
 nano .ssh/config
-\```vim
+\`vim
 Host myserver
     HostName IP
     User myuser
     Port 2222
     IdentityFile ~/.ssh/id_rsa
-\```
+\`
 ssh myserver
 ```
 ```bash
