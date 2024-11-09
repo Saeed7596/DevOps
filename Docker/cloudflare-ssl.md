@@ -56,7 +56,14 @@ Since Cloudflare handles SSL, you only need to configure NGINX to listen on port
 ### Example NGINX Configuration
 
 Replace `example.com` with your subdomain and `172.17.0.1:3033` with the IP address and port of your Docker container.
-
+```nginx
+# Redirect to the non-www version
+server {
+    listen 80;
+    server_name www.example.com;
+    return 301 $scheme://example.com$request_uri;
+}
+```
 ```nginx
 server {
     listen 80;
