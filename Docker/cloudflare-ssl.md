@@ -78,3 +78,7 @@ server {
     }
 }
 ```
+# Restart nginx
+```bash
+docker compose -f docker-nginx.yml restart nginx
+```
