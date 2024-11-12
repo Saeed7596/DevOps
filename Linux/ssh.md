@@ -44,3 +44,9 @@ ClientAliveCountMax 0
 LogLevel VERBOSE
 sudo systemctl restart sshd
 ```
+# Config ssh with ci cd
+### in Destination server
+```bash
+~/.ssh$ cat id_rsa.pub > authorized_keys
+and copy id_rsa in gitlab variables
+```
