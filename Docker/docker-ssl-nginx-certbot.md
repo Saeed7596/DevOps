@@ -1,6 +1,6 @@
 > set ssl with docker
 
-all step should be happened with the user that create the app for example `gitlab_ssh` user
+all step should be happened with the user that create the app for example `user_ssh` user
 
 > first step => **nano `docker-nginx.yml`**
 ```yml
@@ -151,8 +151,8 @@ server {
 
 **` docker compose -f docker-nginx.yml up -d `**
 
-after that check the logs of certbot container and certbot directory to see the files, and the must have the permission of the user of app "`gitlab_ssh`"
-for check use "`ls -l`" and if the files have anthoer user permission use "`chown -R gitlab_ssh:gitlab_ssh certbot`" to change the permission.
+after that check the logs of certbot container and certbot directory to see the files, and the must have the permission of the user of app "`user_ssh`"
+for check use "`ls -l`" and if the files have anthoer user permission use "`chown -R user_ssh:user_ssh certbot`" to change the permission.
 
 > Now run this commands:
 
