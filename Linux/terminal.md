@@ -34,41 +34,6 @@ service --status-all
 netstat -tulnp # show usage port
 > grep -o done logfile.log | wc -l # count "done" word in log file
 ```
-----------------------------------
-# Run container after reboot:
-```bash
-docker run -d --restart unless-stopped <container name>
-docker update --restart unless-stopped <container name>
-```
-----------------------------------
-```bash
-docker cp <container_name>:<path_inside_container> <path_on_host>
-docker cp <path_on_host> <container_name>:<path_inside_container>
-```
-----------------------------------
-```bash
-docker system df
-docker builder prune
-```
-----------------------------------
-```bash
-usermod -aG docker NEWUSER
-```
-----------------------------------
-# change docker registry
-```bash
-nano /etc/docker/daemon.json
-```
-```vim
-{ "insecure-registries" : [ "IPNexus:port" ] 
-}
-```
-```bash
-sudo docker login registry.example.com
-```
-```bash
-sudo systemctl restart docker
-```
 -----------------------------------
 # Add local hosts
 ```bash
