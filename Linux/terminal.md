@@ -55,13 +55,6 @@ docker builder prune
 usermod -aG docker NEWUSER
 ```
 ----------------------------------
-# Config ssh with ci cd
-### in Destination server
-```bash
-~/.ssh$ cat id_rsa.pub > authorized_keys
-and copy id_rsa in gitlab variables
-```
-----------------------------------
 # change docker registry
 ```bash
 nano /etc/docker/daemon.json
