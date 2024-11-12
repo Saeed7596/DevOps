@@ -83,6 +83,7 @@ sudo dpkg -i ./containerd.io_<version>_<arch>.deb \
 The Docker daemon should start automatically after installation. If not, you can start it manually:
 ```bash
 sudo service docker start
+sudo systemctl enable docker
 ```
 
 ### 7. Verify Docker Installation
