@@ -131,6 +131,9 @@ nano /etc/docker/daemon.json
 ```bash
 sudo systemctl restart docker
 ```
+```bash
+sudo docker login registry.example.com
+```
 ------------------------------------
 # Some helpful docker command:
 ### Run container after reboot:
