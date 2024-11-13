@@ -31,6 +31,13 @@ docker compose - f docker-nginx.compose restart nginx
 apt install zabbix-sender
 apt-get install jq
 ```
+# If can't up the zabbix-agent with docker compose 
+```
+docker compose -f docker-zabbix.yml down
+systemctl stop zabbix-agent.service
+docker compose -f docker-zabbix.yml up -d
+systemctl start zabbix-agent.service
+```
 ```bash
 nano count_requests.sh
 ```
