@@ -10,7 +10,7 @@ services:
     environment:
       #- GF_SECURITY_ADMIN_PASSWORD="your_password"
       - GF_INSTALL_PLUGINS=alexanderzobnin-zabbix-app
-      - GF_INSTALL_PLUGINS=grafana-mongodb-datasource
+      #- GF_INSTALL_PLUGINS=grafana-mongodb-datasource # This plugin need the licence
     volumes:
       - ./grafana_data:/var/lib/grafana
     networks:
