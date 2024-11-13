@@ -12,24 +12,24 @@ sudo ln -s $(pwd)/bin/* /usr/local/bin/
 ```
 -------------------------------
 # Add key in zabbix
-> in zabbix dashbord
-> select host
-> create item
-> type item:Zabbix trapper
-> key=mongodb_status
-> Type of information= Text
+1. in zabbix dashbord
+2. select host
+3. create item
+4. type item:Zabbix trapper
+5. key=mongodb_status
+6. Type of information= Text
 -------------------------------
 # Preprocessing
-> in zabbix dashbord
-> select Latest data of your host
-> Name=mongodb_status then select Apply
-> click on mongodb_status item
-> Cerate dependent item
-> Name=mongodb_Slow Ops Count
-> Type: Dependent item
-> Key=mongodb.slow_ops_count
-> select tab Preprocessing
-> JSONPath = $.slow_ops_count
+1. in zabbix dashbord
+2. select Latest data of your host
+3. Name=mongodb_status then select Apply
+4. click on mongodb_status item
+5. Cerate dependent item
+6. Name=mongodb_Slow Ops Count
+7. Type: Dependent item
+8. Key=mongodb.slow_ops_count
+9. select tab Preprocessing
+10. JSONPath = $.slow_ops_count
 -------------------------------
 # Grafana
-item = mongodb_Slow Ops Count
+`item = mongodb_Slow Ops Count`
