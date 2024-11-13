@@ -72,3 +72,9 @@ scp -r username@remote_host:/path/to/remote/directory /path/to/local/directory
 scp -P <ssh port number>
 ```
 ------------------------------------
+# Kill PID
+```bash
+ps aux | grep filename.py
+kill <PID>
+```
+------------------------------------
