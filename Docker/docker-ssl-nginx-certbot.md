@@ -50,6 +50,21 @@ server {
     }
 }
 ```
+```conf
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name "_";
+    return 444; # Connection closed without response
+}
+
+server {
+    listen 443 default_server;
+    listen [::]:443 default_server;
+    server_name "_";
+    ssl_reject_handshake on; # Reject SSL connection
+}
+```
 ```
 server {
     listen 80;
