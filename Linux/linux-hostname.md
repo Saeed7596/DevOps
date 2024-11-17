@@ -63,6 +63,11 @@ To make the hostname accessible within the local network or to ensure other serv
 
 3. Save and close the file.
 
+## hostname
+1. Open the `/etc/hostname` file:
+    ```
+    saeed
+    ```
 ### Example of a Typical /etc/hosts File
 
 ```plaintext
