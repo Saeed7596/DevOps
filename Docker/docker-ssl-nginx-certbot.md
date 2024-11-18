@@ -509,10 +509,10 @@ http {
     # Buffering and file size settings
     client_body_buffer_size 128k;
     client_max_body_size 20m;
-    proxy_buffer_size 256k;
+    proxy_buffer_size 512k;
     proxy_buffers 8 512k;
     proxy_busy_buffers_size 512k;
-    proxy_temp_file_write_size 512k;
+    #proxy_temp_file_write_size 512k;
 
     # Log format
     log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
@@ -529,6 +529,7 @@ http {
     # Compression settings
     gzip on;
     gzip_types text/plain text/css application/json application/javascript text/xml application/xml+rss text/javascript;
+    gzip_vary on;
     gzip_min_length 1024;
     gzip_proxied any;
     gzip_comp_level 6;
