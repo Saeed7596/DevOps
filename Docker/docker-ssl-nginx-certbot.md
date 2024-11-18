@@ -484,3 +484,55 @@ http {
     # server_tokens off;
 }
 ```
+Another `nginx.conf` file for high traffic.
+```conf
+user  nginx;
+worker_processes  auto;
+
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
+
+pcre_jit on;
+
+events {
+    worker_connections  8192;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    client_header_buffer_size 1024;
+    server_tokens off;
+    large_client_header_buffers 4 8192;
+
+    # Buffering and file size settings
+    client_body_buffer_size 128k;
+    client_max_body_size 20m;
+    proxy_buffer_size 256k;
+    proxy_buffers 8 512k;
+    proxy_busy_buffers_size 512k;
+    proxy_temp_file_write_size 512k;
+
+    # Log format
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+    access_log  /var/log/nginx/access.log  main;
+
+    # Connection optimization
+    sendfile        on;
+    tcp_nopush      on;
+    tcp_nodelay     on;
+    keepalive_timeout  65;
+
+    # Compression settings
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml+rss text/javascript;
+    gzip_min_length 1024;
+    gzip_proxied any;
+    gzip_comp_level 6;
+
+    include /etc/nginx/conf.d/*.conf;
+}
+```
