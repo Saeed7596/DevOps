@@ -306,6 +306,11 @@ http {
     server_tokens off; # disable signature
     large_client_header_buffers 4 8192;
 
+    proxy_buffer_size 128k;
+    proxy_buffers 4 256k;
+    proxy_busy_buffers_size 256k;
+    client_max_body_size 10m;
+
     log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
                       '$status $body_bytes_sent "$http_referer" '
                       '"$http_user_agent" "$http_x_forwarded_for"';
