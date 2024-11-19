@@ -124,3 +124,6 @@ docker compose -f docker-nginx.yml restart nginx
 docker exec nginx nginx -t
 docker exec nginx nginx -s reload
 ```
+# Using Online Tools for Checking:
+- [SSL Server Test](https://www.ssllabs.com/ssltest/)
+- [Key CDN](https://www.keycdn.com/features)
