@@ -40,6 +40,9 @@ After making changes, test and reload the configuration:
   docker exec -it nginx /bin/bash
   nginx -t
   docker compose -f docker-nginx.yml restart nginx
+  # or
+  docker exec nginx nginx -t
+  docker exec nginx nginx -s reload
   ```
 # Example Configuration
 ### Below is an example of enabling debug logging globally and for a specific location:
