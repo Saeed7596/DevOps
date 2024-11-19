@@ -43,3 +43,45 @@ add_header X-Download-Options noopen;
 
 # Prevent unnecessary DNS prefetching
 add_header X-DNS-Prefetch-Control "off";
+```
+```nginx
+```nginx
+# جلوگیری از حدس زدن نوع MIME
+add_header X-Content-Type-Options nosniff;
+
+# جلوگیری از حملات Cross-Site Scripting (XSS)
+add_header X-XSS-Protection "1; mode=block";
+
+# جلوگیری از بارگذاری سایت در داخل iframe (حمله Clickjacking)
+add_header X-Frame-Options SAMEORIGIN;
+
+# اطمینان از استفاده از HTTPS (Strict Transport Security)
+add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+# جلوگیری از ارسال محتوا در قالب فایل‌های ZIP و EXE و ...
+add_header X-Permitted-Cross-Domain-Policies none;
+
+# جلوگیری از اشتراک‌گذاری منابع بین دامنه‌ای (CORS)
+add_header Access-Control-Allow-Origin "null";
+
+# جلوگیری از ارسال هدرهای مربوط به انواع مختلف مرورگر
+add_header Referrer-Policy no-referrer-when-downgrade;
+
+# جلوگیری از ارسال اطلاعات درباره نسخه سرور
+server_tokens off;
+
+# جلوگیری از حملات احتمالی به تنظیمات HTTP
+add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';";
+
+# جلوگیری از ارسال هدرهای مرتبط با اشکال‌زدایی مرورگر
+add_header Feature-Policy "microphone 'none'; camera 'none';";
+
+# جلوگیری از درخواست‌های محتوای خود (X-Content-Security-Policy)
+add_header X-Content-Security-Policy "default-src 'self'";
+
+# جلوگیری از ارسال هدرهای ارتباطی برای URLهای درخواست شده
+add_header X-Download-Options noopen;
+
+# جلوگیری از ارسال هدرهای امنیتی مربوط به کانال‌ها
+add_header X-DNS-Prefetch-Control "off";
+```
