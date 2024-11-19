@@ -102,3 +102,14 @@ ssl_ciphers HIGH:!aNULL:!MD5;
 ```nginx
 listen 443 ssl http2;
 ```
+# File Locations:
+- `/etc/nginx/nginx.conf:` This file is the main Nginx configuration file. You can add global SSL settings here, but it’s generally better to modify the specific server block files if you have multiple sites.
+- `/etc/nginx/sites-available/yourdomain.conf:` If you're using a configuration structure with separate site configuration files, you can add these settings in the specific configuration file for your domain.
+- `/etc/nginx/conf.d/:` This directory may contain general configuration files for your server. You could add the SSL settings and security headers in a file here, such as ssl-settings.conf.
+## Restart nginx
+```bash
+docker compose -f docker-nginx.yml restart nginx
+# or
+docker exec nginx nginx -t
+docker exec nginx nginx -s reload
+```
