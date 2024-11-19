@@ -45,7 +45,6 @@ add_header X-Download-Options noopen;
 add_header X-DNS-Prefetch-Control "off";
 ```
 ```nginx
-```nginx
 # جلوگیری از حدس زدن نوع MIME
 add_header X-Content-Type-Options nosniff;
 
@@ -84,4 +83,22 @@ add_header X-Download-Options noopen;
 
 # جلوگیری از ارسال هدرهای امنیتی مربوط به کانال‌ها
 add_header X-DNS-Prefetch-Control "off";
+```
+# SSL Cipher
+### If your goal is to have a more precise choice of algorithms, it makes more sense to use the first setting (ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384';).
+### If you want to use a generic and secure setting, the second setting (ssl_ciphers HIGH:!aNULL:!MD5;) would be more appropriate.
+```nginx
+ssl_protocols TLSv1.2 TLSv1.3;
+ssl_prefer_server_ciphers on;
+ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384';
+```
+```nginx
+ssl_protocols TLSv1.2 TLSv1.3;
+ssl_prefer_server_ciphers on;
+ssl_ciphers HIGH:!aNULL:!MD5;
+```
+# HTTP2
+### Add in default.conf in any server block:
+```nginx
+listen 443 ssl http2;
 ```
