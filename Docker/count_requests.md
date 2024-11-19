@@ -25,6 +25,8 @@ docker compose - f docker-nginx.compose down
 docker compose - f docker-nginx.compose up -d
 #after any change in default.conf
 docker compose - f docker-nginx.compose restart nginx
+# or
+docker exec nginx nginx -s reload
 ```
 # To send this logs to zabbix
 ```bash
