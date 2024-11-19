@@ -102,6 +102,17 @@ ssl_ciphers HIGH:!aNULL:!MD5;
 ```nginx
 listen 443 ssl http2;
 ```
+- ### Check HTTP2
+  ```bash
+  curl -I --http2 https://yourdomain.com
+  ```
+  Output:
+  ```bash
+  HTTP/2 200
+  server: nginx
+  date: Mon, 18 Nov 2024 10:00:00 GMT
+  content-type: text/html; charset=UTF-8
+  ```
 # File Locations:
 - `/etc/nginx/nginx.conf:` This file is the main Nginx configuration file. You can add global SSL settings here, but it’s generally better to modify the specific server block files if you have multiple sites.
 - `/etc/nginx/sites-available/yourdomain.conf:` If you're using a configuration structure with separate site configuration files, you can add these settings in the specific configuration file for your domain.
