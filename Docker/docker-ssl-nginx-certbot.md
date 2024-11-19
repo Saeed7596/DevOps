@@ -203,6 +203,8 @@ server {
 ```
 ```bash
 docker compose -f docker-nginx.yml restart nginx
+# or
+docker exec nginx nginx -s reload
 ```
 
 # Count header with nginx
@@ -232,6 +234,8 @@ docker compose -f docker-nginx.yml down
 docker compose -f docker-nginx.yml up -d
 #after any change in default.conf
 docker compose -f docker-nginx.yml restart nginx
+# or
+docker exec nginx nginx -s reload
 ```
 # To send this logs to zabbix
 ```bash
@@ -355,6 +359,8 @@ docker exec -it nginx /bin/bash # nginx is container name
 nginx -t # check new config
 exit # from container
 docker compose -f docker-nginx.yml restart nginx # nginx is service name in docker-nginx.yml file
+# or
+docker exec nginx nginx -s reload
 ```
 # If you want use brotli use image openresty
 ### `mkdri nginx-conf` and `nano *nginx.conf*`
