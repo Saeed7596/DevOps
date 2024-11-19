@@ -88,6 +88,8 @@ server {
 # Restart nginx
 ```bash
 docker compose -f docker-nginx.yml restart nginx
+# or
+docker exec nginx nginx -s reload
 ```
 # Redirect www to Non-www Domain Using Cloudflare
 
