@@ -25,6 +25,7 @@ networks:
 #volumes: # if using local volume don't neet add volumes
 #  dbdata:
 ```
+# BackUp
 * Maybe you need to install this on server:
 `mongodb-database-tools-ubuntu2204-x86_64-100.10.0.deb`
 ```sh
@@ -35,7 +36,7 @@ mongodump --uri "$fromUri" -o /tmp/temp_db_backup &&
 echo "restoring started" &&
 toUri="mongodb://root:password@server ip:password/URL" &&
 mongorestore --uri "$toUri" /tmp/temp_db_backup --drop --nsExclude="admin.*" --nsExclude="config.*" --nsExclude="local.*" &&
-echo "done"
-rm -rf /tmp/temp_db_backup
+echo "done" &&
+rm -rf /tmp/temp_db_backup &&
 echo "removed"
 ```
