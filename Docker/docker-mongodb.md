@@ -2,7 +2,7 @@
 docker network create mongodb-net
 ```
 ```yml
-version: "3.3"
+#version: "3.9" # in latest update we don't need write the version
 services:
   mongodb:
     container_name: mongodb
@@ -20,8 +20,8 @@ services:
 
 networks:
   mongodb-net:
-    external:
-      name: mongodb-net
+    external: true
+      #name: mongodb-net
 #volumes: # if using local volume don't neet add volumes
 #  dbdata:
 ```
