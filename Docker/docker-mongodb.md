@@ -22,8 +22,8 @@ networks:
   mongodb-net:
     external:
       name: mongodb-net
-volumes:
-  dbdata:
+#volumes: # if using local volume don't neet add volumes
+#  dbdata:
 ```
 * Maybe you need to install this on server:
 `mongodb-database-tools-ubuntu2204-x86_64-100.10.0.deb`
