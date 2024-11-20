@@ -10,7 +10,6 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
-      MONGO_INITDB_BIND_IP: "127.0.0.1,127.0.1.1,172.17.0.1,<ip valid>"
     ports:
       - 27017:27017
     volumes:
