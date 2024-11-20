@@ -40,3 +40,42 @@ echo "done" &&
 rm -rf /tmp/temp_db_backup &&
 echo "removed"
 ```
+# BackUp and keep last 3 days
+```sh
+#!/bin/bash
+
+BACKUP_DIR="/home/mongo/mongo_backup"
+ARCHIVE_DIR="/home/mongo/mongo_archives"
+DATE=$(date +"%Y-%m-%d_%H-%M-%S")
+
+mkdir -p "$BACKUP_DIR"
+mkdir -p "$ARCHIVE_DIR"
+
+echo "Backup process started at $(date)"
+
+FROM_URI="mongodb://url?authSource=admin"
+mongodump --uri "$FROM_URI" -o "$BACKUP_DIR/$DATE"
+
+tar -czf "$ARCHIVE_DIR/mongo_backup_$DATE.tar.gz" -C "$BACKUP_DIR" "$DATE"
+
+rm -rf "$BACKUP_DIR/$DATE"
+
+echo "Backup archived as mongo_backup_$DATE.tar.gz"
+
+cd "$ARCHIVE_DIR"
+ls -t | sed -e '1,3d' | xargs -d '\n' rm -f
+
+echo "Cleanup completed. Backup process finished at $(date)"
+```
+# cronjob
+```
+sudo crontab -e
+sudo crontab -l
+```
+```
+0 3 * * * /path/to/backup.sh >> /var/log/mongo_backup.log 2>&1
+```
+### log
+```
+cat /var/log/backup.log
+```
