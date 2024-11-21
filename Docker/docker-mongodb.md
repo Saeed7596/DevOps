@@ -77,5 +77,5 @@ sudo crontab -l
 ```
 ### log
 ```
-cat /var/log/backup.log
+cat /var/log/mongo_backup.log
 ```
