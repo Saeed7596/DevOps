@@ -45,12 +45,14 @@ To check the open ports on your local system, you can use either the `ss` or `ne
 ### Using `ss`:
 ```bash
 ss -tuln
+ss -s
 ```
 This command lists all open TCP and UDP ports.
 
 ### Using `netstat`:
 ```bash
 netstat -tuln
+netstat -ant | grep ESTABLISHED | wc -l
 ```
 This will show the open TCP and UDP ports along with the services using them.
 
