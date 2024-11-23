@@ -48,7 +48,7 @@ services:
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
 
 networks:
-  mongo_net:
+  mongodb-net:
     external: true
 ```
 ```bash
