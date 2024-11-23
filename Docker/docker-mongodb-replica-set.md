@@ -97,8 +97,5 @@ chmod +x rs-init.sh
 docker compose -f docker-mongo-replica.yml up -d
 ```
 ```bash
-docker exec -it mongo1 bash
-```
-```bash
-./scripts/rs-init.sh
+docker exec -it mongo1 /scripts/rs-init.sh
 ```
