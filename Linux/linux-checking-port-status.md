@@ -74,3 +74,10 @@ nmap <IP_Address>
 ```
 
 These methods will help you check the status of ports and determine if they are open or closed.
+
+## 5. Other 
+```bash
+sudo netstat -tuln | grep <PORT_NUMBER>
+sudo ss -tuln | grep <PORT_NUMBER>
+sudo lsof -i:<PORT_NUMBER>
+```
