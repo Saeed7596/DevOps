@@ -29,6 +29,8 @@ Port 2222
 sudo ufw allow 2222/tcp
 sudo ufw deny 22/tcp
 sudo ufw status
+sudo ufw app list
+sudo ufw app info OpenSSH
 # Make sure to open the port you are enabling in whatever firewall you are using.
 sudo systemctl restart ssh
 ```
