@@ -94,9 +94,11 @@ EOF
 chmod +x rs-init.sh
 ```
 ```bash
+docker compose -f docker-mongo-replica.yml up -d
+```
+```bash
 docker exec -it mongo1 bash
 ```
 ```bash
-cd scripts/
-./rs-init.sh
+./scripts/rs-init.sh
 ```
