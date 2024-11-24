@@ -84,7 +84,7 @@ rs.status();
 
 use admin;
 db.createUser({
-    user: "admin",
+    user: "username",
     pwd: "password",
     roles: [ { role: "root", db: "admin" } ]
 });
@@ -96,6 +96,17 @@ chmod +x rs-init.sh
 ```bash
 docker compose -f docker-mongo-replica.yml up -d
 ```
+### 30 seconds wait
 ```bash
 docker exec -it mongo1 /scripts/rs-init.sh
+```
+# Test
+```bash
+docker exec -it mongo1 mongosh --eval "rs.status()"
+```
+# Compass
+```bash
+mongodb://<username>:<password>@<host1>:<port1>,<host2>:<port2>,<host3>:<port3>/?replicaSet=<replicaSetName>&authSource=admin
+mongodb://admin:password@localhost:27031,localhost:27032,localhost:27033/?replicaSet=dbrs&authSource=admin
+mongodb://username:password@ip-server:27031,ip-server:27032,ip-server:27033/?replicaSet=dbrs&authSource=admin
 ```
