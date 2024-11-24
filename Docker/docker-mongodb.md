@@ -79,3 +79,34 @@ sudo crontab -l
 ```
 cat /var/log/mongo_backup.log
 ```
+### Send log to zabbix
+```bash
+apt install zabbix-sender
+```
+```bash
+nano send-log.sh
+```
+```vim
+#!/bin/bash
+
+LOG_FILE="/var/log/mongo_backup.log"
+
+ZABBIX_SERVER="ip-zabbix-server-or-proxy"
+HOSTNAME="hostname"
+
+LAST_TWO_LINES=$(tail -n 2 "$LOG_FILE")
+
+zabbix_sender -z "$ZABBIX_SERVER" -s "$HOSTNAME" -k mongo_backup_log -o "$LAST_TWO_LINES"
+
+> "$LOG_FILE"
+```
+```bash
+crontab -e
+```
+```vim
+0 4 * * * /path/to/send_mongo_backup_log.sh
+```
+In Zabbix, you need to create a new item of type "Zabbix trapper" for `mongo_backup_log` in order to receive and store the sent data.
+- Key: `mongo_backup_log`
+- Type: "Zabbix trapper"
+- Update interval: 0 (to receive immediately)
