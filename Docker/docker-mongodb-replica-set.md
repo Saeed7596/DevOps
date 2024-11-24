@@ -123,14 +123,14 @@ A Replica Set in MongoDB is a group of servers that maintain the same data, ensu
 - **Read scalability**: Secondary members can handle read operations.
 
 ---
-`_id`: Name of the Replica Set (`dbrs` in this case).
-`version`: Version of the configuration.
-`members`: List of nodes in the Replica Set:
-`_id`: Unique ID for the node.
-`host`: Address and port of the MongoDB instance.
-`priority`: Determines which node is more likely to become the primary.
-`rs.initiate(config)`: Initializes the Replica Set with the provided configuration.
-`force: true`: Overrides the configuration if the Replica Set was previously initialized.
+`_id`: Name of the Replica Set (`dbrs` in this case). \
+`version`: Version of the configuration. \
+`members`: List of nodes in the Replica Set: \
+`_id`: Unique ID for the node. \
+`host`: Address and port of the MongoDB instance. \
+`priority`: Determines which node is more likely to become the primary. \
+`rs.initiate(config)`: Initializes the Replica Set with the provided configuration. \
+`force: true`: Overrides the configuration if the Replica Set was previously initialized. \
 `rs.status();`
 - This command provides information about:
 - Members' roles (Primary, Secondary, Arbiter).
