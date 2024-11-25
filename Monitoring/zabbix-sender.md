@@ -21,7 +21,7 @@ apt install zabbix-sender
 - for example, for linux `focal`
 ```bash
 wget https://repo.zabbix.com/zabbix/7.2/release/ubuntu/pool/main/z/zabbix-release/zabbix-release_7.2-0.1%2Bubuntu20.04_all.deb
-sudo dpkg -i zabbix-release_7.0-3+ubuntu20.04_all.deb
+sudo dpkg -i zabbix-release_7.2-0.1+ubuntu20.04_all.deb
 sudo apt update
 sudo apt install zabbix-sender
 ```
