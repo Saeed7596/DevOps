@@ -110,3 +110,7 @@ In Zabbix, you need to create a new item of type "Zabbix trapper" for `mongo_bac
 - Key: `mongo_backup_log`
 - Type: "Zabbix trapper"
 - Update interval: 0 (to receive immediately)
+Add Trigger:
+- Click on item
+- Create a trigger
+- `Expression` : change(/hostname/mongo_backup_log)<>0
