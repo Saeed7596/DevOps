@@ -104,7 +104,7 @@ zabbix_sender -z "$ZABBIX_SERVER" -s "$HOSTNAME" -k mongo_backup_log -o "$LAST_T
 crontab -e
 ```
 ```vim
-0 4 * * * /path/to/send_mongo_backup_log.sh
+0 4 * * * /path/to/send-log.sh
 ```
 In Zabbix, you need to create a new item of type "Zabbix trapper" for `mongo_backup_log` in order to receive and store the sent data.
 - Key: `mongo_backup_log`
