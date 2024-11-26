@@ -46,6 +46,8 @@ pcre_jit on;
 
 events {
     worker_connections  8192;
+    multi_accept on;
+    use epoll;
 }
 
 http {
