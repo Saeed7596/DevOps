@@ -64,30 +64,30 @@ var config = {
     "members": [
         {
             "_id": 1,
-            "host": "mongo1:27017",
+            "host": "<ip-server>:27031",
             "priority": 3
         },
         {
             "_id": 2,
-            "host": "mongo2:27017",
+            "host": "<ip-server>:27032",
             "priority": 2
         },
         {
             "_id": 3,
-            "host": "mongo3:27017",
+            "host": "<ip-server>:27031",
             "priority": 1
         }
     ]
 };
-rs.initiate(config, { force: true });
-rs.status();
+rs.initiate(config, { force: true })
+rs.status()
 
-use admin;
+use admin
 db.createUser({
     user: "username",
     pwd: "password",
     roles: [ { role: "root", db: "admin" } ]
-});
+})
 EOF
 ```
 ```bash
