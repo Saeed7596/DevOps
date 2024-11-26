@@ -63,10 +63,10 @@ http {
 
     server_tokens off;
     # Client header and body settings
-    client_header_buffer_size 1k;
-    large_client_header_buffers 4 8k;
-    client_body_buffer_size 128k;
     client_max_body_size 32M;
+    client_body_buffer_size 128k;
+    client_header_buffer_size 1024;
+    large_client_header_buffers 4 8192;
 
     # Proxy buffer settings
     proxy_buffer_size 512k;
