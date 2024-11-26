@@ -107,7 +107,8 @@ docker exec -it mongo1 mongosh --eval "rs.status()"
 # Compass
 ```bash
 mongodb://<username>:<password>@<host1>:<port1>,<host2>:<port2>,<host3>:<port3>/?replicaSet=<replicaSetName>&authSource=admin
-mongodb://admin:password@localhost:27031,localhost:27032,localhost:27033/?replicaSet=dbrs&authSource=admin
+mongodb://username:password@localhost:27031,localhost:27032,localhost:27033/?replicaSet=dbrs&authSource=admin
+mongodb://username:password@172.17.0.1:27031,172.17.0.1:27032,172.17.0.1:27034/?replicaSet=dbrs&authSource=admin
 mongodb://username:password@ip-server:27031,ip-server:27032,ip-server:27033/?replicaSet=dbrs&authSource=admin
 ```
 # MongoDB Replica Set Configuration
