@@ -74,7 +74,7 @@ var config = {
         },
         {
             "_id": 3,
-            "host": "<ip-server>:27031",
+            "host": "<ip-server>:27033",
             "priority": 1
         }
     ]
