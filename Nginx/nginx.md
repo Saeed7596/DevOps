@@ -1,4 +1,4 @@
-# Default
+# Default `nginx.conf`
 ```nginx
 user  nginx;
 worker_processes  auto;
@@ -32,7 +32,7 @@ http {
     include /etc/nginx/conf.d/*.conf;
 }
 ```
-# High Performance
+# High Performance `nginx.conf`
 ```nginx
 user  nginx;
 worker_processes  auto;
@@ -100,5 +100,100 @@ http {
 
     # Include additional configurations
     include /etc/nginx/conf.d/*.conf;
+}
+```
+# `default.conf`
+```nginx
+server {
+    listen 80;
+    server_name example.com;
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+server {
+    listen 443 ssl http2;
+    server_name example.com;
+    client_max_body_size 32M;
+
+    location / {
+        access_log /var/log/nginx/panel-access.log custom;
+        proxy_read_timeout      300;
+        proxy_connect_timeout   300;
+        proxy_redirect          off;
+
+        proxy_set_header        Host                $http_host;
+        proxy_set_header        X-Real-IP           $remote_addr;
+        proxy_set_header        X-Forwarded-For     $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto   https;
+        proxy_set_header        X-Frame-Options     SAMEORIGIN;
+        proxy_pass http://172.17.0.1:3005;
+    }
+    ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+```
+# Some Change
+## In `nginx.conf`
+```bash
+sysctl fs.file-max
+fs.file-max = value
+```
+### `worker_rlimit_nofile` is less than the total value of `fs.file-max`
+```nginx
+worker_processes auto;
+
+events {
+    worker_connections 1024;
+}
+
+# worker_rlimit_nofile = worker_connections * 2
+worker_rlimit_nofile 2048;
+
+http {
+    # HTTP config
+}
+```
+## Change of `default.conf`
+### Cache
+```nginx
+server {
+    location ~* \.(webp|jpg|jpeg|png|gif|css|js|ico|woff|woff2|tff|svg)$ {
+        expires 30d;
+        add_header Cache-Control "public, max-age=2592000";
+        try_files $uri $uri/ =404;
+    }
+}
+```
+### HSTS (HTTP Strict Transport Security)
+```nginx
+server {
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+}
+```
+# `stub_status`
+```nginx
+server {    
+    listen 80;
+    server_name example.com;
+
+    location = /basic_status {
+        stub_status;
+    }
+}
+```
+### Now you access to `stub_status`, but it's Unsecured Access to Metrics.
+### for secure
+```nginx
+location /basic_status {
+    stub_status;
+    allow 192.168.1.0/24;
+    allow 127.0.0.1;
+    deny all;               # Block access for others
 }
 ```
