@@ -57,6 +57,7 @@ networks:
 ```bash
 openssl rand -base64 756 > mongo-keyfile
 chmod 600 mongo-keyfile
+chown 999:999 mongo-keyfile
 ```
 ```bash
 nano rs-init.sh
