@@ -15,6 +15,7 @@ services:
     volumes:
       - ./mongors/data1:/data/db
       - ./rs-init.sh:/scripts/rs-init.sh
+      - ./mongo-keyfile:/etc/mongo-keyfile
     networks:
       - mongodb-net
     ports:
@@ -23,33 +24,42 @@ services:
       - mongo2
       - mongo3
     restart: always
-    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: username
+      MONGO_INITDB_ROOT_PASSWORD: password
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs", "--keyFile", "/etc/mongo-keyfile"]
   mongo2:
     container_name: mongo2
     image: mongo:7
     volumes:
       - ./mongors/data2:/data/db
+      - ./mongo-keyfile:/etc/mongo-keyfile
     networks:
       - mongodb-net
     ports:
       - 27032:27017
     restart: always
-    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs", "--keyFile", "/etc/mongo-keyfile"]
   mongo3:
     container_name: mongo3
     image: mongo:7
     volumes:
       - ./mongors/data3:/data/db
+      - ./mongo-keyfile:/etc/mongo-keyfile
     networks:
       - mongodb-net
     ports:
       - 27033:27017
     restart: always
-    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs", "--keyFile", "/etc/mongo-keyfile"]
 
 networks:
   mongodb-net:
     external: true
+```
+```bash
+openssl rand -base64 756 > mongo-keyfile
+chmod 600 mongo-keyfile
 ```
 ```bash
 nano rs-init.sh
@@ -79,15 +89,8 @@ var config = {
         }
     ]
 };
-rs.initiate(config, { force: true })
-rs.status()
-
-use admin
-db.createUser({
-    user: "username",
-    pwd: "password",
-    roles: [ { role: "root", db: "admin" } ]
-})
+rs.initiate(config, { force: true });
+rs.status();
 EOF
 ```
 ```bash
