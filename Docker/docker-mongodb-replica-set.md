@@ -103,11 +103,25 @@ docker compose -f docker-mongo-replica.yml up -d
 ```bash
 docker exec -it mongo1 /scripts/rs-init.sh
 ```
-# Test
+##Create user
+```bash
+docker exec -it mongo1 mongosh
+```
+```bash
+use admin;
+```
+```bash
+db.createUser({
+    user: "username",
+    pwd: "password",
+    roles: [ { role: "root", db: "admin" } ]
+});
+```
+## Test
 ```bash
 docker exec -it mongo1 mongosh --eval "rs.status()"
 ```
-# Compass
+## Compass
 ```bash
 mongodb://<username>:<password>@<host1>:<port1>,<host2>:<port2>,<host3>:<port3>/?replicaSet=<replicaSetName>&authSource=admin
 mongodb://username:password@localhost:27031,localhost:27032,localhost:27033/?replicaSet=dbrs&authSource=admin
