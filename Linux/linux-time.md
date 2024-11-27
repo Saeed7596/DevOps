@@ -32,6 +32,10 @@ sudo timedatectl set-ntp no
 sudo date -s "YYYY-MM-DD HH:MM:SS"
 sudo date -s "2024-11-25 20:30:30"
 ```
+### With timestamp
+```bash
+curl -s https://api.keybit.ir/time/ | jq -r ".timestamp.en" | xargs -I {} sudo date -s @{}
+```
 ### If use `ntp` or `chrony`
 ```bash
 sudo systemctl stop ntp
