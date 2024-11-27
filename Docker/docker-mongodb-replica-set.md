@@ -24,9 +24,6 @@ services:
       - mongo2
       - mongo3
     restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: username
-      MONGO_INITDB_ROOT_PASSWORD: password
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs", "--keyFile", "/etc/mongo-keyfile"]
   mongo2:
     container_name: mongo2
