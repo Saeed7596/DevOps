@@ -113,4 +113,4 @@ In Zabbix, you need to create a new item of type "Zabbix trapper" for `mongo_bac
 Add Trigger:
 - Click on item
 - Create a trigger
-- `Expression` : change(/hostname/mongo_backup_log)<>0 and nodata(/hostname/mongo_backup_log,20)=0
+- `Expression` : change(/hostname/mongo_backup_log)<>0 and nodata(/hostname/mongo_backup_log,300)=0
