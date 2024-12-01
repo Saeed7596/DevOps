@@ -35,7 +35,7 @@ htop
 - Supports remote monitoring via web UI or API.
 - Integration with tools like InfluxDB, Grafana, and Elasticsearch.
 - Lightweight and highly configurable.
-### **Installation** (Document)[https://github.com/nicolargo/glances]
+### **Installation** [Document](https://github.com/nicolargo/glances)
 #### On Ubuntu/Debian:
 ```bash
 sudo apt update
