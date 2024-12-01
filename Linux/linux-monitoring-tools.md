@@ -119,5 +119,8 @@ bpytop
 | **Bpytop** | Resource monitoring       | Graphical interface, detailed metrics         | Users who prefer visuals|
 
 
-
-
+## **Conclusion**
+- Use htop for process management and system overview.
+- Choose Glances for comprehensive system monitoring with remote capabilities.
+- Opt for Ctop to manage and monitor Docker containers efficiently.
+- Try Bpytop if you want an intuitive and visually rich monitoring experience.
