@@ -104,6 +104,8 @@ http {
 ```
 # `default.conf`
 ```nginx
+log_format custom '$http_site_url';
+
 server {
     listen 80;
     server_name example.com;
@@ -120,7 +122,7 @@ server {
     client_max_body_size 32M;
 
     location / {
-        access_log /var/log/nginx/panel-access.log custom;
+        access_log /var/log/nginx/custom.log custom;
         proxy_read_timeout      300;
         proxy_connect_timeout   300;
         proxy_redirect          off;
@@ -130,7 +132,7 @@ server {
         proxy_set_header        X-Forwarded-For     $proxy_add_x_forwarded_for;
         proxy_set_header        X-Forwarded-Proto   https;
         proxy_set_header        X-Frame-Options     SAMEORIGIN;
-        proxy_pass http://172.17.0.1:3005;
+        proxy_pass http://172.17.0.1:3000;
     }
     ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
