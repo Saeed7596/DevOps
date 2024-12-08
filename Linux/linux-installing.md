@@ -28,6 +28,7 @@ To update all packages on your system:
 ```bash
 sudo apt update
 sudo apt upgrade
+sudo reboot
 ```
 
 ## 3. Removing a Package
