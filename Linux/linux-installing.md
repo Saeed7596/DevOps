@@ -57,5 +57,28 @@ sudo apt autoclean    # Removes cached package files
 These commands help keep your system clean and efficient.
 
 ---
+
+# .deb
+## Download Package
+```bash
+wget -O package-name.deb "https://example.com/path-to-package.deb"
+curl -o package-name.deb "https://example.com/path-to-package.deb"
+```
+## Install
+```bash
+sudo dpkg -i package-name.deb
+```
+- install dependency
+  ```bash
+  sudo apt-get install -f
+  ```
+## Check
+```bash
+dpkg -l | grep package-name
+```
+## Remove
+```bash
+sudo dpkg -r package-name
+```
 For more details on package management, you can refer to the official [Ubuntu documentation](https://help.ubuntu.com/).
 
