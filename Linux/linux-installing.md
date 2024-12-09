@@ -62,6 +62,7 @@ These commands help keep your system clean and efficient.
 ## Download Package
 ```bash
 wget -O package-name.deb "https://example.com/path-to-package.deb"
+or
 curl -o package-name.deb "https://example.com/path-to-package.deb"
 ```
 ## Install
@@ -72,8 +73,12 @@ sudo dpkg -i package-name.deb
   ```bash
   sudo apt-get install -f
   ```
-## Check
+## Check which Packages are installed
 ```bash
+dpkg -l
+or
+dpkg --get-selections
+# To find out if a package is already installed
 dpkg -l | grep package-name
 ```
 ## Remove
