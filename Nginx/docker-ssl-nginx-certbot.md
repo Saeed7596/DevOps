@@ -17,6 +17,7 @@ services:
     volumes:
       - ./nginx/:/etc/nginx/conf.d/
       - ./nginx_logs:/var/log/nginx
+      - ./nginx_conf/nginx.conf:/etc/nginx/nginx.conf  # Volume for nginx.conf
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     restart: unless-stopped
@@ -37,7 +38,7 @@ networks:
       name: app-network-name
 ```
 
-> second step **mkdir `nginx`** directory and **nano `default.conf`** file
+## ** second step **mkdir `nginx`** directory and **nano `default.conf`** file **
 ```
 server {
     listen 80 default_server;
@@ -207,6 +208,21 @@ docker compose -f docker-nginx.yml restart nginx
 docker exec nginx nginx -t
 docker exec nginx nginx -s reload
 ```
+## Set new ssl without stop `nginx`
+```bash
+nano nginx/default.conf
+# add new server block
+nano docker-nginx.yml
+# change domain name
+docker exec nginx nginx -t
+docker exec nginx nginx -s reload
+docker compose -f docker-nginx.yml down certbot
+docker compose -f docker-nginx.yml up -d certbot
+nano nginx/default.conf
+# uncomment the ssl line 0f new server block
+docker exec nginx nginx -s reload
+```
+
 
 # Count header with nginx
 * First line of `default.conf`
@@ -366,7 +382,7 @@ docker exec nginx nginx -t
 docker exec nginx nginx -s reload
 ```
 # If you want use brotli use image openresty
-### `mkdri nginx-conf` and `nano *nginx.conf*`
+### `mkdri nginx_conf` and `nano *nginx.conf*`
 ```yml
 services:
   nginx:
@@ -380,8 +396,8 @@ services:
     volumes:
       - ./nginx/:/etc/nginx/conf.d/
       - ./nginx_logs:/var/log/nginx
-      #- ./nginx-conf/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro # Volume for nginx.conf for image openresty (not work)
-      - ./nginx-conf/nginx.conf:/etc/nginx/nginx.conf  # Volume for nginx.conf for image nginx and openresty
+      #- ./nginx_conf/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro # Volume for nginx.conf for image openresty (not work)
+      - ./nginx_conf/nginx.conf:/etc/nginx/nginx.conf  # Volume for nginx.conf for image nginx and openresty
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     restart: unless-stopped
