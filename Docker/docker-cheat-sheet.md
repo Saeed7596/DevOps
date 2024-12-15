@@ -39,12 +39,12 @@
 
 | **Command**                      | **Description**                                |
 | -------------------------------- | ---------------------------------------------- |
-| `docker-compose up`              | Start services defined in `docker-compose.yml` |
-| `docker-compose up -d`           | Start services in detached mode                |
-| `docker-compose down`            | Stop and remove all services                   |
-| `docker-compose ps`              | List all services managed by Compose           |
-| `docker-compose logs`            | Show logs for all services                     |
-| `docker-compose exec service sh` | Run a shell inside a service                   |
+| `docker compose up`              | Start services defined in `docker-compose.yml` |
+| `docker compose up -d`           | Start services in detached mode                |
+| `docker compose down`            | Stop and remove all services                   |
+| `docker compose ps`              | List all services managed by Compose           |
+| `docker compose logs`            | Show logs for all services                     |
+| `docker compose exec service sh` | Run a shell inside a service                   |
 
 ## Volume and Network Management
 
