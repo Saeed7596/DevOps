@@ -25,8 +25,8 @@
 
 ### Docker Attach vs Exec
 - **`docker attach container_name`**: Attaches to the container's main process and allows interaction as if you were inside the container. 
-  - To exit, use `Ctrl+P` followed by `Ctrl+Q` (detaches without stopping the container).
-  - **Note**: Exiting with `Ctrl+C` stops the container.
+  - To exit, use `Ctrl+P+Q` (detaches without stopping the container).
+  - **Note**: Exiting with `Ctrl+C` or `Ctrl+D` stops the container.
 - **`docker exec -it container_name sh`**: Runs a new command or shell in an already running container without interfering with the main process.
 
 ## Image Management
@@ -47,14 +47,14 @@
 
 | **Command**                      | **Description**                                |
 | -------------------------------- | ---------------------------------------------- |
-| `docker-compose up`              | Start services defined in `docker-compose.yml` |
-| `docker-compose up -d`           | Start services in detached mode                |
-| `docker-compose down`            | Stop and remove all services                   |
-| `docker-compose ps`              | List all services managed by Compose           |
-| `docker-compose logs`            | Show logs for all services                     |
-| `docker-compose exec service sh` | Run a shell inside a service                   |
-| `docker-compose pause`           | Pause all services defined in Compose          |
-| `docker-compose unpause`         | Unpause all paused services in Compose         |
+| `docker compose up`              | Start services defined in `docker-compose.yml` |
+| `docker compose up -d`           | Start services in detached mode                |
+| `docker compose down`            | Stop and remove all services                   |
+| `docker compose ps`              | List all services managed by Compose           |
+| `docker compose logs`            | Show logs for all services                     |
+| `docker compose exec service sh` | Run a shell inside a service                   |
+| `docker compose pause`           | Pause all services defined in Compose          |
+| `docker compose unpause`         | Unpause all paused services in Compose         |
 
 ## Volume and Network Management
 
@@ -62,9 +62,7 @@
 | ------------------------------------ | -------------------- |
 | `docker volume ls`                   | List all volumes     |
 | `docker volume rm volume_name`       | Remove a volume      |
-| `docker network ls`                  | List all networks    |
 | `docker network create network_name` | Create a new network |
-| `docker network rm network_name`     | Remove a network     |
 
 ## Inspect and Debug
 
