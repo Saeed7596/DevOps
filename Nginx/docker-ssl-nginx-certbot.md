@@ -108,7 +108,7 @@ server {
     listen 80;
     server_name www.example.com;
     
-    return 301 http://example.com$request_uri;
+    return 301 https://example.com$request_uri;
 }
 
 server {
