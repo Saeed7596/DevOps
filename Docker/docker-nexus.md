@@ -3,7 +3,8 @@ version: '3.8'
 
 services:
   nexus:
-    image: sonatype/nexus3:3.57.0
+    user: "0"
+    image: sonatype/nexus3
     container_name: nexus
     environment:
       - SONATYPE_DIR=/opt/sonatype
