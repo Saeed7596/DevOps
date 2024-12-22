@@ -33,6 +33,7 @@ docker exec -it nexus cat /nexus-data/admin.password
 To push docker image from local to nexus:
 > in Repositories -> create repository -> docker (hosted)
 > check HTTP > put 8084 in the fill
+> Enable the `Docker Bearer Token Realm` in Nexus Security->Realms Tab.
 ```bash
 # in local machine
 docker pull image:tag
