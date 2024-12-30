@@ -16,6 +16,14 @@ Docker networking allows containers to communicate with each other, with the hos
   docker run --network my_bridge_network --name container2 alpine
   ping container1
   ```
+  ```bash
+  docker network create \
+  --driver=bridge \
+  --subnet=192.168.25.0/24 \
+  --ip-range=192.168.25.0/24 \
+  --gateway=192.168.25.254 \
+  my_bridge_network
+  ```
 
 ### 2. **Host Network**
 - Shares the host machine's network stack with the container.
