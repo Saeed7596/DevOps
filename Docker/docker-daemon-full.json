@@ -1,0 +1,52 @@
+{
+  "debug": true,
+  "data-root": "/var/lib/docker",
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3"
+  },
+  "storage-driver": "overlay2",
+  "exec-opts": [
+    "native.cgroupdriver=systemd"
+  ],
+  "bip": "192.168.1.1/24",
+  "default-address-pools": [
+    {
+      "base": "192.168.2.0/24",
+      "size": 24
+    }
+  ],
+  "insecure-registries": [
+    "myregistry.local:5000"
+  ],
+  "registry-mirrors": [
+    "https://mirror.gcr.io"
+  ],
+  "dns": [
+    "8.8.8.8",
+    "8.8.4.4"
+  ],
+  "features": {
+    "buildkit": true
+  },
+  "experimental": true,
+  "mtu": 1500,
+  "live-restore": true,
+  "userland-proxy": false,
+  "default-runtime": "runc",
+  "runtimes": {
+    "runc": {
+      "path": "runc"
+    },
+    "nvidia": {
+      "path": "/usr/bin/nvidia-container-runtime",
+      "runtimeArgs": []
+    }
+  },
+  "iptables": true,
+  "ipv6": true,
+  "fixed-cidr-v6": "2001:db8:1::/64",
+  "max-concurrent-downloads": 3,
+  "max-concurrent-uploads": 5
+}
