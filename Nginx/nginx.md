@@ -61,7 +61,15 @@ http {
     ssl_ciphers         HIGH:!aNULL:!MD5;
     ssl_prefer_server_ciphers on;
 
+    # Security headers for all servers
     server_tokens off;
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection "1; mode=block";
+    add_header X-Robots-Tag none;
+    add_header X-Download-Options noopen;
+    add_header X-Permitted-Cross-Domain-Policies none;
+    add_header Referrer-Policy no-referrer;
+
     # Client header and body settings
     client_max_body_size 32M;
     client_body_buffer_size 128k;
