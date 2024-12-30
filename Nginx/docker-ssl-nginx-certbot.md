@@ -4,11 +4,16 @@ all step should be happened with the user that create the app for example `user_
 
 > first step => **nano `docker-nginx.yml`**
 ```yml
-version: "3.3"
+#version: "3.3"
 services:
   nginx:
-    container_name: nginx
     image: nginx:1.24.0
+    container_name: nginx
+    logging:
+      driver: "json-file"
+      options:
+        max-file: 5
+        max-size: 10m
     ports:
       - 80:80
       - 443:443
@@ -21,6 +26,7 @@ services:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     restart: unless-stopped
+    #restart: always
     networks:
       - app-network-name
   certbot:
@@ -34,8 +40,8 @@ services:
       - ./certbot/www:/var/www/certbot
 networks:
   app-network-name:
-    external:
-      name: app-network-name
+    external: true
+      #name: app-network-name
 ```
 
 ## ** second step **mkdir `nginx`** directory and **nano `default.conf`** file **
