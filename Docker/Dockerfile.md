@@ -147,6 +147,103 @@ ENTRYPOINT ["python3", "app.py"]
 
 ---
 
+### 10. **LABEL**
+Adds metadata to the image in the form of key-value pairs. This is useful for identifying or documenting images.
+```dockerfile
+LABEL key="value"
+LABEL maintainer="your_name@example.com"
+```
+**Example:**
+```dockerfile
+LABEL version="1.0"
+LABEL description="A simple Docker image"
+LABEL maintainer="admin@example.com"
+```
+
+---
+
+### 11. **ARG**
+Defines build-time variables that can be passed during the `docker build` process. These variables are only available during the build.
+
+```dockerfile
+ARG <name>[=<default_value>]
+```
+
+**Example:**
+```dockerfile
+ARG APP_VERSION=1.0
+RUN echo "App version is $APP_VERSION"
+```
+
+To pass a value for the `ARG` during the build:
+```bash
+docker build --build-arg APP_VERSION=2.0 -t myapp .
+```
+
+**Another Example:**
+Using `ARG` for a Git clone without cache:
+```dockerfile
+ARG GIT_REPO=https://github.com/user/repo.git
+ARG GIT_BRANCH=main
+RUN git clone --branch $GIT_BRANCH --depth 1 $GIT_REPO /app
+```
+
+---
+
+### 13. **HEALTHCHECK**
+Specifies a command to check the health of a container. Docker will periodically run this command to determine if the container is still working as expected.
+
+```dockerfile
+HEALTHCHECK [OPTIONS] CMD command
+```
+
+**Example:**
+```dockerfile
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD curl -f http://localhost/ || exit 1
+```
+
+Options:
+- `--interval`: Time between health checks (default is 30s).
+- `--timeout`: Maximum time for a health check to run (default is 30s).
+- `--start-period`: Grace period after starting the container (default is 0s).
+- `--retries`: Number of retries before marking the container as unhealthy (default is 3).
+
+---
+
+### 14. **USER**
+Sets the username or UID that will run the container. This is used to improve security by running containers as non-root users.
+
+```dockerfile
+USER <user>[:<group>]
+```
+
+**Example:**
+```dockerfile
+USER nonroot
+```
+
+You can also specify both user and group:
+```dockerfile
+USER 1001:1001
+```
+
+---
+
+### 15. **SHELL**
+Overrides the default shell used for the `RUN` command. By default, Docker uses `/bin/sh` on Linux.
+
+```dockerfile
+SHELL ["executable", "parameters"]
+```
+
+**Example:**
+```dockerfile
+SHELL ["/bin/bash", "-c"]
+RUN echo "This will use Bash instead of sh"
+```
+
+---
+
 ## Best Practices for Writing Dockerfiles
 
 1. **Use Official Images**: Start with a trusted base image.
