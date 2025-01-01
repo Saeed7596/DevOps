@@ -188,6 +188,16 @@ ARG GIT_BRANCH=main
 RUN git clone --branch $GIT_BRANCH --depth 1 $GIT_REPO /app
 ```
 
+**Another Example:**
+```dockerfile
+ARG CACHEBUST=1
+RUN git clone --depth=1 -b branch-name --single-branch https://user:pass@github.com/user/repo.git
+```
+```vim
+docker build --force-rm --build-arg CACHEBUST=$(date +%s) -t myapp .
+```
+    - --force-rm: Ensures intermediate containers are removed after a successful build.
+    - --build-arg CACHEBUST=$(date +%s): Provides a unique value to CACHEBUST (current timestamp) to bust the cache.
 ---
 
 ### 13. **HEALTHCHECK**
