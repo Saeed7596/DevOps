@@ -196,8 +196,28 @@ RUN git clone --depth=1 -b branch-name --single-branch https://user:pass@github.
 ```vim
 docker build --force-rm --build-arg CACHEBUST=$(date +%s) -t myapp .
 ```
-    - --force-rm: Ensures intermediate containers are removed after a successful build.
-    - --build-arg CACHEBUST=$(date +%s): Provides a unique value to CACHEBUST (current timestamp) to bust the cache.
+Explanation of Flags:
+`--depth=1`:
+
+- Fetches only the most recent commit from the specified branch.
+- This minimizes the amount of data transferred and speeds up the clone operation.
+`-b branch-name`:
+
+- Specifies the branch to be cloned.
+- Replace branch-name with the actual branch name you want to clone.
+`--single-branch`:
+
+- Ensures that only the specified branch is cloned, ignoring other branches in the repository.
+- This is particularly useful for reducing disk space and time during the build.
+
+`https://user:pass@github.com/user/repo.git`:
+
+- Uses HTTP basic authentication for cloning the repository.
+- Replace `user` and `pass` with the GitHub username and personal access token (PAT) or password, respectively.
+- Important: Avoid hardcoding sensitive credentials in the Dockerfile; instead, use build arguments or environment variables to securely pass them during the build process.
+
+- **--force-rm: Ensures intermediate containers are removed after a successful build.**
+- **--build-arg CACHEBUST=$(date +%s): Provides a unique value to CACHEBUST (current timestamp) to bust the cache.**
 ---
 
 ### 13. **HEALTHCHECK**
