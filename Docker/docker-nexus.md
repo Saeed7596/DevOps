@@ -30,15 +30,22 @@ Find the admin password with:
 ```bash
 docker exec -it nexus cat /nexus-data/admin.password
 ```
-To push docker image from local to nexus:
-> in Repositories -> create repository -> docker (hosted)
-> check HTTP > put 8084 in the fill
-> Enable the `Docker Bearer Token Realm` in Nexus Security->Realms Tab.
+## To push docker image from local to nexus:
+### **in Repositories -> create repository -> docker (hosted)**
+### **check HTTP > put 8084 in the fill**
+### **Enable the `Docker Bearer Token Realm` in Nexus Security->Realms Tab.**
 ```bash
 # in local machine
 docker pull image:tag
 docker tag image:tag nesxusURL:8084/image:tag
-docker push nesxusURL:8084/image:tag
+docker login nesxusIP-URL:8084
+```
+add `insecure-registries` in `/etc/docker/daemon.json`
+```json
+"insecure-registries" : [ "nesxusIP-URL:8084"]
+```
+```bash
+docker push nesxusIP-URL:8084/image:tag
 ```
 # nginx conf
 ```conf
