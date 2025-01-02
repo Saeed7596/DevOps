@@ -2,7 +2,7 @@
 nano /etc/netplan/config.yaml
 ```
 # Type1
-```json
+```yml
 network:
   ethernets:
     eth0:
@@ -16,7 +16,7 @@ network:
   version: 2
 ```
 # Type2
-```json
+```yml
 network:
   ethernets:
     eth0:
