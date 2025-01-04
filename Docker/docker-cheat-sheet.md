@@ -43,18 +43,32 @@
 | `docker load -i file.tar`        | Load an image from a tar archive  |
 | `docker commit container_name new_image_name` | Create a new image from a container’s changes |
 
-## Docker Compose
+# Docker Compose Command Cheat Sheet
 
-| **Command**                      | **Description**                                |
-| -------------------------------- | ---------------------------------------------- |
-| `docker compose up`              | Start services defined in `docker-compose.yml` |
-| `docker compose up -d`           | Start services in detached mode                |
-| `docker compose down`            | Stop and remove all services                   |
-| `docker compose ps`              | List all services managed by Compose           |
-| `docker compose logs`            | Show logs for all services                     |
+| **Command**                   | **Description**                                                                                   |
+|-------------------------------|---------------------------------------------------------------------------------------------------|
+| `docker-compose up`           | Create and start containers defined in `docker-compose.yml`.                                      |
+| `docker-compose up -d`        | Start containers in detached mode (run in background).                                            |
+| `docker-compose down`         | Stop and remove containers, networks, volumes, and images created by `up`.                        |
+| `docker-compose start`        | Start existing containers without recreating them.                                                |
+| `docker-compose stop`         | Stop running containers without removing them.                                                    |
+| `docker-compose restart`      | Restart stopped or running containers.                                                            |
+| `docker-compose ps`           | List all containers and their current status.                                                     |
+| `docker-compose logs`         | View logs from all services.                                                                      |
+| `docker-compose logs -f`      | View and follow live logs from all services.                                                      |
+| `docker-compose exec`         | Execute a command inside a running container.                                                     |
+| `docker-compose run`          | Run a one-time command in a new container.                                                        |
+| `docker-compose config`       | Validate and view the configuration of the `docker-compose.yml` file.                             |
+| `docker-compose build`        | Build or rebuild services defined in the Compose file.                                            |
+| `docker-compose pull`         | Pull the latest version of service images from a registry.                                        |
+| `docker-compose push`         | Push service images to a registry.                                                                |
+| `docker-compose pause`        | Pause running containers.                                                                         |
+| `docker-compose unpause`      | Unpause paused containers.                                                                        |
+| `docker-compose scale`        | Scale services to the specified number of instances (deprecated, use `docker-compose up --scale`). |
+| `docker-compose rm`           | Remove stopped containers.                                                                        |
+| `docker-compose top`          | Display running processes inside containers.                                                      |
+| `docker-compose version`      | Display the version of Docker Compose.                                                            |
 | `docker compose exec service sh` | Run a shell inside a service                   |
-| `docker compose pause`           | Pause all services defined in Compose          |
-| `docker compose unpause`         | Unpause all paused services in Compose         |
 
 ## Volume and Network Management
 
