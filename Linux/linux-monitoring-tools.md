@@ -124,3 +124,31 @@ bpytop
 - Choose Glances for comprehensive system monitoring with remote capabilities.
 - Opt for Ctop to manage and monitor Docker containers efficiently.
 - Try Bpytop if you want an intuitive and visually rich monitoring experience.
+
+---
+
+# `watch` Command Cheat Sheet
+
+The `watch` command in Linux allows you to execute a command repeatedly at regular intervals and observe its output.
+
+| **Option/Flag** | **Description**                                                                 | **Example**                              |
+|------------------|---------------------------------------------------------------------------------|------------------------------------------|
+| `-n seconds`    | Set the interval between command executions (default is 2 seconds).            | `watch -n 5 date`                        |
+| `-d`            | Highlight differences between consecutive outputs.                             | `watch -d ls`                            |
+| `-t`            | Turn off the header displaying interval and command.                          | `watch -t uptime`                        |
+| `-e`            | Exit if the command returns a non-zero exit code.                             | `watch -e curl http://example.com`       |
+| `-g`            | Exit when the output of the command changes.                                  | `watch -g ls`                            |
+| `-x`            | Pass the command to the shell for execution (useful for complex commands).    | `watch -x 'df -h | grep sda1'`           |
+| `--no-title`    | Same as `-t`, suppress the header display.                                     | `watch --no-title df -h`                 |
+
+### **Basic Usage Example**
+```bash
+# Monitor disk usage every 2 seconds:
+watch df -h
+
+# Check for new files in the directory and highlight differences:
+watch -d ls
+
+# Run a command every 5 seconds without a header:
+watch -n 5 -t free -m
+
