@@ -62,13 +62,15 @@ http {
     ssl_prefer_server_ciphers on;
 
     # Security headers for all servers
-    server_tokens off;
-    add_header X-Content-Type-Options nosniff;
-    add_header X-XSS-Protection "1; mode=block";
-    #add_header X-Robots-Tag none;
-    add_header X-Download-Options noopen;
-    add_header X-Permitted-Cross-Domain-Policies none;
-    add_header Referrer-Policy no-referrer;
+    server_tokens off; # Disables displaying the Nginx version in HTTP headers to prevent attackers from exploiting known vulnerabilities.
+    add_header X-Content-Type-Options nosniff; # Prevents browsers from interpreting files as a different MIME type, enhancing security against MIME sniffing attacks.
+    add_header X-XSS-Protection "1; mode=block"; # Enables browser's built-in XSS protection and blocks the page if an attack is detected.
+    # add_header X-Robots-Tag none; # SEO Problem: search engines can't index the page
+    add_header X-Robots-Tag "index, follow"; # Allows search engines to index the page and follow its links for better SEO.
+    add_header X-Download-Options noopen; # Prevents files downloaded from being automatically executed in some browsers (e.g., Internet Explorer).
+    add_header X-Permitted-Cross-Domain-Policies none; # Blocks access to Adobe cross-domain policy files, restricting resource sharing from unauthorized domains.
+    # add_header Referrer-Policy no-referrer; # Google analytics not work!
+    add_header Referrer-Policy "strict-origin-when-cross-origin"; # Controls how much referrer information is sent with requests to enhance privacy while maintaining analytics.
 
     # Client header and body settings
     client_max_body_size 32M;
