@@ -2,7 +2,9 @@
 ```bash
 lsb_release -a   ===>   #ubuntu version
 dpkg --print-architecture   ===>   #show ubuntu architect  (arm or amd)
-du -sh /path/to/directory   ===>   #show size of a folder & file 
+du -sh /path/to/directory   ===>   #show size of a folder & file
+du -h
+ls -lhS
 ```
 ----------------------------------
 # Create user
@@ -76,5 +78,16 @@ scp -P <ssh port number>
 ```bash
 ps aux | grep filename.py
 kill <PID>
+```
+------------------------------------
+# curl
+curl is used in command lines or scripts to transfer data.
+```bash
+curl --version
+curl https://example.com
+curl -o output.out https://example.com # The received html output is saved in output.out
+curl -o downloaded.zip https://tosinso.com/file.zip # Download file
+curl -I https://example.com # HTTP headers
+curl -v https://example.com
 ```
 ------------------------------------
