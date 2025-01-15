@@ -89,5 +89,6 @@ curl -o output.out https://example.com # The received html output is saved in ou
 curl -o downloaded.zip https://tosinso.com/file.zip # Download file
 curl -I https://example.com # HTTP headers
 curl -v https://example.com
+curl -vI https://example.com
 ```
 ------------------------------------
