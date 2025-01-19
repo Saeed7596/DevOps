@@ -29,6 +29,7 @@ services:
     container_name: n8n
     restart: always
     environment:
+      - WEBHOOK_URL=https://your-domain.com/
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=postgres
       - DB_POSTGRESDB_PORT=5432
