@@ -21,6 +21,10 @@ This will search for `myfile.txt` in the `/home/user` directory.
     ```bash
     find /path/to/search -type f
     ```
+    ```bash
+    find ./ -type f -size 1033c ! -executable 2</dev/null
+    find ./ -type f -size 33c -user bandit7 -group bandit6 2</dev/null
+    ```
 - To search for directories only:
     ```bash
     find /path/to/search -type d
