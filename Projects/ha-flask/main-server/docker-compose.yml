@@ -14,8 +14,16 @@ services:
       POSTGRES_DB: mydatabase
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
+      #REPLICATE_FROM: postgres_db
+      #PGDATA: /var/lib/postgresql/data/some_name/
     volumes:
+      #- ./replica1/postgresql.conf:/var/lib/postgresql/data/postgresql.conf
+      #- ./replica1/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
       - postgres_data:/var/lib/postgresql/data
+      #- ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5433:5432"
+    #command: postgres -c 'config_file=/var/lib/postgresql/data/postgresql.conf'
 
 volumes:
   postgres_data:
