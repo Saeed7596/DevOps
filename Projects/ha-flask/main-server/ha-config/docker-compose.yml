@@ -1,0 +1,16 @@
+services:
+  haproxy:
+    image: haproxy:latest
+    container_name: haproxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+      - ./hosts:/etc/hosts:ro
+
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
