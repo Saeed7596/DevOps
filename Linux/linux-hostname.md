@@ -38,6 +38,8 @@ To set or change the hostname, you can use the `hostnamectl` command. This comma
     Replace `new-hostname` with your desired hostname:
     ```bash
     sudo hostnamectl set-hostname --static new-hostname
+    sudo hostnamectl set-hostname new-hostname
+    bash
     ```
 
 3. **Verify the Change**:
