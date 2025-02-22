@@ -58,11 +58,14 @@
 | **Command**         | **Description**                                 |
 | ------------------- | ----------------------------------------------- |
 | `ifconfig`         | Display network interface information           |
-| `ip addr`          | Show IP address information                     |
 | `ping host`        | Send ICMP echo requests to test connectivity    |
 | `netstat -tuln`    | Show listening ports and active connections     |
 | `curl URL`         | Fetch a URL using HTTP                          |
 | `wget URL`         | Download files from a URL                       |
+| `ip addr`          | Show IP address information                     |
+| `ip a`             | Show IP address information                     |
+| `ip -c -br a`      | Better Show IP address information              |
+
 
 ## Permissions
 
