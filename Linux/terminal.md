@@ -92,3 +92,18 @@ curl -v https://example.com
 curl -vI https://example.com
 ```
 ------------------------------------
+# base64
+```bash
+echo -n 'my-string' | base64
+bXktc3RyaW5n
+
+echo -n 'bXktc3RyaW5n' | base64 --decode
+my-string
+
+base64 <<< 'Hello, World!'
+SGVsbG8sIFdvcmxkIQo=
+
+base64 -d <<< SGVsbG8sIFdvcmxkIQo=
+Hello, World!
+```
+------------------------------------
