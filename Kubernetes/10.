@@ -1,0 +1,32 @@
+# DaemonSets
+##### Ensures a Pod runs on all (or specific) nodes.
+```bash
+kubectl get ds
+kubectl get daemonsets
+kubectl get daemonsets -A
+kubectl get daemonsets --all-namespaces
+kubectl get ds -n kube-system
+kubectl describe daemonset <daemonset-name> -n <namespace-name>
+kubectl describe daemonset kube-proxy -n kube-system
+```
+```yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: elasticsearch
+  name: elasticsearch
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+      - image: registry.k8s.io/fluentd-elasticsearch:1.20
+        name: fluentd-elasticsearch
+```
