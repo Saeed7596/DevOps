@@ -14,6 +14,10 @@
 | `echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf && sysctl -p` | Enables IP forwarding permanently. | `echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf && sysctl -p` |
 | `/etc/hosts` | Local file for mapping domain names to IP addresses before DNS resolution. | `127.0.0.1 localhost` |
 | `/etc/resolv.conf` | Specifies DNS servers for domain name resolution. | `nameserver 8.8.8.8` |
+| `nslookup`                             | A tool to query DNS servers to obtain domain name or IP address mapping.     |
+| `dig`                                  | A DNS lookup tool for querying domain names and their associated IP addresses. |
+| `ping`                                 | Used to test the connectivity between the local machine and remote systems. |
+| `trace`                                | A network diagnostic tool used to trace the route packets take to a remote host. |
 
 ---
 
