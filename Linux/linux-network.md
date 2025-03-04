@@ -2,7 +2,7 @@
 
 | Command/File | Description | Example |
 |-------------|------------|---------|
-| `ip a` / `ip link` | Displays the status of network interfaces (UP/DOWN, MAC address). | `ip link` |
+| `ip a` / `ip link` | Displays the status of network interfaces (UP/DOWN, MAC address). | `ip a` - `ip a show eth0` |
 | `ip addr` | Shows IP addresses assigned to interfaces. | `ip addr` |
 | `ip addr add <IP>/CIDR dev <interface>` | Assigns an IP address to a network interface temporarily. | `ip addr add 192.168.1.10/24 dev eth0` |
 | `route` | Displays the system's routing table (deprecated). | `route -n` |
