@@ -18,9 +18,14 @@
 | `dig`              | A DNS lookup tool for querying domain names and their associated IP addresses. | dig google.com |
 | `ping`             | Used to test the connectivity between the local machine and remote systems.    | ping 8.8.8.8 |
 | `trace`            | A network diagnostic tool used to trace the route packets take to a remote host. | traceroute google.com |
-
+|`ip netns list`     | This lists all network namespaces on the system. |
+|`tcpdump -l`        | data-network packet analyzer |
+|`netstat -plnt`     | This shows all active listening TCP connections along with the associated processes. | -p: Show the process using each socket.
+-l: Show only listening sockets.
+-n: Show numerical addresses (don’t resolve hostnames).
+-t: Show TCP connections.|
+|`arp`| The arp command is used to display and manipulate the system's ARP (Address Resolution Protocol) cache, which maps IP addresses to MAC (hardware) addresses.| `arp -a` |
 ---
-
 
 # **How to Set Permanent Static IP on Linux**
 
