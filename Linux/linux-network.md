@@ -20,10 +20,7 @@
 | `trace`            | A network diagnostic tool used to trace the route packets take to a remote host. | traceroute google.com |
 |`ip netns list`     | This lists all network namespaces on the system. |
 |`tcpdump -l`        | data-network packet analyzer |
-|`netstat -plnt`     | This shows all active listening TCP connections along with the associated processes. | -p: Show the process using each socket.
--l: Show only listening sockets.
--n: Show numerical addresses (don’t resolve hostnames).
--t: Show TCP connections.|
+|`netstat -plnt`     | This shows all active listening TCP connections along with the associated processes. | -p: Show the process using each socket. \n -l: Show only listening sockets. \n -n: Show numerical addresses (don’t resolve hostnames). \n -t: Show TCP connections.|
 |`arp`| The arp command is used to display and manipulate the system's ARP (Address Resolution Protocol) cache, which maps IP addresses to MAC (hardware) addresses.| `arp -a` |
 ---
 
