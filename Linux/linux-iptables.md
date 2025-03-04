@@ -67,6 +67,10 @@ List current rules with line numbers:
 ```bash
 iptables -L --line-numbers
 ```
+Lists the current NAT (Network Address Translation) rules in the firewall with detailed statistics like packet counts and byte sizes.
+```
+iptables -nvL -t nat
+```
 
 ---
 
