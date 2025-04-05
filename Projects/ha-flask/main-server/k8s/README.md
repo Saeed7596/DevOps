@@ -82,3 +82,60 @@ kubectl apply -f k8s/05-full-project/flask-service.yaml
 
 minikube service flask-app -n flask-project
 ```
+
+---
+
+
+---
+
+# 06
+### install metrics-server
+```bash
+minikube addons enable metrics-server
+kubectl get deployment metrics-server -n kube-system
+# If have ImagePullBackOff error
+kubectl delete pod -n kube-system -l k8s-app=metrics-server
+```
+For set the limits:
+```bash
+kubectl top pod -n flask-project
+```
+```bash
+kubectl apply -f k8s/06-autoscale-hpa/namespace.yaml
+kubectl apply -f k8s/06-autoscale-hpa/secret.yaml
+kubectl apply -f k8s/06-autoscale-hpa/configmap.yaml
+kubectl apply -f k8s/06-autoscale-hpa/postgres-pv.yaml
+kubectl apply -f k8s/06-autoscale-hpa/postgres-pvc.yaml
+kubectl apply -f k8s/06-autoscale-hpa/postgres-deployment.yaml
+kubectl apply -f k8s/06-autoscale-hpa/postgres-service.yaml
+kubectl apply -f k8s/06-autoscale-hpa/flask-deployment.yaml
+kubectl apply -f k8s/06-autoscale-hpa/flask-service.yaml
+kubectl apply -f k8s/06-autoscale-hpa/autoscale.yaml
+
+minikube service flask-app -n flask-project
+```
+### Test HPA
+Use some tools like:
+* apache benchmark (ab)
+* hey
+* wrk
+Or simply use
+```bash
+while true; do curl http://$(minikube ip):port; done
+```
+Or run the python app `python3 k8s/test-hpa.py `
+* Note: Update the `minikube ip` in code.
+### Watch result
+```bash
+kubectl top pod -n flask-project
+kubectl get hpa -n flask-project
+```bash
+watch kubectl get hpa -n flask-project
+```
+```bash
+kubectl events hpa -n flask-project | grep -i "ScalingReplicaSet"
+kubectl events hpa -n flask-project | grep -i "FailedGetResourceMetric"
+```
+```bash
+kubectl describe hpa flask-app-hpa -n flask-project
+```
