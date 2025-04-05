@@ -129,6 +129,7 @@ Or run the python app `python3 k8s/test-hpa.py `
 ```bash
 kubectl top pod -n flask-project
 kubectl get hpa -n flask-project
+```
 ```bash
 watch kubectl get hpa -n flask-project
 ```
