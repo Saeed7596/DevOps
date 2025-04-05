@@ -6,14 +6,79 @@ eval $(minikube docker-env)
 docker build -t flask-app:latest .
 docker build -f Dockerfile.postgres -t custom-postgres:latest .
 ```
+Or
 ```bash
-kubectl apply -f 00-pod.yaml
-kubectl apply -f 00-postgres-service.yaml
+docker build -t flask-app:latest .
+docker build -f Dockerfile.postgres -t custom-postgres:latest .
+minikube image load flask-app:latest
+minikube image load custom-postgres:latest
+```
+
+---
+
+# 01
+```bash
+kubectl apply -f k8s/01-simple-pod
 ```
 Test Database
 ```bash
 kubectl exec -it flask-postgres-pod -c postgres-db -- psql -U myuser -d mydatabase -c "\dt"
 ```
+
 ```bash
 kubectl port-forward pod/flask-postgres-pod 5000:5000
+```
+
+---
+
+# 02
+```bash
+kubectl apply -f k8s/02-two-deployment-service/
+kubectl get all
+minikube service flask-app
+```
+
+---
+
+# 03
+```bash
+kubectl apply -f k8s/03-nodePort-service/
+minikube ip
+http://<Minikube_IP>:30080
+```
+
+---
+
+# 04
+```bash
+kubectl apply -f k8s/04-LoadBalancer-service/
+```
+### Important Note:
+In Minikube, the LoadBalancer type is not truly implemented by default since Minikube is a local cluster. However, it provides a solution for testing:
+
+To access a LoadBalancer service within Minikube:
+```bash
+minikube service flask-app
+minikube service flask-app --url
+```
+This command will:
+- Provide the URL
+- Provide the Port
+- Open the browser directly
+
+---
+
+# 05
+```bash
+kubectl apply -f k8s/05-full-project/namespace.yaml
+kubectl apply -f k8s/05-full-project/secret.yaml
+kubectl apply -f k8s/05-full-project/configmap.yaml
+kubectl apply -f k8s/05-full-project/postgres-pv.yaml
+kubectl apply -f k8s/05-full-project/postgres-pvc.yaml
+kubectl apply -f k8s/05-full-project/postgres-deployment.yaml
+kubectl apply -f k8s/05-full-project/postgres-service.yaml
+kubectl apply -f k8s/05-full-project/flask-deployment.yaml
+kubectl apply -f k8s/05-full-project/flask-service.yaml
+
+minikube service flask-app -n flask-project
 ```
