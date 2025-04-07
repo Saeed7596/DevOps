@@ -10,7 +10,7 @@
 |-------------|---------|
 | OS | Linux (RHEL / CentOS / Fedora / Ubuntu) |
 | Tools | wget, jq, curl, tar |
-| Pull Secret | Download from [Red Hat Console](https://console.redhat.com/openshift/downloads) and save it as: `$HOME/Downloads/pull-secret` |
+| Pull Secret | Download from [Red Hat Console](https://console.redhat.com/openshift/downloads#tool-pull-secret) and save it as: `$HOME/Downloads/pull-secret` |
 | Disk Space | Depends on the OpenShift release (Expect 100GB+ for full mirror) |
 
 ---
@@ -109,7 +109,57 @@ This directory contains all necessary files to populate your private registry or
 REGISTRY_AUTH_FILE=$HOME/Downloads/pull-secret oc mirror --v2 --config imageset-config.yaml file://local-mirror
 ```
 
-#### Check
+### Check
 ```bash
-oc version
+nano mirror.sh
+```
+```sh
+#!/bin/bash
+
+set -e
+
+echo "------ Check oc command ------"
+if ! command -v oc &> /dev/null
+then
+    echo "❌ oc command not found"
+    exit 1
+else
+    echo "✅ oc found -> version: $(oc version | head -n 1)"
+fi
+
+echo "------ Check oc-mirror command ------"
+if ! command -v oc-mirror &> /dev/null
+then
+    echo "❌ oc-mirror not found"
+    exit 1
+else
+    echo "✅ oc-mirror found -> version: $(oc-mirror version || echo 'old oc mirror')"
+fi
+
+echo "------ Check pull-secret ------"
+if grep -q "registry.redhat.io" $HOME/Downloads/pull-secret; then
+    echo "✅ pull-secret looks valid for registry.redhat.io"
+else
+    echo "❌ pull-secret missing registry.redhat.io credentials"
+    exit 1
+fi
+
+echo "------ Test Auth with registry.redhat.io ------"
+if ! REGISTRY_AUTH_FILE=$HOME/Downloads/pull-secret skopeo inspect docker://registry.redhat.io/redhat/redhat-operator-index:v4.18 &> /dev/null
+then
+    echo "❌ Cannot access registry.redhat.io/redhat/redhat-operator-index:v4.18"
+    echo "Check your pull-secret or subscription permission!"
+    exit 1
+else
+    echo "✅ Access to registry.redhat.io confirmed"
+fi
+
+echo "------ Start oc mirror ------"
+REGISTRY_AUTH_FILE=$HOME/Downloads/pull-secret oc mirror --config imageset-config.yaml file://local-mirror -v=5
+
+echo "------ Done ------"
+```
+```bash
+chmod +x mirror.sh
+./mirror.sh
 ```
