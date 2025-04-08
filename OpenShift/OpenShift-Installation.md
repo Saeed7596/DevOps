@@ -30,7 +30,9 @@ if ! command -v oc &> /dev/null; then
   wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-client-linux-amd64-rhel9.tar.gz
   tar -zxvf openshift-client-linux-amd64-rhel9.tar.gz
   chmod +x oc
+  chmod +x kubectl
   sudo mv oc /usr/local/bin
+  sudo mv kubectl /usr/local/bin
   rm -f openshift-client-linux-amd64-rhel9.tar.gz
 else
   echo "oc already installed."
