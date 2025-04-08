@@ -24,17 +24,19 @@ sudo subscription-manager status
 ---
 
 # Install Oblivion
-Download the rpm file [Oblivion](https://github.com/bepass-org/oblivion-desktop
+Download the rpm file [Oblivion](https://github.com/bepass-org/oblivion-desktop)
 ```bash
 sudo rpm -i oblivion-desktop-linux-x86_64.rpm
 ```
 # `libXScrnSaver` package:
-You can download the AlmaLinux or CentOS rmp file.
+You can download the `AlmaLinux` or `CentOS` rmp file.
 ```bash
 https://rpmfind.net/linux/rpm2html/search.php?query=libXScrnSaver
 ```
 ```bash
 wget https://mirror.chpc.utah.edu/pub/almalinux/9/AppStream/x86_64/os/Packages/libXScrnSaver-1.2.3-10.el9.x86_64.rpm
+or
+wget https://rpmfind.net/linux/almalinux/9.5/AppStream/x86_64/os/Packages/libXScrnSaver-1.2.3-10.el9.x86_64.rpm
 ```
 ```bash
 sudo rpm -i libXScrnSaver-1.2.3-10.el9.x86_64.rpm
