@@ -9,6 +9,14 @@ ls -lhS
 
 ---
 
+# Check commands:
+```bash
+echo $?
+```
+* If it returns 0, it means that the previous command was executed correctly.
+
+---
+
 # Create user
 ```bash
 sudo useradd -m -s /bin/bash username
