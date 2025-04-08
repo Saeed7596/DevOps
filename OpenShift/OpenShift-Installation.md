@@ -223,6 +223,7 @@ echo "------ Done ------"
 ```
 ```bash
 sudo dnf install -y skopeo
+skopeo --version
 ```
 ```bash
 chmod +x mirror.sh
