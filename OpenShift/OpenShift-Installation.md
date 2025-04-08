@@ -78,10 +78,66 @@ docker login registry.redhat.io
 ```
 
 ### 5. Generate ImageSet Config
+Find operator channel and release information
+```bash
+oc mirror list operators --catalogs --version=4.18
+```
+Find the available packages within the selected catalog
+```bash
+oc mirror list operators --catalog=registry.redhat.io/redhat/redhat-operator-index:v4.18
+```
+Find channels for the selected package
+```bash
+oc mirror list operators --catalog=registry.redhat.io/redhat/redhat-operator-index:v4.18 --package=rhods-operator
+```
 ```bash
 oc mirror init > imageset-config.yaml
 ```
 ⚠ Customize imageset-config.yaml as needed (OpenShift version, target registry, match `catalog and openshift version`, etc.)
+YAML Sample:
+```yaml
+kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v1alpha2
+storageConfig:
+  local:
+    path: /path/to/disk-rh-ai/metadata
+mirror:
+  operators:
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.16
+    targetCatalog: redhat-catalog-v4.16
+    packages:
+    - name: "jaeger-product"
+      channels:
+      - name: "stable"
+        minVersion: "1.57.0-7"
+    - name: "kiali-ossm"
+      channels:
+      - name: "stable"
+        minVersion: "1.73.8"
+    - name: "openshift-pipelines-operator-rh"
+      channels:
+      - name: "latest"
+        minVersion: "1.15.1"
+    - name: "rhods-operator"
+      channels:
+      - name: "fast"
+        minVersion: "2.11.0"
+    - name: "serverless-operator"
+      channels:
+      - name: "stable"
+        minVersion: "1.33.1"
+    - name: "servicemeshoperator"
+      channels:
+      - name: "stable"
+        minVersion: "2.5.2-0"
+  additionalImages:   
+    - name: quay.io/integreatly/prometheus-blackbox-exporter@sha256:35b9d2c1002201723b7f7a9f54e9406b2ec4b5b0f73d114f47c70e15956103b5
+    - name: quay.io/modh/caikit-nlp@sha256:0cde6c26e02ec398aea959a1a1bcdc615b86821adb41989e81d03de01124545c
+    - name: quay.io/modh/caikit-tgis-serving@sha256:4e907ce35a3767f5be2f3175a1854e8d4456c43b78cf3df4305bceabcbf0d6e2
+…
+…
+…
+```
 
 ### 6. Start Mirroring to Local Directory
 ```bash
@@ -89,7 +145,11 @@ REGISTRY_AUTH_FILE=$HOME/Downloads/pull-secret oc mirror --config imageset-confi
 
 REGISTRY_AUTH_FILE=$HOME/Downloads/pull-secret oc mirror --config imageset-config.yaml file://local-mirror -v=5
 
-#oc mirror --config imageset-config.yaml file://local-mirror -a $HOME/Downloads/pull-secret
+# oc mirror --verbose 3 -c <image_set_configuration> file://<file_path> --v2
+mkdir local-mirror
+oc mirror --verbose 3 -c imageset-config.yaml file://local-mirror --v2
+
+# oc mirror --config imageset-config.yaml file://local-mirror -a $HOME/Downloads/pull-secret
 ```
 
 ---
@@ -158,6 +218,9 @@ echo "------ Start oc mirror ------"
 REGISTRY_AUTH_FILE=$HOME/Downloads/pull-secret oc mirror --config imageset-config.yaml file://local-mirror -v=5
 
 echo "------ Done ------"
+```
+```bash
+sudo dnf install -y skopeo
 ```
 ```bash
 chmod +x mirror.sh
