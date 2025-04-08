@@ -67,3 +67,79 @@ The second number (checking the file system): This number specifies whether the 
 1 means to check the root file system first.
 2 is used for other filesystems to be checked after the root filesystem.
 ```
+
+---
+
+# Expanding Root Partition (`/`) with Additional Space
+
+If you've added extra space to your disk and want to extend your root partition (`/`), follow these steps:
+
+### 1. Check Disk Partitions
+Use `fdisk` to manage your partitions:
+```bash
+sudo fdisk /dev/sda
+```
+
+### 2. List Current Partitions
+To view the existing partitions, use the following command:
+```bash
+p
+```
+
+This will display the partitions on `/dev/sda`, showing the new 50GB space added to `sda3`.
+
+### 3. Delete the Existing Partition (`sda3`)
+To delete the existing partition, run:
+```bash
+d
+3
+```
+This will delete partition `sda3` but without erasing data, as we’ll recreate it with the additional space.
+
+### 4. Create a New Partition with Additional Space
+Now create a new partition to use the additional space:
+```bash
+n
+```
+- Choose `p` for a primary partition.
+- Set the partition number to `3` (to recreate partition `sda3`).
+- Accept the default starting sector.
+- Accept the default ending sector to use the full available space.
+
+When asked if you want to remove the LVM signature, choose **N** to keep the LVM signature:
+```bash
+N
+```
+
+### 5. Save Changes
+After making the changes, save them with:
+```bash
+w
+```
+
+### 6. Resize the Physical Volume (PV)
+Now resize the physical volume to recognize the additional space:
+```bash
+sudo pvresize /dev/sda3
+```
+
+### 7. Extend the Logical Volume (`rhel-root`)
+Next, extend the logical volume that holds the root (`/`) partition:
+```bash
+sudo lvextend -l +100%FREE /dev/mapper/rhel-root
+```
+
+### 8. Expand the Filesystem
+Finally, expand the filesystem to utilize the new space:
+```bash
+sudo xfs_growfs /dev/mapper/rhel-root
+```
+
+### 9. Verify the Changes
+Check the available space with:
+```bash
+df -h
+lsblk
+```
+
+This should show the additional space available in the root partition (`/`).
