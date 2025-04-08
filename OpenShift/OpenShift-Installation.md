@@ -27,11 +27,11 @@ umask 0022
 
 echo "Installing OpenShift CLI..."
 if ! command -v oc &> /dev/null; then
-  wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-client-linux.tar.gz
-  tar -zxvf openshift-client-linux.tar.gz
-  chmod 551 oc
-  sudo mv oc /usr/local/bin/
-  rm -f openshift-client-linux.tar.gz
+  wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-client-linux-amd64-rhel9.tar.gz
+  tar -zxvf openshift-client-linux-amd64-rhel9.tar.gz
+  chmod +x oc
+  sudo mv oc /usr/local/bin
+  rm -f openshift-client-linux-amd64-rhel9.tar.gz
 else
   echo "oc already installed."
 fi
@@ -40,7 +40,7 @@ echo "Installing oc-mirror..."
 if ! command -v oc-mirror &> /dev/null; then
   wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest/oc-mirror.rhel9.tar.gz
   tar -zxvf oc-mirror.rhel9.tar.gz
-  chmod 551 oc-mirror
+  chmod +x oc-mirror
   sudo mv oc-mirror /usr/local/bin/
   rm -f oc-mirror.rhel9.tar.gz
 else
