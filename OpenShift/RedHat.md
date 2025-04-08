@@ -58,7 +58,7 @@ sudo dnf makecache
 echo "[INFO] Updating system..."
 sudo dnf update -y
 
-echo "[DONE] skopeo Installed Successfully!"
+echo "------ Done ------"
 ```
 ```bash
 chmod +x fix-repo.sh
