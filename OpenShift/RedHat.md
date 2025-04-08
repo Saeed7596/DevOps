@@ -27,29 +27,31 @@ nano fix-repo.sh
 ```sh
 #!/bin/bash
 
-echo "[INFO] Adding CentOS Stream Repositories..."
+echo "[INFO] Switching Repositories to AlmaLinux Mirrors..."
 
-cat <<EOF | sudo tee /etc/yum.repos.d/centos-stream.repo
-[centos-stream-appstream]
-name=CentOS Stream AppStream
-baseurl=http://mirror.centos.org/centos-stream/9-stream/AppStream/x86_64/os/
+sudo rm -f /etc/yum.repos.d/*.repo
+
+cat <<EOF | sudo tee /etc/yum.repos.d/almalinux.repo
+[baseos]
+name=AlmaLinux BaseOS
+baseurl=https://repo.almalinux.org/almalinux/9/BaseOS/x86_64/os/
 enabled=1
 gpgcheck=0
 
-[centos-stream-baseos]
-name=CentOS Stream BaseOS
-baseurl=http://mirror.centos.org/centos-stream/9-stream/BaseOS/x86_64/os/
+[appstream]
+name=AlmaLinux AppStream
+baseurl=https://repo.almalinux.org/almalinux/9/AppStream/x86_64/os/
 enabled=1
 gpgcheck=0
 
-[centos-stream-extras]
-name=CentOS Stream Extras
-baseurl=http://mirror.centos.org/centos-stream/9-stream/extras/x86_64/os/
+[extras]
+name=AlmaLinux Extras
+baseurl=https://repo.almalinux.org/almalinux/9/extras/x86_64/os/
 enabled=1
 gpgcheck=0
 EOF
 
-echo "[INFO] Cleaning old cache..."
+echo "[INFO] Cleaning cache..."
 sudo dnf clean all
 
 echo "[INFO] Making cache..."
