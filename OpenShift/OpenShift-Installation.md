@@ -99,6 +99,26 @@ oc mirror init > imageset-config.yaml
 YAML Sample:
 ```yaml
 kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v2alpha1
+mirror:
+  platform:
+    channels:
+    - name: stable-4.18 
+      minVersion: 4.18.2
+      maxVersion: 4.18.2
+    graph: true 
+  operators:
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18 
+      packages: 
+       - name: aws-load-balancer-operator
+       - name: 3scale-operator
+       - name: node-observability-operator
+  additionalImages: 
+   - name: registry.redhat.io/ubi8/ubi:latest
+   - name: registry.redhat.io/ubi9/ubi@sha256:20f695d2a91352d4eaa25107535126727b5945bff38ed36a3e59590f495046f0
+```
+```yaml
+kind: ImageSetConfiguration
 apiVersion: mirror.openshift.io/v1alpha2
 storageConfig:
   local:
