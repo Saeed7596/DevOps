@@ -76,7 +76,10 @@ source ~/.bashrc
 ```bash
 docker login registry.redhat.io
 ```
-
+For Test:
+```bash
+docker pull registry.redhat.io/redhat/redhat-operator-index:v4.18
+```
 ### 5. Generate ImageSet Config
 Find operator channel and release information
 ```bash
@@ -160,14 +163,18 @@ mirror:
 ```
 
 ### 6. Start Mirroring to Local Directory
+Examples:
+  ```bash
+  oc mirror --v2 --help
+  # Mirror To Disk
+  oc-mirror --verbose 3 -c ./isc.yaml file:///home/<user>/oc-mirror/mirror1 --v2
+  ```
 ```bash
-REGISTRY_AUTH_FILE=$HOME/Downloads/pull-secret oc mirror --config imageset-config.yaml file://local-mirror
-
-REGISTRY_AUTH_FILE=$HOME/Downloads/pull-secret oc mirror --config imageset-config.yaml file://local-mirror -v=5
+REGISTRY_AUTH_FILE=$HOME/Downloads/pull-secret oc mirror --config imageset-config.yaml file://local-mirror -v=3
 
 # oc mirror --verbose 3 -c <image_set_configuration> file://<file_path> --v2
 mkdir local-mirror
-oc mirror --verbose 3 -c imageset-config.yaml file://local-mirror --v2
+oc mirror --verbose 3 -c imageset-config.yaml file://local-mirror
 
 # oc mirror --config imageset-config.yaml file://local-mirror -a $HOME/Downloads/pull-secret
 ```
