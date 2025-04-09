@@ -24,12 +24,13 @@ OpenShift is a Kubernetes-based container platform developed by Red Hat. It prov
 
 ### Prerequisites:
 - Linux-based OS (RHEL, CentOS, Fedora, Ubuntu)
-- Minimum 4 CPU cores, 8GB RAM
+- Minimum 4 CPU cores, 10GB RAM
 - Docker or Podman installed
 - oc CLI installed
 
 ### Installation Steps:
 Before proceeding with the installation, you must create an account on [Red Hat's website](https://access.redhat.com/) to obtain the necessary credentials and downloads.
+* Downloan the pull-secret
 #### Installing OpenShift with Local Sandbox
 1. **Install the OpenShift CLI (oc)**:
    ```sh
@@ -42,8 +43,17 @@ Before proceeding with the installation, you must create an account on [Red Hat'
    curl -LO https://developers.redhat.com/content-gateway/rest/mirror/pub/openshift-v4/clients/crc/latest/crc-linux-amd64.tar.xz
    tar -xvf crc-linux-amd64.tar.xz
    sudo mv crc /usr/local/bin/
+   crc version
    crc setup
-   crc start
+   crc status
+   crc config set cpus 8
+   crc config set memory 10000
+   crc start -p pull-secret
+   eval $(crc oc-env)
+   ```
+   ```
+   crc stop
+   crc cleanup
    ```
 3. **Login to OpenShift**:
    ```sh
