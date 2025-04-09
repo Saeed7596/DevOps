@@ -34,9 +34,14 @@ Before proceeding with the installation, you must create an account on [Red Hat'
 #### Installing OpenShift with Local Sandbox
 1. **Install the OpenShift CLI (oc)**:
    ```sh
-   curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz
-   tar -xvf oc.tar.gz -C /usr/local/bin/
+   curl -LO https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-client-linux.tar.gz
+   tar -xvf openshift-client-linux.tar.gz
+   sudo mv oc /usr/local/bin/
    chmod +x /usr/local/bin/oc
+   oc version
+   # curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz
+   # tar -xvf oc.tar.gz -C /usr/local/bin/
+   # chmod +x /usr/local/bin/oc
    ```
 2. **Deploy OpenShift Sandbox (Lightweight test environment)**:
    ```sh
