@@ -37,7 +37,9 @@ Before proceeding with the installation, you must create an account on [Red Hat'
    curl -LO https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-client-linux.tar.gz
    tar -xvf openshift-client-linux.tar.gz
    sudo mv oc /usr/local/bin/
+   sudo mv kubectl /usr/local/bin/
    chmod +x /usr/local/bin/oc
+   chmod +x /usr/local/bin/kubectl
    oc version
    # curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz
    # tar -xvf oc.tar.gz -C /usr/local/bin/
@@ -50,10 +52,15 @@ Before proceeding with the installation, you must create an account on [Red Hat'
    sudo mv crc /usr/local/bin/
    crc version
    crc setup
+   ```
+   * Ensure you have a copy of the downloaded 5.7GB file in another location. When you intend to place the file in the /home/username/.crc/cache directory (or any user's default path), make it `executable`. This will prevent the need for redownloading it in case of a restart.
+   ```bash
    crc status
+   crc config set pull-secret-file /path/to/pull-secret
    crc config set cpus 8
    crc config set memory 10000
-   crc start -p pull-secret
+   crc start
+   # crc start -p pull-secret
    eval $(crc oc-env)
    ```
    ```
@@ -63,6 +70,8 @@ Before proceeding with the installation, you must create an account on [Red Hat'
 3. **Login to OpenShift**:
    ```sh
    oc login -u kubeadmin -p <password> --server=<openshift_api_url>
+   oc get nodes
+   crc console
    ```
 
 ## OpenShift Concepts
