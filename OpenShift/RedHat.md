@@ -20,6 +20,15 @@ cat /etc/*release
 ls /etc/yum.repos.d/
 sudo subscription-manager status
 ```
+### If have problem to get package or get 403 error
+```bash
+sudo systemctl restart NetworkManager
+```
+### Clean `dnf` cache and refresh completely
+```bash
+sudo dnf clean all
+sudo dnf makecache
+```
 ### Change repo
 ```bash
 nano fix-repo.sh
