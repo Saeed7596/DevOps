@@ -207,3 +207,38 @@ ifconfig
 - **Permanent DNS Configuration:** Use `/etc/systemd/resolved.conf` or `/etc/resolv.conf`.
 
 🚀 **These methods will ensure that your static IP configuration persists after reboot!**
+
+---
+
+# Add DNS Manualy
+```
+echo "nameserver 178.22.122.100" | sudo tee /etc/resolv.conf
+echo "nameserver 185.51.200.2" | sudo tee /etc/resolv.conf
+```
+
+---
+
+# Full Network Reset + Cache Clean
+```bash
+# 1. Restart NetworkManager
+sudo systemctl restart NetworkManager
+
+# 2. Clean DNS cache
+sudo systemd-resolve --flush-caches
+
+# 3. Restart DNS resolver
+sudo systemctl restart systemd-resolved
+
+# 4. Clean DNF cache completely
+sudo dnf clean all
+sudo rm -rf /var/cache/dnf
+sudo dnf makecache
+
+# 5. Release and renew DHCP IP
+sudo dhclient -r
+sudo dhclient
+
+# 6. Test DNS and repo connectivity
+ping -c 3 google.com
+dnf repolist
+```
