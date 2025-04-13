@@ -59,6 +59,10 @@ nmcli device show
 netstat -tulnp # show usage port
 > grep -o done logfile.log | wc -l # count "done" word in log file
 ```
+### If have problem to get package or get 403 error
+```bash
+sudo systemctl restart NetworkManager
+```
 
 ---
 
