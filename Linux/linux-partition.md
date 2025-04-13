@@ -1,3 +1,28 @@
+# LVM Partitioning Scheme (for a 100GB Disk)
+| Mount Point   | Size  | Description                                         |
+|---------------|-------|-----------------------------------------------------|
+| `/boot/efi`   | 600M  | EFI system partition (for UEFI boot)                |
+| `/boot`       | 1G    | Stores the kernel and bootloader files              |
+| `/`           | 25G   | Root partition for OS and applications              |
+| `/home`       | 30G   | User files and personal data                        |
+| `/var`        | 15G   | Logs, cache, and databases                          |
+| `swap`        | 4G    | Swap space (usually equal or half of your RAM)      |
+| `/tmp`        | 2G    | Temporary files                                     |
+| Free space    | ~22.4G| Reserved for future expansion of logical volumes    |
+
+---
+
+# `xfs` vs. `ext4` File System Comparison
+| Feature              | `xfs`                                   | `ext4`                        |
+|----------------------|------------------------------------------|-------------------------------|
+| Performance (large files) | Excellent                           | Good                          |
+| General performance   | Fast for most operations                | Stable and well-tested        |
+| LVM Compatibility     | Great                                   | Great                         |
+| Recovery Tools        | Limited                                 | More mature and available     |
+| Best suited for       | Servers, databases, logs                | Desktops, general use         |
+
+---
+
 # Standard Partition Steps
 ```vim
 fdisk -> mkfs -> mount -> /etc/fstab -> mount -a
