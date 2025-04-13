@@ -20,6 +20,11 @@ cat /etc/*release
 ls /etc/yum.repos.d/
 sudo subscription-manager status
 ```
+### Add DNS Manually
+```
+echo "nameserver 178.22.122.100" | sudo tee /etc/resolv.conf
+echo "nameserver 185.51.200.2" | sudo tee /etc/resolv.conf
+```
 ### If have problem to get package or get 403 error
 ```bash
 sudo systemctl restart NetworkManager
@@ -27,6 +32,7 @@ sudo systemctl restart NetworkManager
 ### Clean `dnf` cache and refresh completely
 ```bash
 sudo dnf clean all
+sudo rm -rf /var/cache/dnf
 sudo dnf makecache
 ```
 ### Change repo
