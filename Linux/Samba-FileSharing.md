@@ -68,8 +68,15 @@ sudo ufw allow 'Samba'
 ### From a Linux Client
 #### Option 1: Using `smbclient` (like FTP)
 ```bash
+# Ubuntu
+sudo apt install samba-client -y
+# RedHat
+sudo dnf install samba-client -y
+```
+```bash
 smbclient //<Samba-IP>/SharedFiles -N
 ```
+* The `-N` option means without entering a username and password (when `guest ok = yes` is set on the Samba server).
 
 Once inside, use:
 ```bash
