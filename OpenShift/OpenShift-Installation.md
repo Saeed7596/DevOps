@@ -100,6 +100,27 @@ oc mirror init > imageset-config.yaml
 YAML Sample:
 ```yaml
 kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v1alpha2
+storageConfig:
+  local:
+    path: ./
+mirror:
+  platform:
+    channels:
+    - name: stable-4.18
+      type: ocp
+  operators:
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18
+    packages:
+    - name: serverless-operator
+      channels:
+      - name: stable
+  additionalImages:
+  - name: registry.redhat.io/ubi8/ubi:latest
+  helm: {}
+```
+```yaml
+kind: ImageSetConfiguration
 apiVersion: mirror.openshift.io/v2alpha1
 mirror:
   platform:
@@ -170,13 +191,11 @@ Examples:
   oc-mirror --verbose 3 -c ./isc.yaml file:///home/<user>/oc-mirror/mirror1 --v2
   ```
 ```bash
-REGISTRY_AUTH_FILE=$HOME/Downloads/pull-secret oc mirror --config imageset-config.yaml file://local-mirror -v=3
-
 # oc mirror --verbose 3 -c <image_set_configuration> file://<file_path> --v2
 mkdir local-mirror
 oc mirror --verbose 3 -c imageset-config.yaml file://local-mirror
 
-# oc mirror --config imageset-config.yaml file://local-mirror -a $HOME/Downloads/pull-secret
+# REGISTRY_AUTH_FILE=$HOME/Downloads/pull-secret oc mirror --config imageset-config.yaml file://local-mirror -v=3
 ```
 
 ---
@@ -191,7 +210,7 @@ This directory contains all necessary files to populate your private registry or
 
 ---
 
-### update oc mirror to v2
+### use oc mirror v2
 ```bash
 REGISTRY_AUTH_FILE=$HOME/Downloads/pull-secret oc mirror --v2 --config imageset-config.yaml file://local-mirror
 ```
@@ -242,7 +261,7 @@ else
 fi
 
 echo "------ Start oc mirror ------"
-REGISTRY_AUTH_FILE=$HOME/Downloads/pull-secret oc mirror --config imageset-config.yaml file://local-mirror -v=5
+oc mirror --verbose 3 -c imageset-config.yaml file://local-mirror
 
 echo "------ Done ------"
 ```
