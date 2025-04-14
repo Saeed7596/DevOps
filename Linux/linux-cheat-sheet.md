@@ -108,6 +108,7 @@
 | `systemctl status httpd`  | Check HTTPD Service Status              |
 | `systemctl enable httpd`  | Configure HTTPD to start at startup     |
 | `systemctl disable httpd` | Configure HTTPD to not start at startup |
+| `systemctl daemon-reload` | Instructs systemd to reload all service files and update its internal configuration |
 
 ## Package Manager
 | **Command**               | **Description**                         |
