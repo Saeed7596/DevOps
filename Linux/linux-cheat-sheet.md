@@ -116,7 +116,7 @@
 | `rpm -e telnet.rpm`       | Uninstall Package                       |
 | `rpm -q openssh-server python3 ansible telnet` | Query Packages     |
 | `rpm -qa`                 | List all installations                  |
-| `rpm -qa`                 | grep ftp` | Query ftp package           |
+| rpm -qa | grep ftp        | Query ftp package                       |
 | `yum install ansible`     | Install Package                         |
 | `yum remove ansible`      | Uninstall Package                       |
 | `yum list installed`      | Lists all packages that are installed on your system |
