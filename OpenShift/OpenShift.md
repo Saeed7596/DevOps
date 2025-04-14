@@ -58,10 +58,18 @@ Before proceeding with the installation, you must create an account on [Red Hat'
    crc status
    crc config set pull-secret-file /path/to/pull-secret
    crc config set cpus 8
-   crc config set memory 10000
+   crc config set memory 10752
+   crc config set disk-size 40
+   crc config view
    crc start
    # crc start -p pull-secret
    eval $(crc oc-env)
+   ```
+   ```bash
+   # Disables anonymous usage data collection.
+   crc config set consent-telemetry no
+   # To enable the cluster monitoring operator
+   crc config set enable-cluster-monitoring true
    ```
    ```
    crc stop
@@ -69,9 +77,9 @@ Before proceeding with the installation, you must create an account on [Red Hat'
    ```
 3. **Login to OpenShift**:
    ```sh
+   crc console
    oc login -u kubeadmin -p <password> --server=<openshift_api_url>
    oc get nodes
-   crc console
    ```
 
 ## OpenShift Concepts
