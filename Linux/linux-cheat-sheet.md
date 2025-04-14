@@ -1,7 +1,17 @@
 # Linux Cheat Sheet
 
-## File and Directory Commands
+## Help
+| **Command**        | **Description**                                 |
+| ------------------ | ----------------------------------------------- |
+| `command --help`   | Help                                            |
+| `man command`      | Manual Page                                     |
+| `echo $SHEEL`      | Shell Type                                      |
+| `echo Hi`          | Print to Screen                                 |
+| `cat /etc/*release*` | Check OS Version                              |
+| `dpkg --print-architecture` | Show CPU architect (arm or amd)        |
+| `echo $?`            | If it returns 0, it means that the previous command was executed correctly. |
 
+## File and Directory Commands
 | **Command**        | **Description**                                 |
 | ------------------ | ----------------------------------------------- |
 | `ls`              | List files and directories                     |
@@ -9,18 +19,20 @@
 | `cd directory`    | Change to the specified directory              |
 | `pwd`             | Show the current working directory             |
 | `mkdir directory` | Create a new directory                         |
+| `mkdir -p /tmp/iran/shiraz` | Make Directory Hierarchy             |
 | `rmdir directory` | Remove an empty directory                      |
 | `rm file`         | Remove a file                                  |
 | `rm -r directory` | Remove a directory and its contents recursively|
 | `cp source dest`  | Copy files or directories                      |
+| `cp -r <SourceDirectory> <TargetDirectory>` | Copy Directory       |
 | `mv source dest`  | Move or rename files or directories            |
 | `touch file`      | Create an empty file                           |
 
 ## File Viewing and Editing
-
 | **Command**           | **Description**                                  |
 | --------------------- | ------------------------------------------------ |
 | `cat file`           | Display the contents of a file                  |
+| `cat > new_file.txt` Hi `Ctrl+D` | Add contents to file                |
 | `less file`          | View a file one screen at a time                |
 | `head file`          | Display the first 10 lines of a file            |
 | `tail file`          | Display the last 10 lines of a file             |
@@ -30,7 +42,6 @@
 | `wc file`            | Count lines, words, and characters in a file    |
 
 ## User Management
-
 | **Command**          | **Description**                                 |
 | -------------------- | ----------------------------------------------- |
 | `whoami`            | Show the current logged-in user                 |
@@ -42,7 +53,6 @@
 | `su user`           | Switch to another user                         |
 
 ## Process Management
-
 | **Command**         | **Description**                                 |
 | ------------------- | ----------------------------------------------- |
 | `ps`               | Display currently running processes             |
@@ -54,7 +64,6 @@
 | `fg`               | Resume a job in the foreground                 |
 
 ## Networking Commands
-
 | **Command**         | **Description**                                 |
 | ------------------- | ----------------------------------------------- |
 | `ifconfig`         | Display network interface information           |
@@ -68,7 +77,6 @@
 
 
 ## Permissions
-
 | **Command**             | **Description**                              |
 | ----------------------- | -------------------------------------------- |
 | `chmod 777 file`       | Change permissions of a file or directory    |
@@ -76,11 +84,40 @@
 | `chgrp group file`     | Change group ownership of a file             |
 
 ## Disk Management
-
 | **Command**             | **Description**                              |
 | ----------------------- | -------------------------------------------- |
 | `df -h`               | Show disk space usage                        |
+| `df -Th`              | Show disk space usage                        |
 | `du -sh directory`    | Show size of a directory                     |
 | `mount device dir`    | Mount a device to a directory                |
 | `umount dir`          | Unmount a device                             |
 
+## Download
+| **Command**                                                      | **Description** |
+| ---------------------------------------------------------------- | --------------- |
+| `curl http://www.some-site.com/some-file.txt -O`                 | Download file   |
+| `wget http://www.some-site.com/some-file.txt -O some-file.txt`   | Download file   |
+
+## Service
+| **Command**               | **Description**                         |
+| ------------------------- | --------------------------------------- |
+| `/etc/systemd/system`     | Services location                       |
+| `service httpd start`     | Start HTTPD Service                     |
+| `systemctl start httpd`   | Start HTTPD Service                     |
+| `systemctl stop httpd`    | Stop HTTPD Service                      |
+| `systemctl status httpd`  | Check HTTPD Service Status              |
+| `systemctl enable httpd`  | Configure HTTPD to start at startup     |
+| `systemctl disable httpd` | Configure HTTPD to not start at startup |
+
+## Package Manager
+| **Command**               | **Description**                         |
+| ------------------------- | --------------------------------------- |
+| `rpm -i telnet.rpm`       | Install Package                         |
+| `rpm -e telnet.rpm`       | Uninstall Package                       |
+| `rpm -q openssh-server python3 ansible telnet` | Query Packages     |
+| `rpm -qa`                 | List all installations                  |
+| `rpm -qa`                 | grep ftp` | Query ftp package           |
+| `yum install ansible`     | Install Package                         |
+| `yum remove ansible`      | Uninstall Package                       |
+| `yum list installed`      | Lists all packages that are installed on your system |
+| `/etc/yum.repos.d`        | Repository file location                |
