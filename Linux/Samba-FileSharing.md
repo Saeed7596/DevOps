@@ -84,6 +84,25 @@ Once inside, use:
 `put filename` # Upload file
 `get filename` # Download file
 ```
+# 📦 Monitoring File Transfer Progress with Samba
+This guide helps you monitor the progress of a file being transferred (uploaded or downloaded) via Samba.
+## 🔼 When Uploading a File (to the Samba Server)
+1. SSH into the Samba server:
+   ```bash
+   ssh user@<Samba-IP>
+   ```
+2. Navigate to the shared directory (e.g., /srv/share):
+```bash
+cd /srv/share
+```
+3. Use watch to monitor file size growth in real-time:
+```bash
+watch -- du -h <filename>
+```
+## 🔽 When Downloading a File (from the Samba Server)
+On the same host where the file is being downloaded (open a new terminal), go to the download destination directory.
+
+---
 
 #### Option 2: Mounting the Share
 ```bash
