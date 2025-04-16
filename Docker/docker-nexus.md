@@ -52,6 +52,30 @@ docker push nesxusIP-URL:8084/image:tag
 
 ---
 
+# Or use ca.crt (ca.crt is the `private-key` of site that generate with openssl or letsencrypt)
+- openssl genrsa -out domain.key 2048 openssl req -new -key domain.key -out domain.csr
+- copy the content of `private-key` and paste it in the ca.crt file in this path on linux machine that want to connect to registry.
+## For Docker
+- Copy the `private-key` of site.
+- Put it in this dicrecory: `/etc/docker/certs.d/<registry-host>:<port>/ca.crt`
+- `sudo mkdir -p /etc/docker/certs.d/nexus.ir`
+- `sudo nano -p /etc/docker/certs.d/nexus.ir/ca.crt`
+- `sudo systemctl restart docker`
+- `docker login nexus.ir`
+if use TLS Self-Signed and got error:
+- `sudo cp ca.crt /etc/pki/ca-trust/source/anchors/`
+- `sudo update-ca-trust`
+
+
+## For podman:
+- `sudo mkdir -p /etc/containers/certs.d/nexus.ir`
+- `sudo cp ca.crt /etc/containers/certs.d/nexus.ir/ca.crt`
+if use TLS Self-Signed and got error:
+- `sudo cp ca.crt /etc/pki/ca-trust/source/anchors/`
+- `sudo update-ca-trust`
+
+---
+
 # Podman
 ```bash
 sudo nano /etc/containers/registries.conf
