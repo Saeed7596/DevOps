@@ -73,6 +73,7 @@ Before proceeding with the installation, you must create an account on [Red Hat'
    ```
    ```
    crc stop
+   crc delete
    crc cleanup
    ```
 3. **Login to OpenShift**:
