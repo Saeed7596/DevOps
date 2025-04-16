@@ -81,8 +81,9 @@ if use TLS Self-Signed and got error:
 sudo nano /etc/containers/registries.conf
 ```
 ```bash
-[registries.insecure]
-registries = ["nesxusIP-URL:8084"]
+[[registry]]
+location = "nesxusIP-URL:8084"
+insecure = true
 ```
 
 ---
