@@ -62,6 +62,7 @@ docker push nesxusIP-URL:8084/image:tag
 - `sudo nano -p /etc/docker/certs.d/nexus.ir/ca.crt`
 - `sudo systemctl restart docker`
 - `docker login nexus.ir`
+
 if use TLS Self-Signed and got error:
 - `sudo cp ca.crt /etc/pki/ca-trust/source/anchors/`
 - `sudo update-ca-trust`
@@ -70,6 +71,7 @@ if use TLS Self-Signed and got error:
 ## For podman:
 - `sudo mkdir -p /etc/containers/certs.d/nexus.ir`
 - `sudo cp ca.crt /etc/containers/certs.d/nexus.ir/ca.crt`
+
 if use TLS Self-Signed and got error:
 - `sudo cp ca.crt /etc/pki/ca-trust/source/anchors/`
 - `sudo update-ca-trust`
