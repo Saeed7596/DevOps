@@ -78,6 +78,7 @@ Before proceeding with the installation, you must create an account on [Red Hat'
 3. **Login to OpenShift**:
    ```sh
    crc console
+   crc console --credentials
    oc login -u kubeadmin -p <password> --server=<openshift_api_url>
    oc get nodes
    ```
