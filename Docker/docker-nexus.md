@@ -42,11 +42,27 @@ docker tag image:tag nesxusURL:8084/image:tag
 ```
 add `insecure-registries` in `/etc/docker/daemon.json`
 ```json
-"insecure-registries" : [ "nesxusIP-URL:8084"]
+{
+  "insecure-registries": ["nesxusIP-URL:8084"]
+}
 ```
 ```bash
 docker push nesxusIP-URL:8084/image:tag
 ```
+
+---
+
+# Podman
+```bash
+sudo nano /etc/containers/registries.conf
+```
+```bash
+[registries.insecure]
+registries = ["nesxusIP-URL:8084"]
+```
+
+---
+
 # nginx conf
 ```conf
 server {
