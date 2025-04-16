@@ -111,12 +111,45 @@ bpytop
 
 ---
 
-| Tool       | Primary Use               | Key Features                                   | Ideal For              |
+## **5. bmon**
+### **Overview**
+`bmon` (Bandwidth Monitor) is a real-time, terminal-based network bandwidth monitoring tool for Linux systems. It's simple, fast, and very helpful when you want to visualize incoming/outgoing traffic on your network interfaces.
+### **Features**
+- Real-time bandwidth monitoring
+- Graphical interface (in terminal)
+- Shows transmit/receive rates per interface
+- Lightweight and easy to use
+### **Installation**
+#### On RHEL / CentOS / Fedora:
+```bash
+sudo dnf install bmon -y
+```
+#### On Debian / Ubuntu:
+```bash
+sudo apt install bmon -y
+```
+#### Usage
+```bash
+bmon
+```
+Key   | Action
+------+--------------------------
+ q    | Quit the program
+ d    | Switch to details view
+ g    | Switch to graphical view
+ t    | Switch to text-only view
+ i    | Show interface statistics
+ h    | Help screen
+
+---
+
+| Tool       | Primary Use               | Key Features                                   | Ideal For             |
 |------------|---------------------------|-----------------------------------------------|------------------------|
 | **htop**   | Process monitoring        | Tree view, search, interactive process control| General system usage   |
 | **Glances**| Comprehensive monitoring  | Remote access, API integration, modular design| Broad system overview  |
-| **Ctop**   | Docker container monitoring| Real-time container stats, lightweight        | Docker environments    |
+| **Ctop**   | Docker container monitoring| Real-time container stats, lightweight       | Docker environments    |
 | **Bpytop** | Resource monitoring       | Graphical interface, detailed metrics         | Users who prefer visuals|
+| **bmon**   | Network bandwidth monitor | Real-time graphs, per-interface stats, lightweight| Monitoring network traffic|
 
 
 ## **Conclusion**
