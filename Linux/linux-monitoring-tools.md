@@ -132,14 +132,13 @@ sudo apt install bmon -y
 ```bash
 bmon
 ```
-Key   | Action
-------+--------------------------
- q    | Quit the program
- d    | Switch to details view
- g    | Switch to graphical view
- t    | Switch to text-only view
- i    | Show interface statistics
- h    | Help screen
+#### Key Shortcuts
+- `q`    | Quit the program
+- `d`    | Switch to details view
+- `g`    | Switch to graphical view
+- `t`    | Switch to text-only view
+- `i`    | Show interface statistics
+- `h`    | Help screen
 
 ---
 
