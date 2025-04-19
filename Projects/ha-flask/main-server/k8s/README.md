@@ -140,3 +140,76 @@ kubectl events hpa -n flask-project | grep -i "FailedGetResourceMetric"
 ```bash
 kubectl describe hpa flask-app-hpa -n flask-project
 ```
+
+---
+
+# 06 (OpenShift)
+```bash
+oc login -u developer -p developer
+oc new-project flask-project
+```
+I used a nexus private registry to pull & push images.
+Add insecure registry
+```bash
+sudo nano /etc/containers/registries.conf
+```
+```yaml
+[[registry]]
+location = "default-route-openshift-image-registry.apps-crc.testing"
+insecure = true
+```
+Pull images
+```bash
+podman pull registry.nexus.com/flask-app:latest
+podman pull registry.nexus.com/custom-postgres:latest
+```
+Login to crc local registry
+```bash
+podman login -u developer -p $(oc whoami -t) \
+    default-route-openshift-image-registry.apps-crc.testing
+```
+```bash
+oc login -u developer -p developer
+oc project flask-project
+```
+The postgres Pod Maybe get CrashLoopBackOff error because of premission.
+```bash
+oc adm policy add-scc-to-user anyuid -z default -n flask-project
+```
+Tag and Push images to crc local registry
+```bash
+podman tag registry.nexus.com/flask-app:latest \
+    default-route-openshift-image-registry.apps-crc.testing/flask-project/flask-app:latest
+```
+```bash
+podman push \
+    default-route-openshift-image-registry.apps-crc.testing/flask-project/flask-app:latest
+```
+```bash
+podman tag registry.nexus.com/custom-postgres:latest \
+    default-route-openshift-image-registry.apps-crc.testing/flask-project/custom-postgres:latest
+```
+```bash
+podman push \
+    default-route-openshift-image-registry.apps-crc.testing/flask-project/custom-postgres:latest
+```
+Edit `flask-deployment.yaml`
+```bash
+image: image-registry.openshift-image-registry.svc:5000/flask-project/flask-app
+```
+Edit `postgres-deployment.yaml`
+```bash
+spec:
+  template:
+    spec:
+      securityContext:
+        fsGroup: 26
+      containers:
+        - name: postgres
+          image: default-route-openshift-image-registry.apps-crc.testing/flask-project/custom-postgres:latest
+```
+In OpenShift CRC, services do not automatically create routes. So we create a route:
+```bash
+oc expose svc flask-app -n flask-project
+oc get routes -n flask-project
+```
