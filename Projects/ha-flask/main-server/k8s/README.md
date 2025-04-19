@@ -195,7 +195,7 @@ podman push \
 ```
 Edit `flask-deployment.yaml`
 ```bash
-image: image-registry.openshift-image-registry.svc:5000/flask-project/flask-app
+image: image-registry.openshift-image-registry.svc:5000/flask-project/flask-app:latest
 ```
 Edit `postgres-deployment.yaml`
 ```bash
