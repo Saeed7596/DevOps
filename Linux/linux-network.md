@@ -215,6 +215,42 @@ ifconfig
 echo "nameserver 178.22.122.100" | sudo tee /etc/resolv.conf
 echo "nameserver 185.51.200.2" | sudo tee /etc/resolv.conf
 ```
+## Or 
+### Set Custom DNS on Fedora / RHEL / CentOS (with NetworkManager):
+Find Connection NAME:
+```bash
+nmcli con show
+```
+Set custom DNS:
+```bash
+nmcli con mod "<connection-name>" ipv4.dns "178.22.122.100 185.51.200.2"
+```
+Ignore automatic DNS:
+```bash
+nmcli con mod "<connection-name>" ipv4.ignore-auto-dns yes
+```
+Restart connection:
+```bash
+nmcli con down "<connection-name>" && nmcli con up "<connection-name>"
+```
+### Set Custom DNS on Debian / Ubuntu (with systemd-resolved):
+```bash
+sudo nano /etc/systemd/resolved.conf
+```
+Inside the `[Resolve]` section, add or modify the following lines:
+```conf
+[Resolve]
+DNS=178.22.122.100 185.51.200.2
+FallbackDNS=8.8.8.8
+```
+Restart the systemd-resolved service
+```bash
+sudo systemctl restart systemd-resolved
+```
+Symlink the correct resolv.conf
+```bash
+sudo ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+```
 
 ---
 
