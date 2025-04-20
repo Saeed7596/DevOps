@@ -71,6 +71,59 @@ export DOCKER_CONFIG=$HOME/.docker
 echo 'export DOCKER_CONFIG=$HOME/.docker' >> ~/.bashrc
 source ~/.bashrc
 ```
+  ### 3.1 . Prepare Private Registry Auth
+  ```bash
+  cat $HOME/Downloads/pull-secret | jq . > ./auths.json
+  ```
+  Add your private registry (nexus)
+  
+  Base64 encode your registry username and password:
+  ```bash
+  echo -n 'username:password' | base64 -w0
+  ```
+  Add this part to `auths.json`
+  ```json
+  "registry.example.com": {
+    "auth": "YWRtaW46bXlwYXNzd29yZA==",
+    "email": "you@example.com"
+  }
+  ```
+  The final result should look something like this:
+  ```json
+  {
+    "auths": {
+      "registry.example.com": {
+        "auth": "BGVtbYk3ZHAtqXs=",
+        "email": "you@example.com"
+      },
+      "cloud.openshift.com": {
+        "auth": "b3BlbnNo...",
+        "email": "you@example.com"
+      },
+      "quay.io": {
+        "auth": "b3BlbnNo...",
+        "email": "you@example.com"
+      },
+      "registry.connect.redhat.com": {
+        "auth": "NTE3Njg5Nj...",
+        "email": "you@example.com"
+      },
+      "registry.redhat.io": {
+        "auth": "NTE3Njg5Nj...",
+        "email": "you@example.com"
+      }
+    }
+  }
+  ```
+  Save `auth.json` in this path:
+  ```bash
+  mkdir -p $XDG_RUNTIME_DIR/containers && cp ./auths.json $XDG_RUNTIME_DIR/containers/auth.json
+  ```
+  Or if you don't have the XDG_RUNTIME_DIR variable, create one manually:
+  ```bash
+  mkdir -p ~/.config/containers
+  cp ./auths.json ~/.config/containers/auth.json
+  ```
 
 ### 4. Login to Red Hat Registry
 ```bash
@@ -187,16 +240,21 @@ mirror:
 Examples:
   ```bash
   oc mirror --v2 --help
-  # Mirror To Disk
-  oc-mirror --verbose 3 -c ./isc.yaml file:///home/<user>/oc-mirror/mirror1 --v2
   ```
-```bash
-# oc mirror --verbose 3 -c <image_set_configuration> file://<file_path> --v2
-mkdir local-mirror
-oc mirror --verbose 3 -c imageset-config.yaml file://local-mirror
-
-# REGISTRY_AUTH_FILE=$HOME/Downloads/pull-secret oc mirror --config imageset-config.yaml file://local-mirror -v=3
-```
+  ### Mirror To Disk (v2)
+  - Note: Edit `imageset-config.yaml`
+    - 1. Change the `apiVersion: mirror.openshift.io/v1alpha2` to `apiVersion: mirror.openshift.io/v2alpha1`
+    - 2. Remove `storageConfig`
+  ```bash
+  oc-mirror -c ./imageset-config.yaml file:///home/<user>/oc-mirror/mirror1 --v2
+  ```
+  ### Mirror To Disk (v1)
+  ```bash
+  mkdir local-mirror
+  oc mirror --verbose 3 -c imageset-config.yaml file://local-mirror
+  
+  # REGISTRY_AUTH_FILE=$HOME/Downloads/pull-secret oc mirror --config imageset-config.yaml file://local-mirror -v=3
+  ```
 
 ---
 
