@@ -25,6 +25,24 @@ sudo subscription-manager status
 echo "nameserver 178.22.122.100" | sudo tee /etc/resolv.conf
 echo "nameserver 185.51.200.2" | sudo tee /etc/resolv.conf
 ```
+### Or
+#### Set Custom DNS on Fedora / RHEL / CentOS (with NetworkManager):
+Find Connection NAME:
+```bash
+nmcli con show
+```
+Set custom DNS:
+```bash
+nmcli con mod "<connection-name>" ipv4.dns "178.22.122.100 185.51.200.2"
+```
+Ignore automatic DNS:
+```bash
+nmcli con mod "<connection-name>" ipv4.ignore-auto-dns yes
+```
+Restart connection:
+```bash
+nmcli con down "<connection-name>" && nmcli con up "<connection-name>"
+```
 ### If have problem to get package or get 403 error
 ```bash
 sudo systemctl restart NetworkManager
