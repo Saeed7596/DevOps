@@ -235,11 +235,37 @@ mirror:
 …
 …
 ```
+oc-mirror v2 Sample:
+```yaml
+kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v2alpha1
+mirror:
+  platform:
+    channels:
+    - name: stable-4.13
+      minVersion: 4.13.10
+      maxVersion: 4.13.10
+    graph: true
+  operators:
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.15
+      packages:
+       - name: aws-load-balancer-operator
+       - name: 3scale-operator
+       - name: node-observability-operator
+  additionalImages:
+   - name: registry.redhat.io/ubi8/ubi:latest
+   - name: registry.redhat.io/ubi9/ubi@sha256:20f695d2a91352d4eaa25107535126727b5945bff38ed36a3e59590f495046f0
+```
+
 
 ### 6. Start Mirroring to Local Directory
 Examples:
   ```bash
   oc mirror --v2 --help
+  ```
+  ### Print actions without mirroring images (Test)
+  ```bash
+  oc mirror -c <image_set_config_yaml> --from file://<oc_mirror_workspace_path> docker://<mirror_registry_url> --dry-run --v2
   ```
   ### Mirror To Disk (v2)
   - Note: Edit `imageset-config.yaml`
