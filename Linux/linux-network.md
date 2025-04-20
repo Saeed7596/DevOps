@@ -233,6 +233,13 @@ Restart connection:
 ```bash
 nmcli con down "<connection-name>" && nmcli con up "<connection-name>"
 ```
+### Network Manager Text User Interface
+```bash
+nmtui 
+```
+
+---
+
 ### Set Custom DNS on Debian / Ubuntu (with systemd-resolved):
 ```bash
 sudo nano /etc/systemd/resolved.conf
