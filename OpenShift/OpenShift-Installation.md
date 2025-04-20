@@ -257,30 +257,44 @@ mirror:
    - name: registry.redhat.io/ubi9/ubi@sha256:20f695d2a91352d4eaa25107535126727b5945bff38ed36a3e59590f495046f0
 ```
 
-
 ### 6. Start Mirroring to Local Directory
-Examples:
+```bash
+oc mirror --v2 --help
+```
+### Print actions without mirroring images (Test)
+```bash
+oc mirror -c <image_set_config_yaml> --from file://<oc_mirror_workspace_path> docker://<mirror_registry_url> --dry-run --v2
+```
+### Partially Disconnected Mode
+If you have a system that has access to the Internet and the target registry:
+```bash
+oc mirror --config=./imageset-config.yaml docker://registry.example.com:5000
+```
+### Fully Disconnected Mode
+If your system has access to the internet but not to the target registry:
+  1. Save the images as a .tar file:​
   ```bash
-  oc mirror --v2 --help
+  oc mirror --config=./imageset-config.yaml file://local-mirror
   ```
-  ### Print actions without mirroring images (Test)
+  2. Transfer the .tar file to the disconnected environment.
+  3. In the disconnected environment, transfer the images to the destination registry:​
   ```bash
-  oc mirror -c <image_set_config_yaml> --from file://<oc_mirror_workspace_path> docker://<mirror_registry_url> --dry-run --v2
+  oc mirror --from=./mirror_seq1_000000.tar docker://registry.example.com:5000
   ```
-  ### Mirror To Disk (v2)
-  - Note: Edit `imageset-config.yaml`
-    - 1. Change the `apiVersion: mirror.openshift.io/v1alpha2` to `apiVersion: mirror.openshift.io/v2alpha1`
-    - 2. Remove `storageConfig`
-  ```bash
-  oc-mirror -c ./imageset-config.yaml file:///home/<user>/oc-mirror/mirror1 --v2
-  ```
-  ### Mirror To Disk (v1)
-  ```bash
-  mkdir local-mirror
-  oc mirror --verbose 3 -c imageset-config.yaml file://local-mirror
-  
-  # REGISTRY_AUTH_FILE=$HOME/Downloads/pull-secret oc mirror --config imageset-config.yaml file://local-mirror -v=3
-  ```
+### Mirror To Disk (v2)
+- Note: Edit `imageset-config.yaml`
+  - 1. Change the `apiVersion: mirror.openshift.io/v1alpha2` to `apiVersion: mirror.openshift.io/v2alpha1`
+  - 2. Remove `storageConfig`
+```bash
+oc-mirror -c ./imageset-config.yaml file:///home/<user>/oc-mirror/mirror1 --v2
+```
+### Mirror To Disk (v1)
+```bash
+mkdir local-mirror
+oc mirror --verbose 3 -c imageset-config.yaml file://local-mirror
+
+# REGISTRY_AUTH_FILE=$HOME/Downloads/pull-secret oc mirror --config imageset-config.yaml file://local-mirror -v=3
+```
 
 ---
 
@@ -293,11 +307,6 @@ local-mirror/
 This directory contains all necessary files to populate your private registry or prepare for air-gapped installation.
 
 ---
-
-### use oc mirror v2
-```bash
-REGISTRY_AUTH_FILE=$HOME/Downloads/pull-secret oc mirror --v2 --config imageset-config.yaml file://local-mirror
-```
 
 ### Check
 ```bash
