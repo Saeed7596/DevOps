@@ -263,6 +263,7 @@ oc mirror --v2 --help
 ```
 ### Print actions without mirroring images (Test)
 ```bash
+oc mirror -c <image_set_config_yaml> file://<oc_mirror_workspace_path> --dry-run --v2 
 oc mirror -c <image_set_config_yaml> --from file://<oc_mirror_workspace_path> docker://<mirror_registry_url> --dry-run --v2
 ```
 ### Partially Disconnected Mode
