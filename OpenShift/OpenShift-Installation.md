@@ -281,6 +281,8 @@ If your system has access to the internet but not to the target registry:
   3. In the disconnected environment, transfer the images to the destination registry:​
   ```bash
   oc mirror --from=./mirror_seq1_000000.tar docker://registry.example.com:5000 --v2
+
+  oc mirror --from=./mirror_000001.tar docker://registry.example.com --dest-skip-tls --dest-use-http
   ```
 ### Mirror To Disk (v2)
 - Note: Edit `imageset-config.yaml`
