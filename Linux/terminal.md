@@ -18,17 +18,30 @@ echo $?
 ---
 
 # Create user
+**In Linux `$` means normal user access and `#` means super user (root) access.**
 ```bash
 sudo useradd -m -s /bin/bash username
 sudo passwd username
-sudo usermod -aG sudo username         ===>  # Adding the User to the sudo Group
-sudo -u username -i                    ===>  # switch to user
-ssh-keygen
-sudo -s # switch to super user
 ```
-**In Linux `$` means normal user access and `#` means super user (root) access.**
+### Adding the User to the sudo Group (Ubuntu)
 ```bash
-sudo usermod -aG wheel username        ===>  # Adding the User to the sudo Group
+sudo usermod -aG sudo username
+```
+### Switch to User
+```bash
+sudo -u username -i
+```
+### Generate SSH Key
+```bash
+ssh-keygen
+```
+### Switch to Super User
+```bash
+sudo -s
+```
+### Adding the User to the sudo Group (Red Hat، CentOS، Fedora)
+```bash
+sudo usermod -aG wheel username
 ```
 
 ---
