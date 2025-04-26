@@ -49,27 +49,6 @@ subprocess.run([
     '-days', '365'
 ], check=True)
 
-# ---------[ Create Kubernetes Secret YAML ]---------
-secret_yaml = {
-    'apiVersion': 'v1',
-    'kind': 'Secret',
-    'metadata': {
-        'name': f'{username}-secret',
-        'namespace': namespace
-    },
-    'data': {
-        'tls.crt': base64.b64encode(open(crt_file, 'rb').read()).decode('utf-8'),
-        'tls.key': base64.b64encode(open(key_file, 'rb').read()).decode('utf-8')
-    },
-    'type': 'kubernetes.io/tls'
-}
-
-secret_file = os.path.join(user_dir, f'{username}-secret.yaml')
-with open(secret_file, 'w') as f:
-    yaml.dump(secret_yaml, f)
-
-subprocess.run(['kubectl', 'apply', '-f', secret_file], check=True)
-
 # ---------[ Create Kubernetes Role YAML ]---------
 role_yaml = {
     'apiVersion': 'rbac.authorization.k8s.io/v1',
