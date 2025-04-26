@@ -110,5 +110,20 @@ Always verify user permissions carefully to avoid security issues in your Kubern
 
 ---
 
+# Differences to Apply When Using OpenShift CRC
+
+| Aspect                   | Kubernetes (vanilla)                     | OpenShift CRC                                |
+|--------------------------|----------------------------------------|---------------------------------------------|
+| User Creation            | Create X.509 certs and manage keys     | Prefer using ServiceAccounts or set up local users with htpasswd |
+| CA Certificate Location  | `/etc/kubernetes/pki/ca.crt`            | Use OpenShift CA or fetch from cluster config |
+| CA Key Access            | Required for signing user certs         | Usually not accessible or recommended       |
+| Authentication Setup     | Based on client certificates             | Uses OAuth with providers (htpasswd, LDAP, etc.) |
+| User Management          | Create and bind Roles/RoleBindings       | Same, but often use ServiceAccounts or OpenShift users |
+| kubeconfig Generation    | Embed client certs and keys              | Can embed tokens from OAuth or ServiceAccounts |
+| Login Command            | `kubectl` with client cert                | `oc login` with token or username/password  |
+| Namespace Defaulting     | Specified in Role/RoleBinding             | Same                                         |
+
+---
+
 # Happy Automating! 🌟
 
