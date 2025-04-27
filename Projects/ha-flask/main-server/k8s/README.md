@@ -35,6 +35,12 @@ kubectl port-forward pod/flask-postgres-pod 5000:5000
 ```bash
 kubectl apply -f k8s/02-two-deployment-service/
 kubectl get all
+```
+To access service within Minikube:
+```bash
+minikube service <service-name>
+```
+```bash
 minikube service flask-app
 ```
 
