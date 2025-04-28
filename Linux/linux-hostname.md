@@ -60,10 +60,15 @@ To make the hostname accessible within the local network or to ensure other serv
 
 2. Add an entry for the hostname:
     ```plaintext
+    127.0.0.1   localhost
+    127.0.0.1   saeed
+    ```
+    Ubuntu 22.04
+    ```plaintext
     127.0.1.1   saeed
     ```
 
-3. Save and close the file.
+4. Save and close the file.
 
 ## hostname
 1. Open the `/etc/hostname` file:
