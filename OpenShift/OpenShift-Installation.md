@@ -172,89 +172,44 @@ mirror:
   - name: registry.redhat.io/ubi8/ubi:latest
   helm: {}
 ```
+oc-mirror v2 with operator Sample:
 ```yaml
+
 kind: ImageSetConfiguration
 apiVersion: mirror.openshift.io/v2alpha1
 mirror:
   platform:
     channels:
-    - name: stable-4.18 
-      minVersion: 4.18.2
-      maxVersion: 4.18.2
-    graph: true 
+    - name: stable-4.18
+      type: ocp
   operators:
-    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18 
-      packages: 
-       - name: aws-load-balancer-operator
-       - name: 3scale-operator
-       - name: node-observability-operator
-  additionalImages: 
-   - name: registry.redhat.io/ubi8/ubi:latest
-   - name: registry.redhat.io/ubi9/ubi@sha256:20f695d2a91352d4eaa25107535126727b5945bff38ed36a3e59590f495046f0
-```
-```yaml
-kind: ImageSetConfiguration
-apiVersion: mirror.openshift.io/v1alpha2
-storageConfig:
-  local:
-    path: /path/to/disk-rh-ai/metadata
-mirror:
-  operators:
-  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.16
-    targetCatalog: redhat-catalog-v4.16
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18
     packages:
-    - name: "jaeger-product"
+    - name: openshift-gitops-operator
       channels:
-      - name: "stable"
-        minVersion: "1.57.0-7"
-    - name: "kiali-ossm"
+      - name: gitops-1.16
+    - name: servicemeshoperator
       channels:
-      - name: "stable"
-        minVersion: "1.73.8"
-    - name: "openshift-pipelines-operator-rh"
+      - name: stable
+    - name: loki-operator
       channels:
-      - name: "latest"
-        minVersion: "1.15.1"
-    - name: "rhods-operator"
+      - name: stable-6.2
+    - name: cluster-logging
       channels:
-      - name: "fast"
-        minVersion: "2.11.0"
-    - name: "serverless-operator"
+      - name: stable-6.2
+    - name: redhat-oadp-operator 
       channels:
-      - name: "stable"
-        minVersion: "1.33.1"
-    - name: "servicemeshoperator"
+      - name: stable-1.4
+    - name: openshift-cert-manager-operator
       channels:
-      - name: "stable"
-        minVersion: "2.5.2-0"
-  additionalImages:   
-    - name: quay.io/integreatly/prometheus-blackbox-exporter@sha256:35b9d2c1002201723b7f7a9f54e9406b2ec4b5b0f73d114f47c70e15956103b5
-    - name: quay.io/modh/caikit-nlp@sha256:0cde6c26e02ec398aea959a1a1bcdc615b86821adb41989e81d03de01124545c
-    - name: quay.io/modh/caikit-tgis-serving@sha256:4e907ce35a3767f5be2f3175a1854e8d4456c43b78cf3df4305bceabcbf0d6e2
-…
-…
-…
-```
-oc-mirror v2 Sample:
-```yaml
-kind: ImageSetConfiguration
-apiVersion: mirror.openshift.io/v2alpha1
-mirror:
-  platform:
-    channels:
-    - name: stable-4.13
-      minVersion: 4.13.10
-      maxVersion: 4.13.10
-    graph: true
-  operators:
-    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.15
-      packages:
-       - name: aws-load-balancer-operator
-       - name: 3scale-operator
-       - name: node-observability-operator
-  additionalImages:
-   - name: registry.redhat.io/ubi8/ubi:latest
-   - name: registry.redhat.io/ubi9/ubi@sha256:20f695d2a91352d4eaa25107535126727b5945bff38ed36a3e59590f495046f0
+      - name: stable-v1
+    - name: container-security-operator
+      channels:
+      - name: stable-3.14
+    - name: cluster-observability-operator
+      channels:
+      - name: stable
+  helm: {}
 ```
 
 ### 6. Start Mirroring to Local Directory
