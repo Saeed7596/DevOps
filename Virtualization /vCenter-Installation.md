@@ -97,5 +97,43 @@ This guide provides step-by-step instructions to install **VMware vCenter Server
 
 ---
 
+# 📦 Differences Between Snapshot, Clone, and Template in vSphere
+
+## Snapshot
+- Captures the exact state of a VM (disk, memory, and settings) at a specific point in time.
+- Used mainly for short-term backup purposes (e.g., before updates).
+- **Depends on the original VM** and is **not a full copy**.
+- Allows rollback to the captured state if needed.
+
+## Clone
+- Creates a **full, independent copy** of an existing VM.
+- Once created, the clone is completely separate and can be powered on and modified.
+- Useful for creating development, test, or production VMs.
+
+## Template
+- A **specialized, read-only copy** of a VM designed for standardized deployments.
+- Cannot be powered on directly.
+- VMs are deployed from templates to ensure consistent and repeatable configurations.
+- To edit, you must first convert the template back into a VM.
+
+---
+
+## 🔥 Quick Comparison Table
+
+| Type      | Dependency             | Use Case                        | Editable After Creation |
+|-----------|-------------------------|----------------------------------|--------------------------|
+| Snapshot  | Depends on original VM   | Quick rollback before changes   | Yes (by reverting)       |
+| Clone     | Independent copy         | Duplicate for independent use   | Yes                      |
+| Template  | Independent, read-only   | Standardized VM deployment      | No (needs conversion)    |
+
+---
+
+## 🛠 Example Use Cases
+- **Snapshot:** Before OS patching or application upgrade.
+- **Clone:** Quickly create a development or testing environment.
+- **Template:** Rapidly deploy standardized VMs across the organization.
+
+---
+
 vCenter is now ready to manage your virtual infrastructure! 🎉
 
