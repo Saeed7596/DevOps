@@ -54,6 +54,12 @@ sudo rm -rf /var/cache/dnf
 sudo dnf makecache
 ```
 ### Change repo
+#### User epel
+```bash
+sudo dnf install epel-release
+sudo dnf update
+```
+#### Or Use AlmaLinux repo
 ```bash
 nano fix-repo.sh
 ```
@@ -120,6 +126,22 @@ wget https://rpmfind.net/linux/almalinux/9.5/AppStream/x86_64/os/Packages/libXSc
 ```bash
 sudo rpm -i libXScrnSaver-1.2.3-10.el9.x86_64.rpm
 ```
+
+---
+
+# Install [Hiddyfy](https://github.com/hiddify/hiddify-app)
+```bash
+sudo dnf install libayatana-appindicator3 libayatana-ido3 libayatana-indicator3 libdbusmenu-glib
+```
+```bash
+wget https://github.com/hiddify/hiddify-next/releases/latest/download/Hiddify-rpm-x64.rpm
+```
+```bash
+sudo rpm -ivh Hiddify-rpm-x64.rpm
+```
+
+---
+
 # Route terminal internet traffic throw vpn
 ```bash
 Setting -> Network -> Proxy: Manual -> HTTP/HTTPS = 127.0.0.1:8086
