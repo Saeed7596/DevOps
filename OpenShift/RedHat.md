@@ -130,8 +130,16 @@ sudo rpm -i libXScrnSaver-1.2.3-10.el9.x86_64.rpm
 ---
 
 # Install [Hiddyfy](https://github.com/hiddify/hiddify-app)
+Find the dependency in this [Site](https://rpmfind.net/linux/rpm2html/search.php)
 ```bash
-sudo dnf install libayatana-appindicator3 libayatana-ido3 libayatana-indicator3 libdbusmenu-glib
+wget https://rpmfind.net/linux/epel/9/Everything/x86_64/Packages/l/libayatana-appindicator-gtk3-0.5.93-4.el9.x86_64.rpm && wget https://rpmfind.net/linux/epel/9/Everything/x86_64/Packages/l/libayatana-ido-gtk3-0.10.1-4.el9.x86_64.rpm && wget https://rpmfind.net/linux/epel/9/Everything/x86_64/Packages/l/libayatana-indicator-gtk3-0.9.4-3.el9.x86_64.rpm && wget https://rpmfind.net/linux/epel/9/Everything/x86_64/Packages/l/libdbusmenu-16.04.0-19.el9.x86_64.rpm && wget https://rpmfind.net/linux/epel/9/Everything/x86_64/Packages/l/libdbusmenu-gtk3-16.04.0-19.el9.x86_64.rpm
+```
+```bash
+sudo rpm -i libayatana-ido-gtk3-0.10.1-4.el9.x86_64.rpm \\
+sudo rpm -i libayatana-indicator-gtk3-0.9.4-3.el9.x86_64.rpm \\
+sudo rpm -i libdbusmenu-16.04.0-19.el9.x86_64.rpm \\
+sudo rpm -i libdbusmenu-gtk3-16.04.0-19.el9.x86_64.rpm \\
+sudo rpm -i libayatana-appindicator-gtk3-0.5.93-4.el9.x86_64.rpm
 ```
 ```bash
 wget https://github.com/hiddify/hiddify-next/releases/latest/download/Hiddify-rpm-x64.rpm
