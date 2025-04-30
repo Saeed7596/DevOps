@@ -54,6 +54,7 @@ sudo rm -rf /var/cache/dnf
 sudo dnf makecache
 ```
 ### Change repo
+> **Find the `dependency` in this [Site](https://rpmfind.net/linux/rpm2html/search.php)**
 #### User epel
 ```bash
 sudo dnf install epel-release
@@ -120,7 +121,9 @@ https://rpmfind.net/linux/rpm2html/search.php?query=libXScrnSaver
 ```
 ```bash
 wget https://mirror.chpc.utah.edu/pub/almalinux/9/AppStream/x86_64/os/Packages/libXScrnSaver-1.2.3-10.el9.x86_64.rpm
+```
 or
+```bash
 wget https://rpmfind.net/linux/almalinux/9.5/AppStream/x86_64/os/Packages/libXScrnSaver-1.2.3-10.el9.x86_64.rpm
 ```
 ```bash
@@ -135,11 +138,7 @@ Find the dependency in this [Site](https://rpmfind.net/linux/rpm2html/search.php
 wget https://rpmfind.net/linux/epel/9/Everything/x86_64/Packages/l/libayatana-appindicator-gtk3-0.5.93-4.el9.x86_64.rpm && wget https://rpmfind.net/linux/epel/9/Everything/x86_64/Packages/l/libayatana-ido-gtk3-0.10.1-4.el9.x86_64.rpm && wget https://rpmfind.net/linux/epel/9/Everything/x86_64/Packages/l/libayatana-indicator-gtk3-0.9.4-3.el9.x86_64.rpm && wget https://rpmfind.net/linux/epel/9/Everything/x86_64/Packages/l/libdbusmenu-16.04.0-19.el9.x86_64.rpm && wget https://rpmfind.net/linux/epel/9/Everything/x86_64/Packages/l/libdbusmenu-gtk3-16.04.0-19.el9.x86_64.rpm
 ```
 ```bash
-sudo rpm -i libayatana-ido-gtk3-0.10.1-4.el9.x86_64.rpm \\
-sudo rpm -i libayatana-indicator-gtk3-0.9.4-3.el9.x86_64.rpm \\
-sudo rpm -i libdbusmenu-16.04.0-19.el9.x86_64.rpm \\
-sudo rpm -i libdbusmenu-gtk3-16.04.0-19.el9.x86_64.rpm \\
-sudo rpm -i libayatana-appindicator-gtk3-0.5.93-4.el9.x86_64.rpm
+sudo rpm -i libayatana-ido-gtk3-0.10.1-4.el9.x86_64.rpm && sudo rpm -i libayatana-indicator-gtk3-0.9.4-3.el9.x86_64.rpm && sudo rpm -i libdbusmenu-16.04.0-19.el9.x86_64.rpm && sudo rpm -i libdbusmenu-gtk3-16.04.0-19.el9.x86_64.rpm && sudo rpm -i libayatana-appindicator-gtk3-0.5.93-4.el9.x86_64.rpm
 ```
 ```bash
 wget https://github.com/hiddify/hiddify-next/releases/latest/download/Hiddify-rpm-x64.rpm
