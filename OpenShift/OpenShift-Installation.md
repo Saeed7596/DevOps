@@ -1,7 +1,7 @@
 # OpenShift Offline Mirror Installation Guide (RedHat9 OS)
 
 > Automating OpenShift Image Mirroring for Air-Gapped or Private Environments.
-
+Follow this [Link](https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/disconnected_installation_mirroring/about-installing-oc-mirror-v2)
 ---
 
 ## Prerequisites
@@ -326,3 +326,6 @@ skopeo --version
 chmod +x mirror.sh
 ./mirror.sh
 ```
+
+---
+
