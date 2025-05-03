@@ -8,12 +8,28 @@ nmcli device show
 ```
 ### enable redhat subscription
 ```bash
+sudo subscription-manager register --username <username> --password <password>
+sudo subscription-manager register
+```
+```bash
+sudo subscription-manager refresh
+```
+```bash
 sudo subscription-manager repos --enable=rhel-9-for-x86_64-baseos-rpms
 sudo subscription-manager repos --enable=rhel-9-for-x86_64-appstream-rpms
 ```
 ### show all repo
 ```bash
 sudo subscription-manager repos --list
+```
+```bash
+sudo subscription-manager list --available --all
+```
+# Un-registering a system
+```bash
+sudo subscription-manager remove --all
+sudo subscription-manager unregister
+sudo subscription-manager clean
 ```
 ```bash
 cat /etc/*release
@@ -130,9 +146,19 @@ wget https://rpmfind.net/linux/almalinux/9.5/AppStream/x86_64/os/Packages/libXSc
 sudo rpm -i libXScrnSaver-1.2.3-10.el9.x86_64.rpm
 ```
 
+# Route terminal internet traffic throw vpn (Oblivion)
+```bash
+Setting -> Network -> Proxy: Manual -> HTTP/HTTPS = 127.0.0.1:8086
+```
+## Show external ip for check the vpn connection in terminal
+```bash
+curl ifconfig.me
+```
+Output should be the vpn ip
+
 ---
 
-# Install [Hiddyfy](https://github.com/hiddify/hiddify-app)
+# Install [Hiddiyfy](https://github.com/hiddify/hiddify-app)
 Find the dependency in this [Site](https://rpmfind.net/linux/rpm2html/search.php)
 ```bash
 wget https://rpmfind.net/linux/epel/9/Everything/x86_64/Packages/l/libayatana-appindicator-gtk3-0.5.93-4.el9.x86_64.rpm && wget https://rpmfind.net/linux/epel/9/Everything/x86_64/Packages/l/libayatana-ido-gtk3-0.10.1-4.el9.x86_64.rpm && wget https://rpmfind.net/linux/epel/9/Everything/x86_64/Packages/l/libayatana-indicator-gtk3-0.9.4-3.el9.x86_64.rpm && wget https://rpmfind.net/linux/epel/9/Everything/x86_64/Packages/l/libdbusmenu-16.04.0-19.el9.x86_64.rpm && wget https://rpmfind.net/linux/epel/9/Everything/x86_64/Packages/l/libdbusmenu-gtk3-16.04.0-19.el9.x86_64.rpm
@@ -146,15 +172,46 @@ wget https://github.com/hiddify/hiddify-next/releases/latest/download/Hiddify-rp
 ```bash
 sudo rpm -ivh Hiddify-rpm-x64.rpm
 ```
-
----
-
-# Route terminal internet traffic throw vpn
+# Or Install [HiddiyfyCli](https://hiddify.com/fa/app/HiddifyCli-guide/#hiddifycli-hiddifyapp_1)
+[Download](https://github.com/hiddify/hiddify-core/releases) the file and extrat
 ```bash
-Setting -> Network -> Proxy: Manual -> HTTP/HTTPS = 127.0.0.1:8086
+wget https://github.com/hiddify/hiddify-core/releases/download/v3.1.8/hiddify-cli-linux-amd64.tar.gz
+tar -xzvf hiddify-cli-linux-amd64.tar.gz
+```
+Save your sublink as a `.txt` file
+```bash
+nano sublink.txt
+```
+```bash
+./HiddifyCli run -c <config file or sublink>
+./HiddifyCli run -c nano sublink.txt
+```
+Check the `Mixed Port`
+```bash
+echo $http_proxy
+echo $https_proxy
+# Output is empty!
+export http_proxy="127.0.0.1:Mixed Port"
+export https_proxy="127.0.0.1:Mixed Port"
+# Mixed Port = 2334
+export http_proxy="127.0.0.1:2334"
+export https_proxy="127.0.0.1:2334"
+```
+You can save the config form Hiddiyfy app as a `.json` file, so now don't need set the port manually
+```bash
+./HiddifyCli run -c <config file or sublink> -d <HiddifyApp config file or URL>
+./HiddifyCli run -c sublink.txt -d mu-config.json
+```
+
+# Route terminal internet traffic throw vpn (Hiddiyfy)
+```bash
+Setting -> Network -> Proxy: Manual -> HTTP/HTTPS = 127.0.0.1:2334
 ```
 ## Show external ip for check the vpn connection in terminal
 ```bash
-curl ifconfig.me
+curl ipinfo.io
 ```
 Output should be the vpn ip
+
+---
+
