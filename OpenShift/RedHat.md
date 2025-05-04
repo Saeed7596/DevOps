@@ -184,7 +184,7 @@ nano sublink.txt
 ```
 ```bash
 ./HiddifyCli run -c <config file or sublink>
-./HiddifyCli run -c nano sublink.txt
+./HiddifyCli run -c sublink.txt
 ```
 Check the `Mixed Port`
 ```bash
