@@ -124,7 +124,10 @@ source ~/.bashrc
   mkdir -p ~/.config/containers
   cp ./auths.json ~/.config/containers/auth.json
   ```
-
+  Restart docker
+  ```bash
+  sudo systemctl restart docker
+  ```
 ### 4. Login to Red Hat Registry
 ```bash
 docker login registry.redhat.io
