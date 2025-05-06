@@ -30,10 +30,16 @@ Find the admin password with:
 ```bash
 docker exec -it nexus cat /nexus-data/admin.password
 ```
+After Change admin password:
+  - **✔ Disable anonymous access**
+
+---
+
 ## To push docker image from local to nexus:
-1. **Enable the `Docker Bearer Token Realm` in Nexus Security->Realms Tab.**
+1. **in Nexus Security -> Realms Tab -> Enable the `Docker Bearer Token Realm`**
 2. **in Repositories -> create repository -> docker (hosted)**
-3. ** ✔ check HTTP > put 8084 in the fill**
+3. **✔ check HTTP > put 8084 in the fill**
+4. **✔ Enable Docker V1 API**
 ```bash
 # in local machine
 docker login nesxusIP-URL:8084
@@ -52,10 +58,28 @@ docker push nesxusIP-URL:8084/image:tag
 
 ---
 
-# Or use ca.crt (ca.crt is the `private-key` of site that generate with openssl or letsencrypt)
+# Auto login
+## Config `.docker/config.json`
+```bash
+echo -n 'username:password' | base64 -w0
+```
+```json
+{
+  "auths": {
+    "nexus.ir": {
+      "auth": "BGVtbYk3ZHAtqXs=",
+      "email": "you@example.com"
+    }
+  }
+}
+```
+
+---
+
+## Or use ca.crt (ca.crt is the `private-key` of site that generate with openssl or letsencrypt)
 - openssl genrsa -out domain.key 2048 openssl req -new -key domain.key -out domain.csr
 - copy the content of `private-key` and paste it in the ca.crt file in this path on linux machine that want to connect to registry.
-## For Docker
+### For Docker
 - Copy the `private-key` of site.
 - Put it in this dicrecory: `/etc/docker/certs.d/<registry-host>:<port>/ca.crt`
 - `sudo mkdir -p /etc/docker/certs.d/nexus.ir`
@@ -68,7 +92,7 @@ if use TLS Self-Signed and got error:
 - `sudo update-ca-trust`
 
 
-## For podman:
+### For podman:
 - `sudo mkdir -p /etc/containers/certs.d/nexus.ir`
 - `sudo cp ca.crt /etc/containers/certs.d/nexus.ir/ca.crt`
 
