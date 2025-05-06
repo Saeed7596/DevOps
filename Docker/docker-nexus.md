@@ -105,7 +105,9 @@ server {
 server {
     listen 443 ssl;
     server_name nexus.ir;
+
     client_max_body_size 32M;
+    # client_max_body_size 5G; # if got error: 413 Request Entity Too Large
 
     location / {
         proxy_read_timeout      300;
