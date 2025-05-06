@@ -325,3 +325,131 @@ docker exec -it <gitlab-container-name> gitlab-rake gitlab:check SANITIZE=true
 ### Recovering Sensitive Files in Case of Errors (e.g., `gitlab-secrets.json`)
 If you encounter a 500 error after the update, you may need to restore sensitive files like `gitlab-secrets.json` from a backup. This file contains sensitive keys that might need to be restored for the new version.
 
+---
+
+# Using GitLab Container Registry
+
+## Overview
+
+GitLab Container Registry allows you to build, push, and deploy Docker images within GitLab itself. This document explains how to enable and use the Container Registry in a GitLab project.
+
+---
+
+## 1. Check if Container Registry is Enabled on GitLab Server
+
+* If you are using **Self-Managed GitLab** (installed GitLab on your own server), ensure that the Registry is configured in `/etc/gitlab/gitlab.rb`:
+
+```ruby
+registry_external_url 'https://registry.example.com'
+```
+
+After editing, apply changes:
+
+```bash
+sudo gitlab-ctl reconfigure
+```
+
+* If you are using **GitLab.com (SaaS)**, Container Registry is enabled by default.
+
+---
+
+## 2. Enable Registry for a Project
+
+* Go to your project in GitLab.
+
+* Navigate to:
+
+  **Settings > General > Visibility, Project Features, Permissions**
+
+* Ensure the **Container Registry** checkbox is enabled.
+
+---
+
+## 3. Accessing the Registry
+
+After activation, your project will have its own Registry path:
+
+```text
+registry.gitlab.com/<your-namespace>/<your-project>
+```
+
+Example:
+
+```text
+registry.gitlab.com/saeed/devops-project
+```
+
+---
+
+## 4. Login to GitLab Container Registry
+
+Use Docker CLI to log in:
+
+```bash
+docker login registry.gitlab.com
+```
+
+**Credentials:**
+
+* **Username:** Your GitLab username
+* **Password:** A **Personal Access Token** (with `write_registry` scope)
+
+> It is recommended NOT to use your GitLab account password.
+
+---
+
+## 5. Push Docker Images to Registry
+
+### Tag your image:
+
+```bash
+docker tag my-image registry.gitlab.com/<your-namespace>/<your-project>/<image-name>:<tag>
+```
+
+### Push your image:
+
+```bash
+docker push registry.gitlab.com/<your-namespace>/<your-project>/<image-name>:<tag>
+```
+
+---
+
+## 6. Private vs Public Projects
+
+* If your GitLab project is **private**, the Registry will be private too.
+* If your GitLab project is **public**, the Registry can also be public, but you may need to explicitly allow it via project settings.
+
+---
+
+# GitLab Runner Configuration Example
+
+When using GitLab Runner with Docker executor and pulling images from the registry, configure `/etc/gitlab-runner/config.toml`:
+
+```toml
+[[runners]]
+  [runners.docker]
+    pull_policy = ["if-not-present"]
+```
+
+**Explanation:**
+
+* `pull_policy = ["if-not-present"]` tells the Runner to pull the image **only if it is not available locally**.
+
+---
+
+## Summary Table
+
+| Step                                 | Command/Setting                                                               |
+| :----------------------------------- | :---------------------------------------------------------------------------- |
+| Install or configure GitLab Registry | `/etc/gitlab/gitlab.rb`                                                       |
+| Enable Registry for a project        | Settings > General > Visibility and Permissions                               |
+| Docker login                         | `docker login registry.gitlab.com`                                            |
+| Tag Image                            | `docker tag my-image registry.gitlab.com/<namespace>/<project>/<image>:<tag>` |
+| Push Image                           | `docker push registry.gitlab.com/<namespace>/<project>/<image>:<tag>`         |
+| GitLab Runner Pull Policy            | `pull_policy = ["if-not-present"]`                                            |
+
+---
+
+# Done! ✨
+
+You can now use GitLab's built-in Container Registry to manage your Docker images efficiently.
