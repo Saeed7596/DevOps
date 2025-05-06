@@ -137,11 +137,110 @@ scp /srv/gitlab/config/gitlab-secrets.json username@remote_host:/srv/gitlab/conf
 ```
 -------------------------------------------
 # gitlab-runner 
-### install with docker
+# GitLab Runner Installation with Docker
+## Steps
+### 1. Pull the GitLab Runner image
 ```bash
-docker run -d --name gitlab-runner --restart always -v /var/run/docker.sock:/var/run/docker.sock -v gitlab-runner-config:/etc/gitlab-runner gitlab-runner:16.1.0
+docker pull gitlab/gitlab-runner:latest
 ```
-* config file in /etc/gitlab-runner/config.toml
+
+### 2. Run the GitLab Runner container
+```bash
+docker run -d --name gitlab-runner --restart always \
+  -v /srv/gitlab-runner/config:/etc/gitlab-runner \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  gitlab/gitlab-runner:latest
+```
+
+* `/srv/gitlab-runner/config:/etc/gitlab-runner` : Mounts a volume for Runner configuration.
+* `/var/run/docker.sock:/var/run/docker.sock` : Allows Docker to be controlled inside jobs.
+
+### 3. Register the GitLab Runner
+
+```bash
+docker exec -it gitlab-runner gitlab-runner register
+```
+
+You will be prompted to provide:
+* **GitLab URL** (e.g., `https://git.example.ir`)
+* **Registration Token** (get this from your GitLab project's CI/CD settings)
+* **Description** (name your runner)
+* **Tags** (optional labels for this runner)
+* **Executor** (`docker`, `shell`, etc.)
+* **Default Docker image** (e.g., `docker:latest`)
+
+---
+
+# Understanding `/etc/gitlab-runner/config.toml`
+The `config.toml` file is the main configuration file for GitLab Runner.
+
+Example structure:
+```toml
+concurrent = 4
+check_interval = 0
+
+[session_server]
+  session_timeout = 1800
+
+[[runners]]
+  name = "my-runner"
+  url = "https://gitlab.com/"
+  token = "xxxxxxxxxxxxxxxxxxxx"
+  executor = "docker"
+
+  [runners.custom_build_dir]
+  [runners.docker]
+    tls_verify = false
+    pull_policy = ["if-not-present"]
+    image = "docker:latest"
+    privileged = true
+    disable_entrypoint_overwrite = false
+    oom_kill_disable = false
+    disable_cache = false
+    volumes = ["/cache"]
+    shm_size = 0
+```
+
+## Important Sections:
+
+* **concurrent**: Max number of jobs that can run simultaneously.
+* **session\_server**: Configuration for WebSocket session for the job trace.
+* **runners**: List of runners registered.
+
+  * **name**: Friendly name for the runner.
+  * **url**: GitLab instance URL.
+  * **token**: Authentication token for the runner.
+  * **executor**: How jobs are run (e.g., `docker`, `shell`, `virtualbox`).
+
+### Inside `[runners.docker]`
+
+* **image**: Default Docker image used.
+* **privileged**: Whether to enable Docker-in-Docker.
+* **volumes**: Volumes mounted into the containers.
+* **shm\_size**: Shared memory size for containers.
+* **pull_policy**: Defines when Docker should pull images. Example: `["if-not-present"]`
+
+---
+
+# Quick Commands
+
+| Action                   | Command                                                                                                               |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| View Runner logs         | `docker logs gitlab-runner`                                                                                           |
+| Restart Runner container | `docker restart gitlab-runner`                                                                                        |
+| Update Runner image      | `docker pull gitlab/gitlab-runner:latest && docker stop gitlab-runner && docker rm gitlab-runner && re-run container` |
+
+---
+
+# Tips
+
+* Always backup `config.toml` before updating or modifying it.
+* Use `tags` smartly to assign jobs to appropriate runners.
+* Prefer "privileged" mode if you need to run Docker inside jobs.
+
+---
+
+**My `/etc/gitlab-runner/config.toml`**
 ```vim
 concurrent = 1
 check_interval = 0
@@ -172,7 +271,9 @@ shutdown_timeout = 0
     volumes = ["/cache:/cache", "/var/run/docker.sock:/var/run/docker.sock"]
     shm_size = 0
 ```
--------------------------------------------
+
+---
+
 # Upgrade
 ## Change the image of docker-compose.yml file, but you should pay attention the [upgrade-path](https://gitlab-com.gitlab.io/support/toolbox/upgrade-path/), change image step by step.
 * For example upgrade 16.1.2 to 17.3.4:
