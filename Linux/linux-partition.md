@@ -168,3 +168,127 @@ lsblk
 ```
 
 This should show the additional space available in the root partition (`/`).
+
+---
+
+# Growpart Quick Guide
+## Introduction
+`growpart` is a Linux utility used to safely and automatically extend a partition to fill the available disk space without losing existing data. It's much safer and faster than manually editing partitions with `fdisk` or `parted`.
+
+---
+
+## When to Use
+* You resized a virtual disk (VMware, Hyper-V, etc.)
+* Your server needs more space on an existing partition
+* You want to avoid manual and risky partition deletion/recreation
+
+---
+
+## How `growpart` Works
+* It expands an existing partition (e.g., `/dev/sda3`) into the available free space
+* It does **NOT** resize the filesystem itself (you must do that separately)
+
+## Install Growpart
+Depending on your Linux distribution:
+**RHEL / CentOS / Rocky / AlmaLinux:**
+```bash
+sudo yum install cloud-utils-growpart
+```
+
+**Ubuntu / Debian:**
+```bash
+sudo apt update
+sudo apt install cloud-guest-utils
+```
+
+**SUSE / openSUSE:**
+```bash
+sudo zypper install cloud-utils-growpart
+```
+
+---
+
+## Basic Usage
+```bash
+sudo growpart /dev/<device> <partition_number>
+```
+**Example:**
+```bash
+sudo growpart /dev/sda 3
+```
+This expands `/dev/sda3` to use all free space on the disk.
+
+---
+
+### Resize Physical Volume
+```bash
+sudo pvresize /dev/sda3
+```
+
+---
+
+### Extend Logical Volume (For Example: /home)
+```bash
+sudo lvextend -l +100%FREE /dev/rhel/home
+```
+
+---
+
+## Next Step: Expand Filesystem
+After extending the partition, you must also expand the filesystem inside it.
+
+### If ext4 filesystem:
+```bash
+sudo resize2fs /dev/mapper/<your_logical_volume>
+```
+**Example for ext4:**
+```bash
+sudo resize2fs /dev/mapper/rhel-home
+```
+### If XFS filesystem:
+```bash
+sudo xfs_growfs /mount/point
+```
+**Example for XFS on `/home` mount point:**
+```bash
+sudo xfs_growfs /home
+```
+
+---
+
+## Important Notes
+
+* `growpart` does **not** destroy any data
+* It works with both **MBR** and **GPT** partition tables
+* If your system uses **LVM**, after `growpart`, you may also need to extend the Volume Group (VG) and Logical Volume (LV) accordingly
+* In some rare cases, a reboot may be needed, but usually not
+
+## Troubleshooting
+
+* **"device not found" error:** Ensure you have the correct device name and partition number.
+* **"not a partition table" error:** The target disk might not have a proper partition table.
+
+---
+
+# Check
+```bash
+df -h /home
+sudo lvs
+sudo vgs
+sudo pvs
+```
+
+---
+
+## Summary
+
+| Step                        | Command Example                             |
+| --------------------------- | ------------------------------------------- |
+| 1. Install growpart         | `sudo yum install cloud-utils-growpart`     |
+| 2. Expand Partition         | `sudo growpart /dev/sda 3`                  |
+| 3. Resize Physical Volume   | `sudo pvresize /dev/sda3`                   |
+| 4. Extend Logical Volume    | `sudo lvextend -l +100%FREE /dev/rhel/home` |
+| 5. Expand Filesystem (ext4) | `sudo resize2fs /dev/mapper/rhel-home`      |
+| 5. Expand Filesystem (xfs)  | `sudo xfs_growfs /home`                     |
+
+---
