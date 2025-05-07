@@ -35,6 +35,7 @@ chmod 700 get_helm.sh
 | Show Installed Release Status | `helm status [release-name]`                                 |
 | Get Release Values            | `helm get values [release-name]`                             |
 | Create a new Helm chart       | `helm create [chart-name]`                                   |
+| Renders Helm chart templates  | `helm template [RELEASE_NAME] [CHART] [flags]`               |
 
 Note:
 - `repo-name` is custom name that you set for the repository.
@@ -72,6 +73,18 @@ helm ls -A
 helm ls -n <namespace-name>
 
 helm history <release-name>
+```
+**helm Template**
+```bash
+# Render a chart locally
+helm template myapp ./mychart
+helm template myapp . --namespace [namespace-name]
+
+# Render with specific values file
+helm template myapp ./mychart -f values-production.yaml
+
+# Save output to files
+helm template myapp ./mychart > output.yaml
 ```
 
 ---
