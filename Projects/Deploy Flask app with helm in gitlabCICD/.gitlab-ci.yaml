@@ -1,0 +1,35 @@
+stages:
+  - build
+  - deploy
+
+# It's better to defined these variables in CI/CD -> variables 
+variables:
+  CI_REGISTRY: registry.example.com
+  CI_REGISTRY_USER: "admin"
+  CI_REGISTRY_PASSWORD: ""
+
+build:
+  stage: build
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - echo "Building Docker image..."
+    - docker build -t $CI_REGISTRY/$CI_PROJECT_PATH:$CI_COMMIT_SHORT_SHA .
+    - docker push $CI_REGISTRY/$CI_PROJECT_PATH:$CI_COMMIT_SHORT_SHA
+    
+  tags:
+    - docker
+
+
+deploy:
+  stage: deploy
+  # this overrides the global image
+  image: dtzar/helm-kubectl:latest
+  script:
+    - echo "Deploying application to Kubernetes..."
+    - mkdir -p ~/.kube
+    # $KUBE_CONFIG is defined earlier in CI/CD variables or job environment
+    - echo "$KUBE_CONFIG" > ~/.kube/config
+    - helm template  myapp ./deploy --namespace default  --set image.repository=$CI_REGISTRY/$CI_PROJECT_PATH,image.tag=$CI_COMMIT_SHORT_SHA
+    - helm install  myapp ./deploy --namespace default  --set image.repository=$CI_REGISTRY/$CI_PROJECT_PATH,image.tag=$CI_COMMIT_SHORT_SHA
+  tags:
+    - docker
