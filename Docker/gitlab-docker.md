@@ -275,14 +275,6 @@ Edit your `config.toml` file and add the socket to the `volumes` section:
     volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache"]
 ```
 
-Or, if starting the container manually:
-
-```bash
-docker run -d --name gitlab-runner \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  gitlab/gitlab-runner
-```
-
 ---
 
 ## docker-compose.yml Example
