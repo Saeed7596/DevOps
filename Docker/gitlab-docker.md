@@ -240,6 +240,79 @@ check_interval = 0
 
 ---
 
+# GitLab Runner - Docker in Docker (dind) Issue and Solution
+
+## Problem
+
+When running `gitlab-runner` **inside a container**, if you encounter the following error during your CI/CD pipelines:
+
+```text
+ERROR: error during connect: Post "http://docker:2375/_ping": no such host
+```
+
+This error means that your GitLab Runner container **does not have access to a Docker daemon**, and therefore it **cannot execute Docker commands** like `docker build`, `docker run`, etc.
+
+---
+
+## Root Cause
+
+Inside the container, there is **no Docker daemon** available by default. The runner tries to connect to a Docker service at `docker:2375`, but fails because it doesn't exist.
+
+---
+
+## Solution
+
+You must **mount the host's Docker socket** (`/var/run/docker.sock`) into the GitLab Runner container.
+This way, the container can **communicate with the host’s Docker daemon**.
+
+Edit your `config.toml` file and add the socket to the `volumes` section:
+
+```toml
+[[runners]]
+  ...
+  [runners.docker]
+    ...
+    volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache"]
+```
+
+Or, if starting the container manually:
+
+```bash
+docker run -d --name gitlab-runner \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  gitlab/gitlab-runner
+```
+
+---
+
+## docker-compose.yml Example
+
+You can use the following `docker-compose.yml` to easily set up GitLab Runner with Docker socket mounted:
+
+```yaml
+version: '3.7'
+
+services:
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    container_name: gitlab-runner
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /srv/gitlab-runner/config:/etc/gitlab-runner
+```
+
+> **Note:** Make sure `/srv/gitlab-runner/config` exists or adjust it to where you want to store your GitLab Runner configuration.
+
+---
+
+## 📌 Important Note
+
+Mounting the Docker socket gives the container full control over the host’s Docker engine,
+so **make sure** only trusted pipelines are allowed to run in this runner.
+
+---
+
 **My `/etc/gitlab-runner/config.toml`**
 ```vim
 concurrent = 1
