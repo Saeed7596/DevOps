@@ -11,7 +11,8 @@ services:
       - NEXUS_HOME=/opt/sonatype/nexus
       - NEXUS_DATA=/nexus-data
       - SONATYPE_WORK=/opt/sonatype/sonatype-work
-      - INSTALL4J_ADD_VM_PARAMS=-Xms2703m -Xmx2703m -XX:MaxDirectMemorySize=2703m
+      #- INSTALL4J_ADD_VM_PARAMS=-Xms2703m -Xmx2703m -XX:MaxDirectMemorySize=2703m
+      - INSTALL4J_ADD_VM_PARAMS=-Xms4096m -Xmx8192m -XX:MaxDirectMemorySize=4096m
     volumes:
       - ./nexus-data:/nexus-data
     ports:
