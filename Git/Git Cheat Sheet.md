@@ -103,27 +103,20 @@ git push origin v1.0                    # Push tag to remote
 ---
 
 ## Git Bisect
-
 ### What is `git bisect`?
-
 `git bisect` helps you find the commit that introduced a bug by performing a binary search between known good and bad commits.
-
 ### How to use `git bisect`
-
 ```bash
 git bisect start
 git bisect bad        # mark the current commit as bad
 git bisect good <commit-hash>  # mark a known good commit
 ```
-
 Then follow the testing prompts (`good`/`bad`) until the problematic commit is found.
 
 Finally, reset:
-
 ```bash
 git bisect reset
 ```
-
 Example Workflow:
 ```bash
 git bisect start
@@ -138,21 +131,17 @@ git bisect reset
 ---
 
 ## GPG --gen-key
-
 ### What is `gpg --gen-key`?
-
 The `gpg --gen-key` command generates a new GPG key pair for encrypting, signing, and verifying files and commits.
-
 ### How to generate a GPG key
-
 ```bash
 gpg --full-generate-key
 ```
-
 Follow the interactive prompts to complete setup.
-
 ### List and export your GPG key
-
+```bash
+gpg --list-secret-keys --keyid-format LONG
+```
 ```bash
 gpg --list-keys
 gpg --armor --export <Key-ID>
@@ -161,67 +150,61 @@ gpg --armor --export <Key-ID>
 ---
 
 ## Signing Git Commits and Tags
-
 ### Sign a Git Commit
-
 To sign a commit manually:
-
 ```bash
 git commit -S -m "Your signed commit message"
 ```
-
 * `-S` option tells Git to sign the commit with your GPG key.
 
+Set your signing key in Git:
+```bash
+git config --global user.signingkey YOUR_KEY_ID
+```
 To configure Git to always sign commits:
-
 ```bash
 git config --global commit.gpgSign true
 ```
-
 ### Sign a Git Tag
-
 Create and sign an annotated tag:
-
 ```bash
 git tag -s v1.0.0 -m "Signed version 1.0.0"
 ```
-
+### Push the tag to the remote repository:
+```bash
+git push origin v1.0.0
+```
 ### Verify a Signed Commit or Tag
-
 To verify a signed commit:
-
 ```bash
 git log --show-signature
 ```
-
 To verify a signed tag:
-
 ```bash
 git tag -v <tagname>
 ```
 
 You will see the signature verification output.
 
+### Important Notes:
+- Always push your signed commits and tags (`git push` and `git push origin --tags`).
+- Ensure your GPG key is not expired.
+- If GitHub/GitLab does not recognize your signature, check that the correct email and key are uploaded.
+
 ---
 
 ## Git Blame
-
 ### What is `git blame`?
-
 `git blame` shows you who last modified each line of a file and when.
-
 This is useful for tracking changes and understanding the history behind each line.
-
 ### How to use `git blame`
 ```bash
 git blame <filename>
 ```
-
 Example:
 ```bash
 git blame main.py
 ```
-
 You can also blame a specific line range:
 ```bash
 git blame -L 10,20 <filename>
@@ -230,26 +213,21 @@ git blame -L 10,20 <filename>
 ---
 
 ## LICENSE File in Projects
-
 ### What is a LICENSE file?
-
 The LICENSE file in a project defines the legal terms under which the project's source code can be used, modified, and distributed.
 
 It informs users about:
-
 * Their rights to use the code.
 * Any limitations or requirements (e.g., attribution).
 * Liability disclaimers.
 
 ### Common Open-Source Licenses
-
 * MIT License
 * Apache License 2.0
 * GNU GPL v3
 * BSD License
 
 ### Why should you include a LICENSE?
-
 * To legally protect yourself and contributors.
 * To inform users of their rights and responsibilities.
 * To make your project open-source in a standardized way.
