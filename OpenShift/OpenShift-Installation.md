@@ -46,6 +46,15 @@ if ! command -v oc-mirror &> /dev/null; then
 else
   echo "oc-mirror already installed."
 fi
+
+echo "Installing OpenShift Install fips..."
+if ! command -v openshift-install-fips &> /dev/null ; then
+    wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-install-rhel9-amd64.tar.gz
+    tar zxvf openshift-install-rhel9-amd64.tar.gz
+    chmod +x openshift-install-fips
+    sudo mv openshift-install-fips /usr/local/bin
+    rm -f openshift-install-rhel9-amd64.tar.gz
+fi
 ```
 
 ### 2. Install Docker (if not installed)
@@ -332,3 +341,20 @@ chmod +x mirror.sh
 
 ---
 
+#  Deleting the images from disconnected environment 
+1. Create a YAML file that deletes previous images:
+```bash
+oc mirror delete --config delete-image-set-config.yaml --workspace file://<previously_mirrored_work_folder> --v2 --generate docker://<remote_registry>
+```
+Where:
+* `<previously_mirrored_work_folder>`: Use the directory where images were previously mirrored or stored during the mirroring process.
+* `<remote_registry>`: Insert the URL or address of the remote container registry from which images will be deleted.
+2. Go to the `<previously_mirrored_work_folder>/delete directory` that was created.
+3. Verify that the `delete-images.yaml` file has been generated.
+4. Manually ensure that each image listed in the file is no longer needed by the cluster and can be safely removed from the registry.
+5. After you generate the `delete` YAML file, delete the images from the remote registry:
+```bash
+oc mirror delete --v2 --delete-yaml-file <previously_mirrored_work_folder>/delete/delete-images.yaml docker:/ <remote_registry>
+```
+Where:
+* `<previously_mirrored_work_folder>`: Specify your previously mirrored work folder.
