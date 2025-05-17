@@ -50,10 +50,10 @@ fi
 echo "Installing OpenShift Install..."
 if ! command -v openshift-install-fips &> /dev/null ; then
     wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-install-linux.tar.gz
-    tar zxvf openshift-install-rhel9-amd64.tar.gz
-    chmod +x openshift-install-fips
-    sudo mv openshift-install-fips /usr/local/bin
-    rm -f openshift-install-rhel9-amd64.tar.gz
+    tar zxvf openshift-install-linux.tar.gz
+    chmod +x openshift-install
+    sudo mv openshift-install /usr/local/bin
+    rm -f openshift-install-linux.tar.gz
 else
   echo "OpenShift Install already installed."
 fi
