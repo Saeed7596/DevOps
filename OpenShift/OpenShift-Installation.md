@@ -272,13 +272,193 @@ oc mirror --verbose 3 -c imageset-config.yaml file://local-mirror
 
 ---
 
-Output Directory Structure
-```lua
-local-mirror/
-├── manifests/
-└── blobs/
+# Installing on vSphere
+1. Generate ssh-key
+```bash
+ssh-keygen -t rsa -N '' -f $HOME/.ssh/id_openshift
+eval "$(ssh-agent -s)"
+ssh-add $HOME/.ssh/id_openshift
 ```
-This directory contains all necessary files to populate your private registry or prepare for air-gapped installation.
+2. Install `openshift-install`
+Check
+```bash
+openshift-install version
+```
+3. Offline RHCOS image location
+```bash
+mkdir rhcos
+cd rhcos
+wget https://mirror.openshift.com/pub/openshift-v4/amd64/dependencies/rhcos/latest/rhcos-vmware.x86_64.ova
+```
+```bash
+python3 -m http.server 8080
+```
+4. Create `install-config.yaml` file
+```bash
+mkdir cluster-config
+cd cluster-config
+```
+```bash
+nano install-config.yaml
+```
+Sample:
+```yaml
+apiVersion: v1
+baseDomain: domain.com   # Your base domain (used in *.apps.<cluster-name>.<baseDomain>)
+compute:
+- architecture: amd64
+  hyperthreading: Enabled
+  name: worker
+  platform: {}
+  replicas: 2
+controlPlane:
+  architecture: amd64
+  hyperthreading: Enabled
+  name: master
+  platform: {}
+  replicas: 3
+metadata:
+  creationTimestamp: null
+  name: ocp-cluster          # Cluster name (will be used in FQDNs like api.ocp.domain.com)
+networking:
+  networkType: OVNKubernetes
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  serviceNetwork:
+  - 172.30.0.0/16
+  machineNetwork:
+  - cidr: 192.168.252.0/23   # Your machine subnet (nmcli connection show ens34)
+platform:
+  vsphere:
+    failureDomains:
+    - name: <failure_domain_name>
+      region: <default_region_name>
+      server: <IP or FQDN of your vCenter server>
+      topology:
+        computeCluster: "/<data_center>/host/<cluster>"
+        datacenter: <data_center>
+        datastore: "/<data_center>/datastore/<datastore>"
+        networks:
+        - <VM_Network_name>
+        resourcePool: "/<data_center>/host/<cluster>/Resources/<resourcePool>"
+      zone: <default_zone_name>
+    vcenters:
+    - datacenters:
+      - <Name of vSphere Datacenter>
+      password: <vSpherePassword!>
+      port: 443
+      server: <IP or FQDN of your vCenter server>
+      user: administrator@vsphere.local
+    hosts:
+    - hostname: bootstrap
+      role: bootstrap
+      networkDevice:
+        ipAddrs:
+        - 192.168.252.229/23
+        gateway: 192.168.253.254
+        nameservers:
+        - <DNS-IP>
+    - hostname: master01
+      role: control-plane
+      networkDevice:
+        ipAddrs:
+        - 192.168.254.224/23
+        gateway: 192.168.253.254
+        nameservers:
+        - <DNS-IP>
+    - hostname: master02
+      role: control-plane
+      networkDevice:
+        ipAddrs:
+        - 192.168.254.225/23
+        gateway: 192.168.253.254
+        nameservers:
+        - <DNS-IP>
+    - hostname: master03
+      role: control-plane
+      networkDevice:
+        ipAddrs:
+        - 192.168.254.226/23
+        gateway: 192.168.253.254
+        nameservers:
+        - <DNS-IP>
+    - hostname: worker01
+      role: compute
+      networkDevice:
+        ipAddrs:
+        - 192.168.254.227/23
+        gateway: 192.168.253.254
+        nameservers:
+        - <DNS-IP>
+    - hostname: worker02
+      role: compute
+      networkDevice:
+        ipAddrs:
+        - 192.168.254.228/23
+        gateway: 192.168.253.254
+        nameservers:
+        - <DNS-IP>
+    diskType: thin
+    # Offline RHCOS image location
+    # if user registry
+    clusterOSImage: http://mirror.example.com/upload/rhcos-vmware.x86_64.ova
+    # if user local 
+    # clusterOSImage: http://<ip-this-host>:8080/rhcos-vmware.x86_64.ova
+publish: External
+# Paste your pull secret here
+pullSecret: |
+  {"auths": ...}
+# Your SSH public key (for accessing nodes)
+sshKey: |
+  ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC...
+# Trust bundle for internal registry (e.g., Nexus self-signed cert)
+additionalTrustBundle: |
+  -----BEGIN CERTIFICATE-----
+  (cert Nexus or CA internal)
+  -----END CERTIFICATE-----
+# Registry mirror for air-gap install
+imageDigestMirrors:
+  - mirrors:
+    - registry.example.com/openshift/release
+    source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+  - mirrors:
+    - registry.example.com/openshift/release-images
+    source: quay.io/openshift-release-dev/ocp-release
+```
+5. Performing the actual installation
+```bash
+openshift-install create cluster --dir=<your-folder>
+openshift-install create cluster --dir=cluster-config
+openshift-install create cluster --dir . --log-level=info
+```
+* Note: if something get wrong
+    ```bash
+    openshift-install destroy cluster --dir .
+    ```
+6. The `kubeconfig` and `kubeadmin-password` files are generated in the same directory.
+```bash
+export KUBECONFIG=~/cluster-config/auth/kubeconfig
+oc login -u kubeadmin -p $(cat ~/cluster-config/auth/kubeadmin-password)
+```
+```bash
+oc whoami
+```
+
+---
+
+# Deploy a cluster
+After you have mirrored your image set to the mirror registry, you must apply the generated `ImageDigestMirrorSet` (IDMS), `ImageTagMirrorSet` (ITMS), `CatalogSource`, and `UpdateService` to the cluster.
+```bash
+oc apply -f <path_to_oc-mirror_workspace>/working-dir/cluster-resources
+```
+
+Verification
+```bash
+oc get imagedigestmirrorset
+oc get imagetagmirrorset
+oc get catalogsource -n openshift-marketplace
+```
 
 ---
 
