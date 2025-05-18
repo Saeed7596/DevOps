@@ -458,7 +458,7 @@ oc whoami
 
 ---
 
-# Deploy a cluster
+# Preparation a cluster
 After you have mirrored your image set to the mirror registry, you must apply the generated `ImageDigestMirrorSet` (IDMS), `ImageTagMirrorSet` (ITMS), `CatalogSource`, and `UpdateService` to the cluster.
 ```bash
 oc apply -f <path_to_oc-mirror_workspace>/working-dir/cluster-resources
@@ -470,6 +470,77 @@ oc get imagedigestmirrorset
 oc get imagetagmirrorset
 oc get catalogsource -n openshift-marketplace
 ```
+
+---
+
+# Test Cluster
+Node status:
+```bash
+oc get nodes
+```
+Check the entire cluster status:
+```bash
+oc get clusteroperators
+```
+All must be in Available and True status.
+
+Check API and DNS status:
+```bash
+oc get clusterversion
+oc get co dns
+oc get co kube-apiserver
+```
+Log Status
+```bash
+oc adm must-gather
+```
+This command collects all the logs necessary for debugging the cluster.
+
+Final Test
+```bash
+oc get pods -A
+oc get projects
+oc describe node <node-name>
+```
+
+---
+
+# Web Console
+```bash
+oc get route console -n openshift-console -o jsonpath='{.spec.host}'
+```
+```js
+https://console-openshift-console.apps.<cluster-name>.<baseDomain>
+```
+
+---
+
+# Install Operator 
+### With Web Connsole
+1. Log in to the web console.
+2. Go to Operators > OperatorHub.
+3. Select the desired operator such as MongoDB, Logging, Service Mesh.
+4. Click "Install".
+5. Select the desired Namespace.
+6. Confirm and the installation will begin.
+
+### With CLI
+For example install `Elasticsearch Operator`
+```bash
+oc apply -f - <<EOF
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: elasticsearch-operator
+  namespace: openshift-operators
+spec:
+  channel: stable
+  name: elasticsearch-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+EOF
+```
+For operators in an air-gap environment and using the internal registry, change the `source` to, for example, `registry-operators`.
 
 ---
 
