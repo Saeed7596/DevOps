@@ -238,6 +238,8 @@ oc mirror -c <image_set_config_yaml> --from file://<oc_mirror_workspace_path> do
 ### Google Cloud 
 * If use Google Cloud for dowmload image
 * Make a copy in Bucket!
+**Note:
+Before creating VM and Google Storage Bucket, you must enable API s that are intended for allowing communication between GCP resources inside your project!**
 ```bash
 cd local-mirror/
 gsutil cp mirror_000001.tar gs://sarv-dev-ops-bucket-01/
