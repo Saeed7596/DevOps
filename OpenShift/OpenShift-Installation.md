@@ -235,6 +235,15 @@ oc mirror --v2 --help
 oc mirror -c <image_set_config_yaml> file://<oc_mirror_workspace_path> --dry-run --v2 
 oc mirror -c <image_set_config_yaml> --from file://<oc_mirror_workspace_path> docker://<mirror_registry_url> --dry-run --v2
 ```
+### Google Cloud 
+* If use Google Cloud for dowmload image
+* Make a copy in Bucket!
+```bash
+cd local-mirror/
+gsutil cp mirror_000001.tar gs://sarv-dev-ops-bucket-01/
+tar -czvf working-dir.tar.gz working-dir/
+gsutil cp working-dir.tar.gz gs://sarv-dev-ops-bucket-01/
+```
 ### Partially Disconnected Mode
 If you have a system that has access to the Internet and the target registry:
 ```bash
