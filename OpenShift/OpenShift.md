@@ -115,7 +115,8 @@ A **ResourceQuota** limits resource consumption at the project level to ensure f
 | `oc get pods` | List all running pods |
 | `oc get nodes` | Display node information |
 | `oc apply -f <file>.yaml` | Apply configuration from a YAML file |
-| `oc expose svc <service-name>` | Expose a service as a route |
+| `oc expose svc <service-name>` | Expose a service as a route (Create Route) |
+| `oc get routes -A` | See all Routes: |
 | `oc scale deployment <name> --replicas=3` | Scale a deployment |
 | `oc delete pod <pod-name>` | Delete a specific pod |
 | `oc create user <username>` | Create a new user |
