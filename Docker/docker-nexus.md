@@ -152,3 +152,20 @@ server {
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 }
 ```
+
+---
+
+# Use nexus for Other file
+1. **in Repositories -> Create repository -> raw (hosted)**
+Nexus Address
+```bash
+http://nexus.local:8081
+```
+Upload File with `curl`
+```bash
+curl -u admin:yourpassword --upload-file ./myfile.zip http://nexus.local:8081/repository/raw-files/myfolder/myfile.zip
+```
+Download File wirh `curl`
+```bash
+curl -u admin:yourpassword http://nexus.local:8081/repository/raw-files/myfolder/myfile.zip -O
+```
