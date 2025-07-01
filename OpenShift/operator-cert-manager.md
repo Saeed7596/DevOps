@@ -70,9 +70,9 @@ When to Use:
     apiVersion: cert-manager.io/v1
     kind: Issuer
     metadata:
-    name: ca-issuer
+      name: ca-issuer
     spec:
-    ca:
+      ca:
         secretName: ca-key-pair
     ```
 
@@ -86,21 +86,21 @@ When to Use:
     apiVersion: cert-manager.io/v1
     kind: Issuer
     metadata:
-    name: selfsigned-issuer
+      name: selfsigned-issuer
     spec:
-    selfSigned: {}
+      selfSigned: {}
     ```
 2. **Request Certificate**:
     ```yaml
     apiVersion: cert-manager.io/v1
     kind: Certificate
     metadata:
-    name: selfsigned-cert
+      name: selfsigned-cert
     spec:
-    secretName: selfsigned-cert-tls
-    issuerRef:
+      secretName: selfsigned-cert-tls
+      issuerRef:
         name: selfsigned-issuer
-    dnsNames:
+      dnsNames:
         - example.internal
     ```
 
@@ -117,13 +117,13 @@ When to Use:
     apiVersion: cert-manager.io/v1
     kind: Issuer
     metadata:
-    name: vault-issuer
+      name: vault-issuer
     spec:
-    vault:
+      vault:
         server: https://vault.example.com
         path: pki/sign/example-dot-com
         auth:
-        tokenSecretRef:
+          tokenSecretRef:
             name: vault-token
             key: token
     ```
