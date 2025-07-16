@@ -1,4 +1,4 @@
-# Vault Integration with cert-manager on OpenShift (Air-Gapped Environment)
+# [Vault](https://developer.hashicorp.com/vault) Integration with cert-manager on OpenShift (Air-Gapped Environment)
 
 ## Scenario Overview
 
@@ -10,10 +10,22 @@
 
 ## 1. Install Vault on a Separate VM
 
-### Step 1: Install Vault Binary
-
+### Step 1: Install Vault 
+Ubuntu/Debian
 ```bash
-wget https://releases.hashicorp.com/vault/1.15.2/vault_1.15.2_linux_amd64.zip
+wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install vault
+```
+CentOS/RHEL
+```bash
+sudo yum install -y yum-utils
+sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+sudo yum -y install vault
+```
+or Install Binary
+```bash
+wget https://releases.hashicorp.com/vault/1.20.0/vault_1.20.0_linux_amd64.zip
 unzip vault_1.15.2_linux_amd64.zip
 sudo install vault /usr/local/bin/
 ```
@@ -188,7 +200,7 @@ spec:
 ## ✅ 2. Install Vault (Binary)
 ```bash
 # Download latest version
-curl -O https://releases.hashicorp.com/vault/1.15.4/vault_1.15.4_linux_amd64.zip
+curl -O https://releases.hashicorp.com/vault/1.20.0/vault_1.20.0_linux_amd64.zip
 unzip vault_1.15.4_linux_amd64.zip
 sudo mv vault /usr/local/bin/
 
