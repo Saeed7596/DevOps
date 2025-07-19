@@ -29,6 +29,12 @@ wget https://releases.hashicorp.com/vault/1.20.0/vault_1.20.0_linux_amd64.zip
 unzip vault_1.15.2_linux_amd64.zip
 sudo install vault /usr/local/bin/
 ```
+#### Verify
+```bash
+vault -version
+```
+
+---
 
 ### Step 2: Create Vault Configuration
 
