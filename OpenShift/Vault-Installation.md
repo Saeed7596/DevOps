@@ -31,7 +31,7 @@ sudo install vault /usr/local/bin/
 ```
 #### Verify
 ```bash
-vault -version
+vault -v
 ```
 
 ---
