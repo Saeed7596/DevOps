@@ -45,6 +45,9 @@
 | `diff file1 file2`   | Compare the difference of these files           |
 | `wc file`            | Count lines, words, and characters in a file    |
 
+* `cat error.log | grep "Database connection" > error.txt`
+* `cat error.log | grep "Database connection" | wc -l`
+
 ## User Management
 | **Command**         | **Description**                                |
 | ------------------- | ---------------------------------------------- |
