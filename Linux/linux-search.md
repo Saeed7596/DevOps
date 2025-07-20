@@ -8,11 +8,17 @@ The `find` command is used to search for files and directories within a specific
 
 ### Search for Files by Name:
 ```bash
+find [starting_path] [option] [expression]
+
 find /path/to/search -name "filename"
 ```
 Example:
 ```bash
 find /home/user -name "myfile.txt"
+
+find / -name "*.conf*" | grep db
+find / -name "*.yml*" | grep compose
+find / -name "*.yaml*" | grep compose
 ```
 This will search for `myfile.txt` in the `/home/user` directory.
 
