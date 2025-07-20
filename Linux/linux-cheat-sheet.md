@@ -33,24 +33,30 @@
 | --------------------- | ------------------------------------------------ |
 | `cat file`           | Display the contents of a file                  |
 | `cat > new_file.txt` Hi `Ctrl+D` | Add contents to file                |
+| `> file`           | clear the content of file                       |
+| `echo Hi > a.txt`  | Replace                                         |
+| `echo Hi >> a.txt` | Append                                          |
 | `less file`          | View a file one screen at a time                |
 | `head file`          | Display the first 10 lines of a file            |
 | `tail file`          | Display the last 10 lines of a file             |
 | `nano file`          | Edit a file using the Nano text editor          |
 | `vi file`            | Edit a file using the Vi text editor            |
 | `grep 'text' file`   | Search for 'text' in a file                     |
+| `diff file1 file2`   | Compare the difference of these files           |
 | `wc file`            | Count lines, words, and characters in a file    |
 
 ## User Management
-| **Command**          | **Description**                                 |
-| -------------------- | ----------------------------------------------- |
+| **Command**         | **Description**                                |
+| ------------------- | ---------------------------------------------- |
 | `whoami`            | Show the current logged-in user                 |
 | `id`                | Display user ID and group ID                    |
-| `who`               | Show who is logged in                          |
+| `who`               | Show who is logged in                           |
 | `adduser user`      | Add a new user                                  |
 | `passwd user`       | Change the password for a user                  |
 | `deluser user`      | Delete a user                                   |
-| `su user`           | Switch to another user                         |
+| `addgroup group`    | Add a new group                                 |
+| `useradd user`      | Add a new user with group                       |
+| `su user`           | Switch to another user                          |
 
 ## Process Management
 | **Command**         | **Description**                                 |
@@ -109,6 +115,8 @@
 | `systemctl enable httpd`  | Configure HTTPD to start at startup     |
 | `systemctl disable httpd` | Configure HTTPD to not start at startup |
 | `systemctl daemon-reload` | Instructs systemd to reload all service files and update its internal configuration |
+| `journalctl -fu httpd`    | Display logs                            |
+| `dmesg`                   | Kernel logs                             |
 
 ## Package Manager
 | **Command**               | **Description**                         |
