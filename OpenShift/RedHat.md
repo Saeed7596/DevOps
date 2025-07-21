@@ -38,6 +38,7 @@ sudo subscription-manager list --available --all
 ### Update
 ```bash
 sudo dnf clean all
+sudp dnf repolist
 sudo dnf update
 ```
 # Un-registering a system
