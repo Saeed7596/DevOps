@@ -52,6 +52,49 @@ cat /etc/*release
 ls /etc/yum.repos.d/
 sudo subscription-manager status
 ```
+
+---
+
+# Install Package
+## Use dnf
+```bash
+sudo dnf update
+sudo dnf install -y package_name
+```
+## Use rpm
+```bash
+sudo rpm -ivh package_name.rpm
+sudo rpm -Uvh package_name.rpm        # Upgrade an RPM
+```
+
+# Uninstall Package
+## Use dnf
+```bash
+sudo dnf list installed
+sudo dnf list installed | grep <package_name>
+sudo dnf remove <package_name>
+sudo dnf autoremove
+```
+Example:
+```bash
+sudo yum list installed | grep httpd   # Find the httpd package
+sudo yum remove httpd                  # Remove the httpd package
+sudo yum autoremove                    # Remove unused dependencies
+```
+## Or Using rpm
+```bash
+rpm -qa
+sudo rpm -e <package_name>             # Replace <package_name> with the full name of the package.
+```
+Example:
+```bash
+rpm -qa | grep httpd                   # Find the httpd package
+sudo rpm -e httpd-2.4.6-97.el7.x86_64  # Remove the httpd package
+```
+
+---
+
+
 ### Add DNS Manually
 ```
 echo "nameserver 178.22.122.100" | sudo tee /etc/resolv.conf
