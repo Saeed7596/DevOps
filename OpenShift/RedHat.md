@@ -1,4 +1,13 @@
 # Some RedHat Challenges
+## Sites
+[Developers](https://developers.redhat.com/)
+
+[Products Download](https://developers.redhat.com/products/rhel/download)
+
+[Console](https://console.redhat.com/)
+
+[Subscriptions](https://console.redhat.com/subscriptions/overview)
+
 ### show the ip address:
 ```bash
 ip -br -c -4 a # -br: breake , -c: color , -4: show ipv4 , a: addr
@@ -8,8 +17,8 @@ nmcli device show
 ```
 ### enable redhat subscription
 ```bash
-sudo subscription-manager register --username <username> --password <password>
 sudo subscription-manager register
+sudo subscription-manager register --username <username> --password <password>
 ```
 ```bash
 sudo subscription-manager refresh
@@ -21,9 +30,15 @@ sudo subscription-manager repos --enable=rhel-9-for-x86_64-appstream-rpms
 ### show all repo
 ```bash
 sudo subscription-manager repos --list
+sudo subscription-manager repos --list-enabled
 ```
 ```bash
 sudo subscription-manager list --available --all
+```
+### Update
+```bash
+sudo dnf clean all
+sudo dnf update
 ```
 # Un-registering a system
 ```bash
