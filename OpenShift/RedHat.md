@@ -94,7 +94,6 @@ sudo rpm -e httpd-2.4.6-97.el7.x86_64  # Remove the httpd package
 
 ---
 
-
 ### Add DNS Manually
 ```
 echo "nameserver 178.22.122.100" | sudo tee /etc/resolv.conf
@@ -209,11 +208,26 @@ sudo rpm -i libXScrnSaver-1.2.3-10.el9.x86_64.rpm
 ```bash
 Setting -> Network -> Proxy: Manual -> HTTP/HTTPS = 127.0.0.1:8086
 ```
+### With command:
+```bash
+export http_proxy=http://your.proxy:port
+export https_proxy=http://your.proxy:port
+```
+```bash
+echo $http_proxy
+echo $https_proxy
+```
 ## Show external ip for check the vpn connection in terminal
 ```bash
 curl ifconfig.me
 ```
 Output should be the vpn ip
+## Check cdn.redhat.com
+```bash
+curl -v https://cdn.redhat.com
+host cdn.redhat.com
+nc -vz cdn.redhat.com 443
+```
 
 ---
 
