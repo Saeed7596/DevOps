@@ -1,6 +1,7 @@
 # Some RedHat Challenges
 ## Sites
 [Developers](https://developers.redhat.com/)
+* While building, make sure you select Developer Subscription.
 
 [Products Download](https://developers.redhat.com/products/rhel/download)
 
