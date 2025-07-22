@@ -94,13 +94,20 @@ vault login <root_token>
 vault secrets enable pki
 vault secrets tune -max-lease-ttl=87600h pki
 
-vault write pki/root/generate/internal   common_name="vault.local"   ttl=87600h
+vault write pki/root/generate/internal \
+  common_name="vault.local" \
+  ttl=87600h
 
-vault write pki/config/urls   issuing_certificates="https://vault.infra.local:8200/v1/pki/ca"   crl_distribution_points="https://vault.infra.local:8200/v1/pki/crl"
+vault write pki/config/urls \
+  issuing_certificates="https://<vault-ip>:8200/v1/pki/ca" \
+  crl_distribution_points="https://<vault-ip>:8200/v1/pki/crl"
 
-vault write pki/roles/cert-manager   allowed_domains="svc.cluster.local,cluster.local,infra.local"   allow_subdomains=true   max_ttl="72h"
+vault write pki/roles/cert-manager \
+  allowed_domains="svc.cluster.local,cluster.local,infra.local" \
+  allow_subdomains=true \
+  max_ttl="72h"
 ```
-
+* Note: If you want more specific domains to be supported (e.g. apps.infra.local), add them to allowed_domains.
 ---
 
 ## 3. Configure Kubernetes Auth in Vault
@@ -116,20 +123,39 @@ export SA_JWT=$(oc sa get-token cert-manager-vault -n cert-manager)
 export K8S_CAB=$(oc get cm kube-root-ca.crt -n cert-manager -o jsonpath='{.data.ca\.crt}')
 ```
 
-### Configure Vault
-
+### Configure auth method in Vault
 ```bash
 vault auth enable kubernetes
 
-vault write auth/kubernetes/config   token_reviewer_jwt="$SA_JWT"   kubernetes_host="$K8S_HOST"   kubernetes_ca_cert="$K8S_CAB"
-
+vault write auth/kubernetes/config \
+  token_reviewer_jwt="$SA_JWT" \
+  kubernetes_host="$K8S_HOST" \
+  kubernetes_ca_cert="$K8S_CAB"
+```
+```bash
+vault policy write cert-manager-policy - <<EOF
+path "pki/sign/cert-manager" {
+  capabilities = ["create", "update"]
+}
+path "pki/roles/cert-manager" {
+  capabilities = ["read"]
+}
+EOF
+```
+* ❗ Important Note: Only the `pki/sign/cert-manager` and `pki/roles/cert-manager` paths should be accessible. Avoid giving full access to `pki/*` except in testing.
+```bash
 vault policy write cert-manager-policy - <<EOF
 path "pki/*" {
   capabilities = ["read", "list", "create", "update"]
 }
 EOF
-
-vault write auth/kubernetes/role/cert-manager   bound_service_account_names=cert-manager-vault   bound_service_account_namespaces=cert-manager   policies=cert-manager-policy   ttl=24h
+```
+```bash
+vault write auth/kubernetes/role/cert-manager \
+  bound_service_account_names=cert-manager-vault \
+  bound_service_account_namespaces=cert-manager \
+  policies=cert-manager-policy \
+  ttl=24h
 ```
 
 ---
@@ -143,12 +169,13 @@ metadata:
   name: vault-cluster-issuer
 spec:
   vault:
-    server: https://vault.infra.local:8200
+    server: https://<vault-ip>:8200
     path: pki/sign/cert-manager
     caBundle: <BASE64_ENCODED_CA_CERT>
     auth:
       kubernetes:
-        mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        mountPath: /v1/auth/kubernetes
+        # mountPath: /var/run/secrets/kubernetes.io/serviceaccount
         role: cert-manager
         serviceAccountRef:
           name: cert-manager-vault
@@ -158,7 +185,7 @@ spec:
 To get CA in base64:
 
 ```bash
-base64 -w0 vault.crt
+base64 -w0 /opt/vault/tls/tls.crt
 ```
 
 ---
