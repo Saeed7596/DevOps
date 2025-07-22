@@ -111,7 +111,8 @@ A **ResourceQuota** limits resource consumption at the project level to ensure f
 | Command | Description |
 |---------|-------------|
 | `oc login` | Authenticate to OpenShift cluster |
-| `oc new-project <name>` | Create a new project |
+| `oc new-project <project-name>` | Create a new project |
+| `oc project <project-name>` | Change current project/namespace |
 | `oc get pods` | List all running pods |
 | `oc get nodes` | Display node information |
 | `oc apply -f <file>.yaml` | Apply configuration from a YAML file |
