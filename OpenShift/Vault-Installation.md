@@ -40,16 +40,17 @@ vault -v
 
 ```hcl
 # /etc/vault.d/vault.hcl
-listener "tcp" {
-  address = "0.0.0.0:8200"
-  tls_cert_file = "/etc/vault/tls/vault.crt"
-  tls_key_file  = "/etc/vault/tls/vault.key"
-}
+ui = true
+
 storage "file" {
   path = "/opt/vault/data"
 }
-ui = true
-disable_mlock = true
+
+listener "tcp" {
+  address       = "0.0.0.0:8200"
+  tls_cert_file = "/opt/vault/tls/tls.crt"
+  tls_key_file  = "/opt/vault/tls/tls.key"
+}
 ```
 Another One:
 ```hcl
@@ -69,9 +70,9 @@ ui = true
 ### Step 3: Enable and Start Vault
 
 ```bash
-sudo mkdir -p /opt/vault/data /etc/vault/tls
-sudo cp vault.crt vault.key /etc/vault/tls/
-sudo chmod 600 /etc/vault/tls/*
+sudo mkdir -p /opt/vault/data /opt/vault/tls/
+sudo cp vault.crt vault.key /opt/vault/tls/
+sudo chmod 600 /opt/vault/tls/*
 vault server -config=/etc/vault.d/vault.hcl
 ```
 
@@ -79,6 +80,7 @@ In another terminal:
 
 ```bash
 export VAULT_ADDR=https://<vault-ip>:8200
+export VAULT_SKIP_VERIFY=true
 vault operator init
 vault operator unseal
 vault login <root_token>
@@ -96,7 +98,7 @@ vault write pki/root/generate/internal   common_name="vault.local"   ttl=87600h
 
 vault write pki/config/urls   issuing_certificates="https://vault.infra.local:8200/v1/pki/ca"   crl_distribution_points="https://vault.infra.local:8200/v1/pki/crl"
 
-vault write pki/roles/cert-manager   allowed_domains="svc.cluster.local,cluster.local"   allow_subdomains=true   max_ttl="72h"
+vault write pki/roles/cert-manager   allowed_domains="svc.cluster.local,cluster.local,infra.local"   allow_subdomains=true   max_ttl="72h"
 ```
 
 ---
