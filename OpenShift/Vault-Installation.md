@@ -529,3 +529,95 @@ crontab -e
 # Every day at 7:00 AM
 0 7 * * * /path/to/check-vault-cert.sh >> /var/log/vault-cert-check.log 2>&1
 ```
+
+---
+
+# ✅ Complete auto-renewal script:
+So if you want Vault to request a certificate for its own TLS from Vault (self-renew), it is recommended to create a special role like the following:
+```bash
+vault write pki/roles/vault-tls-role \
+  allowed_domains="vault.infra.local" \
+  allow_subdomains=true \
+  allow_ip_sans=true \
+  max_ttl="8760h"
+```
+## ✅ Initial setup commands
+1. Create token file for secure use:
+```bash
+echo "<your_root_token>" > /root/.vault-token
+chmod 600 /root/.vault-token
+```
+2. Install `jq`:
+```bash
+sudo yum install -y jq
+```
+3. Code:
+```sh
+#!/bin/bash
+
+CERT_PATH="/opt/vault/tls/tls.crt"
+KEY_PATH="/opt/vault/tls/tls.key"
+CERT_DIR="/opt/vault/tls"
+DAYS_LEFT_THRESHOLD=30
+VAULT_ADDR="https://<cault-ip>:8200"
+VAULT_ROLE="vault-tls-role"
+COMMON_NAME="vault.infra.local"
+
+# Enter root token or read from secure file
+VAULT_TOKEN_FILE="/root/.vault-token"
+if [ ! -f "$VAULT_TOKEN_FILE" ]; then
+  echo "❌ Vault token not found at $VAULT_TOKEN_FILE"
+  exit 1
+fi
+VAULT_TOKEN=$(cat "$VAULT_TOKEN_FILE")
+
+# Check current certificate
+if [ ! -f "$CERT_PATH" ]; then
+  echo "❌ Certificate file not found at $CERT_PATH"
+  exit 1
+fi
+
+EXPIRY_DATE=$(openssl x509 -in "$CERT_PATH" -noout -enddate | cut -d= -f2)
+EXPIRY_EPOCH=$(date -d "$EXPIRY_DATE" +%s)
+NOW_EPOCH=$(date +%s)
+DAYS_LEFT=$(( (EXPIRY_EPOCH - NOW_EPOCH) / 86400 ))
+
+echo "📆 Certificate expires on: $EXPIRY_DATE ($DAYS_LEFT days left)"
+
+if [ "$DAYS_LEFT" -gt "$DAYS_LEFT_THRESHOLD" ]; then
+  echo "✅ Certificate still valid. No renewal needed."
+  exit 0
+fi
+
+echo "⚠️ Renewing certificate via Vault..."
+
+# Request a new certificate from Vault
+RESPONSE=$(curl -s --insecure \
+  --header "X-Vault-Token: $VAULT_TOKEN" \
+  --request POST \
+  --data "{\"common_name\": \"$COMMON_NAME\", \"ttl\": \"8760h\"}" \
+  "$VAULT_ADDR/v1/pki/issue/$VAULT_ROLE")
+
+NEW_CERT=$(echo "$RESPONSE" | jq -r '.data.certificate')
+NEW_KEY=$(echo "$RESPONSE" | jq -r '.data.private_key')
+
+if [ -z "$NEW_CERT" ] || [ -z "$NEW_KEY" ]; then
+  echo "❌ Failed to retrieve new certificate from Vault"
+  exit 1
+fi
+
+# Backup the current certificate
+cp "$CERT_PATH" "$CERT_PATH.bak"
+cp "$KEY_PATH" "$KEY_PATH.bak"
+
+# Certificate and key replacement
+echo "$NEW_CERT" > "$CERT_PATH"
+echo "$NEW_KEY" > "$KEY_PATH"
+chmod 600 "$CERT_PATH" "$KEY_PATH"
+
+echo "✅ New certificate installed."
+
+# Restart Vault
+systemctl restart vault
+echo "🔁 Vault restarted."
+```
