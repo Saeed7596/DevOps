@@ -42,6 +42,8 @@ vault -v
 # /etc/vault.d/vault.hcl
 ui = true
 
+api_addr = "https://<vault-ip>:8200"
+
 storage "file" {
   path = "/opt/vault/data"
 }
@@ -52,6 +54,9 @@ listener "tcp" {
   tls_key_file  = "/opt/vault/tls/tls.key"
 }
 ```
+**Note**: `api_addr` should be the same as what `cert-manager` is going to use. `IP` or `DNS` accessible from within the cluster.
+**Note**: Use `https` for `api_addr` because we have tls.crt & tls.key in listener tcp.
+
 Another One:
 ```hcl
 listener "tcp" {
@@ -63,7 +68,7 @@ storage "raft" {
   node_id = "node1"
 }
 api_addr = "http://127.0.0.1:8200"
-cluster_addr = "https://127.0.0.1:8201"
+cluster_addr = "https://127.0.0.1:8201"  # For HA or replication
 ui = true
 ```
 
@@ -80,10 +85,29 @@ In another terminal:
 
 ```bash
 export VAULT_ADDR=https://<vault-ip>:8200
-export VAULT_SKIP_VERIFY=true
+export VAULT_SKIP_VERIFY=true                # Temporary only! Delete after initial setup.
 vault operator init
 vault operator unseal
 vault login <root_token>
+```
+#### What should I do after changing the vault.hcl file?
+1. Test the config file (optional but useful):
+```bash
+vault server -config=/etc/vault.d/vault.hcl -log-level=debug
+```
+* This will run Vault in the foreground. Useful for testing but not for production
+
+2. Restart the Vault service:
+```bash
+sudo systemctl daemon-reexec
+sudo systemctl restart vault
+```
+
+3. Check the status:
+```bash
+sudo systemctl status vault
+# or
+vault status
 ```
 
 ---
@@ -95,7 +119,9 @@ vault secrets enable pki
 vault secrets tune -max-lease-ttl=87600h pki
 
 vault write pki/root/generate/internal \
-  common_name="vault.local" \
+  common_name="vault.infra.local" \
+  alt_names="vault.infra.local" \
+  ip_sans="<vault-ip>" \
   ttl=87600h
 
 vault write pki/config/urls \
@@ -105,9 +131,16 @@ vault write pki/config/urls \
 vault write pki/roles/cert-manager \
   allowed_domains="svc.cluster.local,cluster.local,infra.local" \
   allow_subdomains=true \
+  allow_ip_sans=true \
   max_ttl="72h"
 ```
-* Note: If you want more specific domains to be supported (e.g. apps.infra.local), add them to allowed_domains.
+**Note**: If you want more specific domains to be supported (e.g. apps.infra.local), add them to allowed_domains.
+* `common_name`: Same as Vault's main DNS (preferably the internal bank name or registered DNS)
+
+* `alt_names`: This is so that the same name is in DNS on the SAN.
+
+* `ip_sans`: The actual IP address you connect to Vault from the cluster (important!)
+
 ---
 
 ## 3. Configure Kubernetes Auth in Vault
