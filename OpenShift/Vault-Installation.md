@@ -102,7 +102,11 @@ vault server -config=/etc/vault.d/vault.hcl -log-level=debug
 sudo systemctl daemon-reexec
 sudo systemctl restart vault
 ```
-
+if don't use systemd:
+```bash
+pkill vault
+vault server -config=/etc/vault.d/vault.hcl
+```
 3. Check the status:
 ```bash
 sudo systemctl status vault
@@ -475,5 +479,53 @@ spec:
 ## ✅ Result
 After creating this Certificate, cert-manager contacts Vault, issues a cert, and stores it in Secret test-cert-tls.
 
+---
 
+# ✅ Vault Certificate Expiration Check Script
+```bash
+nano check-vault-cert.sh
+```
+```sh
+#!/bin/bash
 
+CERT_PATH="/opt/vault/tls/tls.crt"
+DAYS_LEFT_THRESHOLD=30
+
+if [ ! -f "$CERT_PATH" ]; then
+  echo "❌ Certificate file not found at $CERT_PATH"
+  exit 1
+fi
+
+# Extract expiration date
+EXPIRY_DATE=$(openssl x509 -in "$CERT_PATH" -noout -enddate | cut -d= -f2)
+EXPIRY_EPOCH=$(date -d "$EXPIRY_DATE" +%s)
+NOW_EPOCH=$(date +%s)
+
+# Calculate the number of days remaining
+DAYS_LEFT=$(( (EXPIRY_EPOCH - NOW_EPOCH) / 86400 ))
+
+echo "✅ Certificate expires on: $EXPIRY_DATE"
+echo "📆 Days left: $DAYS_LEFT"
+
+if [ "$DAYS_LEFT" -le "$DAYS_LEFT_THRESHOLD" ]; then
+  echo "⚠️ WARNING: Certificate expires in $DAYS_LEFT days!"
+
+# Here you can set an automatic renewal order or send an email/Slack.
+
+else
+  echo "✅ Certificate is still valid for more than $DAYS_LEFT_THRESHOLD days."
+fi
+```
+```bash
+chmod +x check-vault-cert.sh
+```
+```bash
+./check-vault-cert.sh
+```
+```bash
+crontab -e
+```
+```bash
+# Every day at 7:00 AM
+0 7 * * * /path/to/check-vault-cert.sh >> /var/log/vault-cert-check.log 2>&1
+```
