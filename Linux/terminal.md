@@ -164,3 +164,19 @@ base64 -d <<< SGVsbG8sIFdvcmxkIQo=
 Hello, World!
 ```
 
+---
+
+# Add self-sign CA
+* You can download the CA from browser.
+## Debian/Ubuntu:
+```bash
+sudo cp ca.crt /usr/local/share/ca-certificates/vcsa.crt
+sudo update-ca-certificates
+```
+## RHEL/CentOS/Fedora
+```bash
+sudo cp ca.crt /etc/pki/ca-trust/source/anchors/
+sudo update-ca-trust
+```
+
+---
