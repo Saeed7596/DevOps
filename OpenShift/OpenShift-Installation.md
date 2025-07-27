@@ -364,48 +364,42 @@ platform:
       server: <IP or FQDN of your vCenter server>
       user: administrator@vsphere.local
     hosts:
-    - hostname: bootstrap
-      role: bootstrap
+    - role: bootstrap
       networkDevice:
         ipAddrs:
         - 192.168.252.229/23
         gateway: 192.168.253.254
         nameservers:
         - <DNS-IP>
-    - hostname: master01
-      role: control-plane
+    - role: control-plane
       networkDevice:
         ipAddrs:
         - 192.168.254.224/23
         gateway: 192.168.253.254
         nameservers:
         - <DNS-IP>
-    - hostname: master02
-      role: control-plane
+    - role: control-plane
       networkDevice:
         ipAddrs:
         - 192.168.254.225/23
         gateway: 192.168.253.254
         nameservers:
         - <DNS-IP>
-    - hostname: master03
-      role: control-plane
+    - role: control-plane
       networkDevice:
         ipAddrs:
         - 192.168.254.226/23
         gateway: 192.168.253.254
         nameservers:
         - <DNS-IP>
-    - hostname: worker01
-      role: compute
+    - role: compute
       networkDevice:
         ipAddrs:
         - 192.168.254.227/23
         gateway: 192.168.253.254
         nameservers:
         - <DNS-IP>
-    - hostname: worker02
-      role: compute
+    - role: compute
       networkDevice:
         ipAddrs:
         - 192.168.254.228/23
