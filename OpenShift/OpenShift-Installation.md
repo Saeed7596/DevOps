@@ -284,7 +284,13 @@ oc mirror --verbose 3 -c imageset-config.yaml file://local-mirror
 ---
 
 # Installing on vSphere
-1. Generate ssh-key
+0. From the vCenter home page, download the vCenter’s root CA certificates. Click Download trusted root CA certificates in the vSphere Web Services SDK section. The `<vCenter>/certs/download.zip` file downloads. Extract the compressed file that contains the vCenter root CA certificates.
+```bash
+sudo cp certs/lin/* /etc/pki/ca-trust/source/anchors
+
+sudo update-ca-trust extract
+```
+2. Generate ssh-key
 ```bash
 ssh-keygen -t rsa -N '' -f $HOME/.ssh/id_openshift
 eval "$(ssh-agent -s)"
@@ -433,6 +439,8 @@ imageDigestMirrors:
     - registry.example.com/openshift/release-images
     source: quay.io/openshift-release-dev/ocp-release
 ```
+* Note: `additionalTrustBundle` must be the CA or root signer, not the server-specific TLS certificate (like Nexus or vCenter).
+* Usually on the same server or in the path `/etc/ssl/certs/ca.crt`
 5. Performing the actual installation
 ```bash
 openshift-install create cluster --dir=<your-folder>
