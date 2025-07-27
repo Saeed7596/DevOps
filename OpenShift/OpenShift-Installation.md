@@ -320,13 +320,15 @@ compute:
 - architecture: amd64
   hyperthreading: Enabled
   name: worker
-  platform: {}
+  platform:
+    vsphere: {}
   replicas: 2
 controlPlane:
   architecture: amd64
   hyperthreading: Enabled
   name: master
-  platform: {}
+  platform:
+    vsphere: {}
   replicas: 3
 metadata:
   creationTimestamp: null
@@ -412,7 +414,7 @@ platform:
         - <DNS-IP>
     diskType: thin
     # Offline RHCOS image location
-    # if user registry
+    # if use registry
     clusterOSImage: http://mirror.example.com/upload/rhcos-vmware.x86_64.ova
     # if user local 
     # clusterOSImage: http://<ip-this-host>:8080/rhcos-vmware.x86_64.ova
