@@ -626,3 +626,33 @@ oc mirror delete --v2 --delete-yaml-file <previously_mirrored_work_folder>/delet
 ```
 Where:
 * `<previously_mirrored_work_folder>`: Specify your previously mirrored work folder.
+
+---
+
+# 🔸 Shut down the nodes in the following order:
+🧱 Shutdown order:
+🔻 Worker nodes (important: Worker first)
+
+🔻 Master nodes (all three Masters with a few seconds between them(At least 30 to 60 seconds))
+
+🔻 Other servers (like Bastion, Load Balancer, or internal DNS machine)
+
+In vSphere, use the console or govc or PowerCLI to shut down:
+```bash
+govc vm.power -off -vm openshift-worker-0
+govc vm.power -off -vm openshift-worker-1
+govc vm.power -off -vm openshift-master-0
+govc vm.power -off -vm openshift-master-1
+govc vm.power -off -vm openshift-master-2
+```
+
+# ✅ Powering up the cluster after a shutdown
+🧱 Powering up order:
+🔼 Master nodes (first master-0 → wait a few seconds → then master-1 → then master-2)
+
+🔼 Worker nodes
+
+🔼 Other services (like Bastion or Jump server)
+
+Power up each Master with a short interval (like 20-30 seconds) so that etcd starts up properly.
+
