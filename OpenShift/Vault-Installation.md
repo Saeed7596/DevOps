@@ -159,6 +159,28 @@ export K8S_HOST=$(oc config view -o jsonpath='{.clusters[0].cluster.server}')
 export SA_JWT=$(oc sa get-token cert-manager-vault -n cert-manager)
 export K8S_CAB=$(oc get cm kube-root-ca.crt -n cert-manager -o jsonpath='{.data.ca\.crt}')
 ```
+Check the variables, Should not be empyt!
+```bash
+echo $K8S_HOST
+echo $SA_JWT
+echo $SA_JWT
+```
+
+  * Note: After create sa, check the sa to have token.
+  * `oc describe sa cert-manager-vault -n cert-manager`
+  * if Tokens = <none>
+    ```bash
+    kubectl apply -f - <<EOF
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: vauly-token-sa
+      namespace: cert-manager
+      annotations:
+        kubernetes.io/service-account.name: cert-manager-vault
+    type: kubernetes.io/service-account-token
+    EOF
+    ```
 
 ### Configure auth method in Vault
 ```bash
