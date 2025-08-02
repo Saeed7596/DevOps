@@ -376,6 +376,23 @@ When to Use:
 
 ---
 
+# 🛠 Command to check the expiration of important certificates:
+```bash
+oc get csr
+oc get certificatesigningrequests
+oc get secret -n openshift-config
+oc get secret -n openshift-ingress
+oc get certificate -A
+oc describe certificate -A
+```
+```bash
+oc get secrets -n openshift-config-managed -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.data.tls\.crt}{"\n"}{end}' | while read name crt; do
+  echo "$crt" | base64 -d | openssl x509 -noout -subject -enddate -issuer && echo "---"
+done
+```
+
+---
+
 ✅ 🔐 Script to check the expiration date of OpenShift root CAs
 ```bash
 nano check-ca-expiry.sh
