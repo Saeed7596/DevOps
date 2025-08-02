@@ -441,5 +441,8 @@ done
 echo -e "\n✅ Done. Review any expiration dates approaching soon."
 ```
 ```bash
+chmod +x check-ca-expiry.sh
+```
+```bash
 ./check-ca-expiry.sh
 ```
