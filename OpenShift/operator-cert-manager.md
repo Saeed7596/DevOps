@@ -373,3 +373,56 @@ When to Use:
 |Vault        | Enterprise security | HashiCorp Vault installation |
 
 **Note: Never install both Red Hat's cert-manager Operator and community cert-manager Operator in the same cluster.**
+
+---
+
+✅ 🔐 Script to check the expiration date of OpenShift root CAs
+```bash
+nano check-ca-expiry.sh
+```
+```bash
+#!/bin/bash
+
+# Required tool: openssl, base64, oc
+
+echo "🔍 Checking expiration dates of main CA certificates in your OpenShift cluster..."
+echo "------------------------------------------------------------"
+
+# Array of important secrets/configs that usually contain CA certs
+CA_LOCATIONS=(
+  "openshift-service-ca/service-ca"
+  "openshift-ingress-operator/router-ca"
+  "openshift-authentication/oauth-serving-cert"
+  "openshift-kube-apiserver/kube-apiserver-client-ca"
+  "openshift-kube-controller-manager/service-network-serving-cert-signer"
+  "openshift-config/user-ca-bundle"
+)
+
+for item in "${CA_LOCATIONS[@]}"; do
+  ns=$(echo "$item" | cut -d'/' -f1)
+  name=$(echo "$item" | cut -d'/' -f2)
+
+  echo -e "\n🔹 Inspecting: $ns/$name"
+
+  # Try as secret first
+  cert_data=$(oc get secret -n "$ns" "$name" -o jsonpath='{.data.ca\.crt}' 2>/dev/null)
+
+  # Fallback: Try configmap
+  if [ -z "$cert_data" ]; then
+    cert_data=$(oc get configmap -n "$ns" "$name" -o jsonpath='{.data.ca\.crt}' 2>/dev/null)
+  fi
+
+  if [ -z "$cert_data" ]; then
+    echo "  ❌ Certificate not found or doesn't contain ca.crt"
+    continue
+  fi
+
+  # Decode and parse with openssl
+  echo "$cert_data" | base64 -d | openssl x509 -noout -subject -issuer -enddate
+done
+
+echo -e "\n✅ Done. Review any expiration dates approaching soon."
+```
+```bash
+./check-ca-expiry.sh
+```
