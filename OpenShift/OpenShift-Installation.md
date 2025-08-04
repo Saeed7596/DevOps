@@ -695,6 +695,71 @@ mirror:
       - name: stable-5.8
   helm: {}
 ```
+Get two version:
+```bash
+kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v2alpha1
+mirror:
+  platform:
+    channels:
+      - name: stable-4.16
+        type: ocp
+        minVersion: 4.16.43
+        maxVersion: 4.16.43
+      - name: stable-4.17
+        type: ocp
+        minVersion: 4.17.35
+        maxVersion: 4.17.35
+    graph: true
+  operators:
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.16
+      packages:
+        - name: cluster-observability-operator 
+          channels:
+            - name: stable
+        - name: cluster-logging 
+          channels:
+            - name: stable-6.2
+        - name: loki-operator 
+          channels:
+            - name: stable-6.2 
+        - name: netobserv-operator 
+          channels:
+            - name: stable
+        - name: openshift-gitops-operator
+          channels:
+            - name: latest
+        - name: servicemeshoperator 
+          channels:
+            - name: stable
+        - name: tempo-product 
+          channels:
+            - name: stable
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.17
+      packages:
+        - name: cluster-observability-operator 
+          channels:
+            - name: stable
+        - name: cluster-logging 
+          channels:
+            - name: stable-6.3
+        - name: loki-operator 
+          channels:
+            - name: stable-6.3 
+        - name: netobserv-operator 
+          channels:
+            - name: stable
+        - name: openshift-gitops-operator
+          channels:
+            - name: latest
+        - name: servicemeshoperator 
+          channels:
+            - name: stable
+        - name: tempo-product 
+          channels:
+            - name: stable
+  helm: {}
+```
 ```bash
 oc mirror --config=imageset-config-4.17.yaml file://local-mirror/ --v2
 ```
