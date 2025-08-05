@@ -130,6 +130,7 @@ scp -P <ssh port number>
 # Kill PID
 ```bash
 ps aux | grep filename.py
+ps aux | grep 'oc mirror'
 kill <PID>
 ```
 
