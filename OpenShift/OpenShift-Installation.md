@@ -232,11 +232,23 @@ apiVersion: mirror.openshift.io/v2alpha1
 kind: ImageSetConfiguration
 mirror:
   operators:
-    - catalog: registry.redhat.io/redhat/redhat-operator-index:v<OCP_VERSION> # Replace with your OCP version
-      packages:
-        - name: <operator-name> # Replace with the exact Operator name
-          channels:
-            - name: <channel-name> # Replace with the desired channel (e.g., stable, alpha)
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v<OCP_VERSION> # Replace with your OCP version
+    packages:
+    - name: <operator-name> # Replace with the exact Operator name
+      channels:
+      - name: <channel-name> # Replace with the desired channel (e.g., stable, alpha)
+```
+For example:
+```yaml
+apiVersion: mirror.openshift.io/v2alpha1
+kind: ImageSetConfiguration
+mirror:
+  operators:
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18
+    packages:
+    - name: elasticsearch-operator 
+      channels:
+      - name: stable-5.8
 ```
 
 ### 6. Start Mirroring to Local Directory
