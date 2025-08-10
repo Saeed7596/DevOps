@@ -873,3 +873,25 @@ watch oc get nodes
 ```bash
 oc adm cluster-restore /backup/path
 ```
+
+---
+
+# Debug and ssh
+Whenever possible, access to nodes without using SSH, by spawning a debug pod directly from the `oc` command line:
+
+```bash
+oc debug node/[node_name]
+```
+Important note: By design, OpenShift 4 clusters are immutable and rely on Operators to apply cluster changes. In turn, this means that accessing the underlying nodes directly by SSH is not the recommended procedure. Additionally, the nodes will be tainted as accessed.
+
+Workaround
+When it is not possible to access the nodes with oc debug node command, it is possible to leverage the ssh protocol for the same:
+
+* Generally, the "SSH keys (Public/Private)" are generated during the cluster installation.
+* The "Public Key" is passed inside the install-config.yaml manifest .
+* After successful cluster installation, the "Public key" is copied at path `$/home/core/.ssh/authorized_keys` or `/home/core/.ssh/authorized_keys.d` location across the nodes.
+* It is possible to use the generated "SSH Private key" to access the nodes as core user by running below command:
+```bash
+ssh -i /path/to/privatekey core@[master-hostname]
+ssh -i /path/to/privatekey core@[worker-hostname]
+```
