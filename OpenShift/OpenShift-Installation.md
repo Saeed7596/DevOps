@@ -895,3 +895,18 @@ When it is not possible to access the nodes with oc debug node command, it is po
 ssh -i /path/to/privatekey core@[master-hostname]
 ssh -i /path/to/privatekey core@[worker-hostname]
 ```
+## If you use the same installation machine
+* The private key that corresponds to that public key must be on the same machine.
+* For example, if you placed the public key from ~/.ssh/id_rsa.pub, the private key is ~/.ssh/id_rsa.
+
+Connection example:
+```bash
+ssh -i ~/.ssh/id_rsa core@<node-ip>
+```
+**Note**: The default user in RHCOS is `core`, not `root`.
+
+## If you use a different machine
+* You must transfer the private key to that machine (with permission: `chmod 600 id_rsa`).
+* You will still connect with the core user.
+
+---
