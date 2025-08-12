@@ -910,3 +910,66 @@ ssh -i ~/.ssh/id_rsa core@<node-ip>
 * You will still connect with the core user.
 
 ---
+
+# DEBUG!
+Check:
+```bash
+oc get node
+```
+Output:
+```text
+NAME                       STATUS      ROLES                  AGE   VERSION
+openshift-v6sts-master-0   Ready       control-plane,master   14d   v1.31.7
+openshift-v6sts-master-1   Ready       control-plane,master   14d   v1.31.7
+openshift-v6sts-master-2   NotReady    control-plane,master   14d   v1.31.7
+openshift-v6sts-worker-0   NotReady    worker                 13d   v1.31.7
+openshift-v6sts-worker-1   Ready       worker                 13d   v1.31.7
+```
+There are two nodes with status: `NotReady`
+```bash
+oc describe node openshift-v6sts-master-2
+oc describe node openshift-v6sts-worker-1
+```
+* Look for `kubelet` status.
+* It may be not ready.
+* You can also check `Conditions:` section and look up the date to make sure it's accurate(up-to-date).
+
+Check `CertificateSigningRequest (CSR)`
+```bash
+oc get csr 
+oc adm certificate approve <csr_name>
+```
+* If you see some are `Pending`, **there is your problem.**  💥
+* The `kubelet` can not connect to the `API Server` without Token.
+```bash
+oc get csr | grep Pending | awk '{print $1}' | xargs oc adm certificate approve
+```
+## ✅ Now must be solved!
+
+### If the issue is not **Solved** yet,
+
+Use ssh to connect to the nodes that are `NotReady`
+```bash
+ssh -i ~/.ssh/id_rsa core@<node-ip>
+```
+```bash
+journalctl -u kubelet -f
+sudo systemctl status kubelet 
+sudo systemctl restart kubelet
+```
+Sometimes Problem is about the `NTP service`:
+```bash
+systemctl status chrony-wait.service
+systemctl status chronyd
+chronyc tracking
+
+sudo systemctl restart chronyd
+sudo systemctl enable chronyd
+```
+Connect the `NTP Server` Manually:
+```bash
+sudo bash -c 'echo "server <ntp-server-ip> iburst" >> /etc/chrony.conf'
+sudo systemctl restart chronyd
+```
+
+---
