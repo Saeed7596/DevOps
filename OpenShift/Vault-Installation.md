@@ -156,7 +156,7 @@ oc create sa cert-manager-vault -n cert-manager
 oc adm policy add-cluster-role-to-user system:auth-delegator -z cert-manager-vault -n cert-manager
 
 export K8S_HOST=$(oc config view -o jsonpath='{.clusters[0].cluster.server}')
-export SA_JWT=$(oc create token cert-manager-vault -n cert-manager)
+export SA_JWT=$(oc create token cert-manager-vault -n cert-manager --audience=vault)
 export K8S_CAB=$(oc get cm kube-root-ca.crt -n cert-manager -o jsonpath='{.data.ca\.crt}')
 ```
 Check the variables, Should not be empyt!
@@ -211,10 +211,11 @@ EOF
 ```
 ```bash
 vault write auth/kubernetes/role/cert-manager \
-  bound_service_account_names=cert-manager-vault \
-  bound_service_account_namespaces=cert-manager \
-  policies=cert-manager-policy \
-  ttl=24h
+    bound_service_account_names=cert-manager-vault \
+    bound_service_account_namespaces=cert-manager \
+    policies=cert-manager-policy \
+    ttl=24h \
+    audience=vault
 ```
 
 ---
