@@ -163,7 +163,7 @@ Check the variables, Should not be empyt!
 ```bash
 echo $K8S_HOST
 echo $SA_JWT
-echo $SA_JWT
+echo $K8S_CAB
 ```
 
   * Note: After create sa, check the sa to have token.
@@ -174,7 +174,7 @@ echo $SA_JWT
     apiVersion: v1
     kind: Secret
     metadata:
-      name: vauly-token-sa
+      name: vault-token-sa
       namespace: cert-manager
       annotations:
         kubernetes.io/service-account.name: cert-manager-vault
