@@ -544,6 +544,13 @@ https://console-openshift-console.apps.<cluster-name>.<baseDomain>
 
 ---
 
+# Check API Server healthz
+```bash
+curl -k https://api.openshift.<baseDomain>.com:6443/healthz
+```
+
+---
+
 # Install Operator 
 ### With Web Connsole
 1. Log in to the web console.
