@@ -304,6 +304,33 @@ spec:
 
 ---
 
+## Delete
+#### On the Vault server:
+```bash
+# Disable PKI engine (Delete the CA you created)
+vault secrets disable pki
+
+# Disable Kubernetes auth (Delete auth method)
+vault auth disable kubernetes
+
+# Delete policy
+vault policy delete cert-manager-policy
+```
+#### On the OpenShift cluster:
+```bash
+# Delete ClusterIssuer
+oc delete clusterissuer vault-cluster-issuer
+
+# Delete ServiceAccount
+oc delete sa cert-manager-vault -n cert-manager
+
+# Delete Role and RoleBinding
+oc delete role cert-manager-vault-token-role -n cert-manager
+oc delete rolebinding cert-manager-vault-token-binding -n cert-manager
+```
+
+---
+
 # 🎯 Another Way 
 
 ## ✅ 1. Prerequisites on the VM
