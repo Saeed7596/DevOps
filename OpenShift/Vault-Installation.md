@@ -122,21 +122,11 @@ vault status
 vault secrets enable pki
 vault secrets tune -max-lease-ttl=87600h pki
 
-vault write pki/root/generate/internal \
-  common_name="vault.infra.local" \
-  alt_names="vault.infra.local" \
-  ip_sans="<vault-ip>" \
-  ttl=87600h
+vault write pki/root/generate/internal common_name="vault.infra.local" alt_names="vault.infra.local" ip_sans="<vault-ip>" ttl=87600h
 
-vault write pki/config/urls \
-  issuing_certificates="https://<vault-ip>:8200/v1/pki/ca" \
-  crl_distribution_points="https://<vault-ip>:8200/v1/pki/crl"
+vault write pki/config/urls issuing_certificates="https://<vault-ip>:8200/v1/pki/ca" crl_distribution_points="https://<vault-ip>:8200/v1/pki/crl"
 
-vault write pki/roles/cert-manager \
-  allowed_domains="svc.cluster.local,cluster.local,infra.local" \
-  allow_subdomains=true \
-  allow_ip_sans=true \
-  max_ttl="72h"
+vault write pki/roles/cert-manager allowed_domains="svc.cluster.local,cluster.local,infra.local" allow_subdomains=true allow_ip_sans=true max_ttl="72h"
 ```
 **Note**: If you want more specific domains to be supported (e.g. apps.infra.local), add them to allowed_domains.
 * `common_name`: Same as Vault's main DNS (preferably the internal bank name or registered DNS)
@@ -152,11 +142,11 @@ vault write pki/roles/cert-manager \
 ### Prerequisites
 
 ```bash
-oc create sa cert-manager-vault -n cert-manager
-oc adm policy add-cluster-role-to-user system:auth-delegator -z cert-manager-vault -n cert-manager
+oc create sa cert-manager -n cert-manager
+oc adm policy add-cluster-role-to-user system:auth-delegator -z cert-manager -n cert-manager
 
 export K8S_HOST=$(oc config view -o jsonpath='{.clusters[0].cluster.server}')
-export SA_JWT=$(oc create token cert-manager-vault -n cert-manager --audience=vault)
+export SA_JWT=$(oc create token cert-manager -n cert-manager --audience=vault)
 export K8S_CAB=$(oc get cm kube-root-ca.crt -n cert-manager -o jsonpath='{.data.ca\.crt}')
 ```
 Check the variables, Should not be empyt!
@@ -166,9 +156,9 @@ echo $SA_JWT
 echo $K8S_CAB
 ```
 
-  * Note: After create sa, check the sa to have token. `oc get sa cert-manager-vault -n cert-manager`
-  * `oc describe sa cert-manager-vault -n cert-manager`
-    * if Tokens = none **but if the `echo $SA_JWT` and `oc get sa cert-manager-vault -n cert-manager` return value, you don't need to apply this!**
+  * Note: After create sa, check the sa to have token. `oc get sa cert-manager -n cert-manager`
+  * `oc describe sa cert-manager -n cert-manager`
+    * if Tokens = none **but if the `echo $SA_JWT` and `oc get sa cert-manager -n cert-manager` return value, you don't need to apply this!**
       ```bash
       kubectl apply -f - <<EOF
       apiVersion: v1
@@ -177,7 +167,7 @@ echo $K8S_CAB
         name: vault-token-sa
         namespace: cert-manager
         annotations:
-          kubernetes.io/service-account.name: cert-manager-vault
+          kubernetes.io/service-account.name: cert-manager
       type: kubernetes.io/service-account-token
       EOF
       ```
@@ -186,10 +176,7 @@ echo $K8S_CAB
 ```bash
 vault auth enable kubernetes
 
-vault write auth/kubernetes/config \
-  token_reviewer_jwt="$SA_JWT" \
-  kubernetes_host="$K8S_HOST" \
-  kubernetes_ca_cert="$K8S_CAB"
+vault write auth/kubernetes/config token_reviewer_jwt="$SA_JWT" kubernetes_host="$K8S_HOST" kubernetes_ca_cert="$K8S_CAB"
 ```
 ```bash
 vault policy write cert-manager-policy - <<EOF
@@ -210,18 +197,38 @@ path "pki/*" {
 EOF
 ```
 ```bash
-vault write auth/kubernetes/role/cert-manager \
-    bound_service_account_names=cert-manager-vault \
-    bound_service_account_namespaces=cert-manager \
-    policies=cert-manager-policy \
-    ttl=24h \
-    audience=vault
+vault write auth/kubernetes/role/cert-manager bound_service_account_names=cert-manager bound_service_account_namespaces=cert-manager policies=cert-manager-policy ttl=24h audience=vault
 ```
 
 ---
 
-## 4. Define Vault ClusterIssuer
-
+## 4. Define Vault Role, Rolebinding, ClusterIssuer
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cert-manager-token-role
+  namespace: cert-manager
+rules:
+  - apiGroups: [""]
+    resources: ["serviceaccounts/token"]
+    verbs: ["create"]
+```
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cert-manager-token-binding
+  namespace: cert-manager
+subjects:
+  - kind: ServiceAccount
+    name: cert-manager
+    namespace: cert-manager
+roleRef:
+  kind: Role
+  name: cert-manager-token-role
+  apiGroup: rbac.authorization.k8s.io
+```
 ```yaml
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -238,7 +245,7 @@ spec:
         # mountPath: /var/run/secrets/kubernetes.io/serviceaccount
         role: cert-manager
         serviceAccountRef:
-          name: cert-manager-vault
+          name: cert-manager
           namespace: cert-manager
 ```
 
