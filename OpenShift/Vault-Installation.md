@@ -114,6 +114,15 @@ sudo systemctl status vault
 vault status
 ```
 
+### Step 4: Open the Port
+```bash
+sudo firewall-cmd --list-ports
+sudo firewall-cmd --list-services
+
+sudo firewall-cmd --add-port=8200/tcp --permanent
+sudo firewall-cmd --reload
+```
+
 ---
 
 ## 2. Enable and Configure PKI Backend
@@ -249,10 +258,19 @@ spec:
           namespace: cert-manager
 ```
 
+`caBundle` = the `issuing_ca` content after runnig `vault write pki/root/generate/internal`
 To get CA in base64:
-
+* save `<issuing_ca_content>"` as a file like `is_ca.crt`:
 ```bash
-base64 -w0 /opt/vault/tls/tls.crt
+cat is_ca.crt | base64 -w0
+# Or
+echo "<issuing_ca_content>" | base64 -w0
+```
+Verify:
+```bash
+openssl x509 -in /opt/vault/tls/tls.crt -text -noout | grep CA
+
+openssl x509 -in is_ca.crt -text -noout | grep CA 
 ```
 
 ---
@@ -301,6 +319,14 @@ spec:
 - Vault acts as a full internal CA with secure integration via Kubernetes Auth.
 - cert-manager handles issuance and renewal transparently.
 - Optional: Use external CA (bank) for public-facing routes.
+
+---
+
+## Restart & Describe
+```bash
+oc rollout restart deploy cert-manager -n cert-manager
+oc describe clusterissuer vault-cluster-issuer
+```
 
 ---
 
