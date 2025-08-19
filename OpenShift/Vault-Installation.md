@@ -704,3 +704,23 @@ echo "✅ New certificate installed."
 systemctl restart vault
 echo "🔁 Vault restarted."
 ```
+
+---
+
+### Note:
+Create the cert-manager namespace
+```bash
+oc create ns cert-manager
+```
+Output: 
+```text
+namespace/cert-manager created
+```
+**Label the namespace to disable OpenShift’s default security policy**
+**This allows cert-manager’s web hooks to run properly**:
+```bash
+oc label namespace cert-manager cert-manager.io/disable-validation=true
+```
+**Note**: Above step not required in case of other kubernetes environment. It is possible to store cert-manager using operatorHub with openShift
+
+---
