@@ -169,3 +169,108 @@ Download File wirh `curl`
 ```bash
 curl -u admin:yourpassword http://nexus.local:8081/repository/raw-files/myfolder/myfile.zip -O
 ```
+
+---
+
+# Delete a Specific Docker Image:
+## 🔹 Method 1: Remove a specific tag from a repository
+For example, if your repository name is `docker-hosted` and the desired image is `myapp:1.0`:
+1. Find the relevant asset:
+```bash
+curl -u admin:yourpassword \
+  -X GET "http://<nexus-host>:8081/service/rest/v1/assets?repository=docker-hosted" \
+  | jq .
+```
+The output will contain a list of assets. Look for the part where the `path` looks like this:
+```bash
+myapp/manifest/1.0
+```
+Each asset has an `id`.
+
+2. Delete asset using `id`:
+```bash
+curl -u admin:yourpassword \
+  -X DELETE "http://<nexus-host>:8081/service/rest/v1/assets/<asset-id>"
+```
+
+## 🔹 Method 2: Delete the entire Image (all tags)
+To completely delete an image from a repository, you can use the Component API:
+1. Find the component:
+```bash
+curl -u admin:yourpassword \
+  -X GET "http://<nexus-host>:8081/service/rest/v1/components?repository=docker-hosted" \
+  | jq .
+```
+Search for the component with the desired name (e.g. `myapp`).
+2. Delete
+```bash
+curl -u admin:yourpassword \
+  -X DELETE "http://<nexus-host>:8081/service/rest/v1/components/<component-id>"
+```
+
+# 🔹 Important Note
+* Nexus does not have a default UI for deleting image/tag in the docker registry; the API must be used.
+* After deleting, it is better to run garbage collection from `Admin → Cleanup → Compact Blob Store` to free up disk space.
+
+# Helpful Links
+* [Components API](https://help.sonatype.com/en/components-api.html#ComponentsAPI-DeleteComponent)
+* [Delete Docker Images From Nexus Repository 3](https://support.sonatype.com/hc/en-us/articles/360009696054-Options-to-Delete-Docker-Images-From-Nexus-Repository-3)
+
+---
+
+# Automate Delete
+Just give it the `repo`, `image`, and `tag`, and it will find it on Nexus and delete it.
+```bash
+nano delete_image.sh
+```
+```bash
+#!/bin/bash
+# Script to delete a Docker image (tag) from Nexus Repository using REST API
+
+# --- Configuration ---
+NEXUS_URL="http://<nexus-host>:8081"   # Nexus base URL
+REPO="docker-hosted"                   # Docker repository name
+USER="admin"                           # Nexus username
+PASS="yourpassword"                    # Nexus password
+
+# --- Input Arguments ---
+IMAGE_NAME=$1   # e.g. myapp
+IMAGE_TAG=$2    # e.g. 1.0
+
+if [[ -z "$IMAGE_NAME" || -z "$IMAGE_TAG" ]]; then
+  echo "Usage: $0 <image-name> <tag>"
+  exit 1
+fi
+
+echo "[*] Searching for image $IMAGE_NAME:$IMAGE_TAG in repository $REPO ..."
+
+# Query components in the repository
+COMPONENTS=$(curl -s -u $USER:$PASS \
+  -X GET "$NEXUS_URL/service/rest/v1/components?repository=$REPO")
+
+# Extract component id for the given image:tag
+COMP_ID=$(echo $COMPONENTS | jq -r ".items[] | select(.name==\"$IMAGE_NAME\" and .version==\"$IMAGE_TAG\") | .id")
+
+if [[ -z "$COMP_ID" || "$COMP_ID" == "null" ]]; then
+  echo "[!] Image $IMAGE_NAME:$IMAGE_TAG not found in repository $REPO."
+  exit 1
+fi
+
+echo "[*] Found component ID: $COMP_ID"
+echo "[*] Deleting..."
+
+# Delete the component
+curl -s -u $USER:$PASS -X DELETE "$NEXUS_URL/service/rest/v1/components/$COMP_ID"
+
+if [[ $? -eq 0 ]]; then
+  echo "[✔] Successfully deleted $IMAGE_NAME:$IMAGE_TAG from $REPO."
+else
+  echo "[✘] Failed to delete image."
+fi
+```
+```bash
+chmod +x delete_image.sh
+```
+```bash
+./delete_image.sh
+```
