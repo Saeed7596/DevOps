@@ -34,6 +34,11 @@ sudo install vault /usr/local/bin/
 vault -v
 ```
 
+#### Auto Complete
+```bash
+vault -autocomplete-install
+```
+
 ---
 
 ### Step 2: Create Vault Configuration
