@@ -492,6 +492,13 @@ After you have mirrored your image set to the mirror registry, you must apply th
 ```bash
 oc apply -f <path_to_oc-mirror_workspace>/working-dir/cluster-resources
 ```
+**Note**: If wants to apply new cluster-resources, you should keep the old one and then copy all cluster-resources file to another directory like `merged-cluster-resources` then apply!
+```bash
+cp <path_to_oc-mirror_workspace>/working-dir/cluster-resources/* ~/merged-cluster-resources
+```
+```bash
+oc apply -f merged-cluster-resources/
+```
 
 Verification
 ```bash
