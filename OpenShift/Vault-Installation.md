@@ -136,18 +136,44 @@ sudo firewall-cmd --reload
 vault secrets enable pki
 vault secrets tune -max-lease-ttl=87600h pki
 
-vault write pki/root/generate/internal common_name="vault.example.com" alt_names="vault.example.com" ip_sans="<vault-ip>" ttl=87600h
+vault write pki/root/generate/internal common_name="vault.example.com" alt_names="vault.example.com,localhost" ip_sans="<vault-ip>" ttl=87600h
 
 vault write pki/config/urls issuing_certificates="https://<vault-ip>:8200/v1/pki/ca" crl_distribution_points="https://<vault-ip>:8200/v1/pki/crl"
 
-vault write pki/roles/cert-manager allowed_domains="svc.cluster.local,cluster.local,infra.local" allow_subdomains=true allow_ip_sans=true max_ttl="72h"
+vault write pki/roles/cert-manager allowed_domains="*.example.com,192.168.252.0/24,192.168.254.0/24,*.openshift.example.com,svc.cluster.local,cluster.local" allow_subdomains=true allow_ip_sans=true max_ttl="72h"
 ```
+
 **Note**: If you want more specific domains to be supported (e.g. apps.infra.local), add them to allowed_domains.
 * `common_name`: Same as Vault's main DNS (preferably the internal bank name or registered DNS)
 
 * `alt_names`: This is so that the same name is in DNS on the SAN.
 
 * `ip_sans`: The actual IP address you connect to Vault from the cluster (important!)
+
+**Note**: If you're using Vault's own TLS certificate (not the PKI one), make sure it includes the IP address:
+
+* Option A: Add IP SAN to existing Vault TLS certificate
+
+```bash
+# Check current Vault TLS configuration
+vault read sys/config/state/sanitized
+
+# Update Vault config with proper TLS certificate that includes IP SANs
+```
+
+* Option B: Temporarily disable TLS verification (not recommended for production)
+```yaml
+# In your cert-manager configuration, add:
+spec:
+  issuerRef:
+    name: vault-issuer
+  vault:
+    server: https://<vaul-ip>:8200
+    path: pki/sign/cert-manager
+    caBundle: <your-ca-cert>
+    # Add this line to skip TLS verification (development only)
+    skipTLSVerify: true
+```
 
 ---
 
@@ -196,7 +222,7 @@ echo $K8S_CAB
 ```bash
 vault auth enable kubernetes
 
-vault write auth/kubernetes/config token_reviewer_jwt="$SA_JWT" kubernetes_host="$K8S_HOST" kubernetes_ca_cert="$K8S_CAB"
+vault write auth/kubernetes/config token_reviewer_jwt="$SA_JWT" kubernetes_host="$K8S_HOST" kubernetes_ca_cert="$K8S_CAB" disable_local_ca_jwt=false
 ```
 ```bash
 vault policy write cert-manager-policy - <<EOF
@@ -259,6 +285,8 @@ spec:
     server: https://<vault-ip>:8200
     path: pki/sign/cert-manager
     caBundle: <BASE64_ENCODED_CA_CERT>
+    # Add this line to skip TLS verification (development only)
+    skipTLSVerify: true
     auth:
       kubernetes:
         mountPath: /v1/auth/kubernetes
@@ -467,6 +495,101 @@ oc create secret generic cert-manager-vault-token \
   -n cert-manager \
   --from-literal=token=$(oc create token cert-manager -n cert-manager --audience=vault --duration=8760h)
 echo "Vault token rotated successfully"
+```
+
+---
+
+# DNS Alternative
+Using `/etc/hosts` is sufficient for testing and development, but for production OpenShift clusters, you'll need a more robust solution.
+
+Using `/etc/hosts` (Development/Testing)
+Yes, it's enough for testing - you can add the entry to /etc/hosts on each node:
+```bash
+# Add to /etc/hosts on all OpenShift nodes
+192.168.252.223 vault.example.com
+```
+But there are limitations:
+* Manual maintenance required on all nodes
+* Not scalable
+* Changes aren't persistent across node reboots/recreates
+* Only works for the nodes where you've updated the hosts file
+
+## Production Solutions
+For production OpenShift clusters, use one of these methods:
+
+1. OpenShift DNS Operator (Recommended)
+Create a DNS entry in the cluster's DNS:
+```yaml
+apiVersion: config.openshift.io/v1
+kind: DNS
+metadata:
+  name: cluster
+spec:
+  baseDomain: example.com
+  privateZone:
+    tags:
+      Name: my-cluster-dns
+```
+2. Cluster DNS Configuration
+Add a DNS entry to the cluster's CoreDNS/Custom DNS:
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+  namespace: openshift-dns
+data:
+  vault.server: |
+    hosts {
+      192.168.252.223 vault.example.com
+      fallthrough
+    }
+```
+3. Service and Route/Ingress (Best Practice)
+Create a Service and Route for Vault:
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: vault-service
+  namespace: vault
+spec:
+  ports:
+  - port: 8200
+    targetPort: 8200
+  selector:
+    app: vault
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: vault-route
+  namespace: vault
+spec:
+  host: vault.example.com
+  port:
+    targetPort: 8200
+  to:
+    kind: Service
+    name: vault-service
+  tls:
+    termination: passthrough
+```
+4. External DNS Service
+Use an external DNS service like `Bind`, `AWS Route53`, or `CloudDNS`:
+
+### Immediate Solution for Testing
+For immediate testing, update `/etc/hosts` on your helper node and test:
+```bash
+# Add to /etc/hosts
+echo "192.168.252.223 vault.example.com" | sudo tee -a /etc/hosts
+
+# Test DNS resolution
+nslookup vault.example.com
+ping -c 1 vault.example.com
+
+# Update your Vault configuration to use hostname
+vault write pki/config/urls issuing_certificates="https://vault.example.com:8200/v1/pki/ca" crl_distribution_points="https://vault.example.com:8200/v1/pki/crl"
 ```
 
 ---
