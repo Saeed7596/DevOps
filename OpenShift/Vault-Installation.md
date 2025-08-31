@@ -248,6 +248,8 @@ path "pki/*" {
 }
 EOF
 ```
+
+### **Create Vault Role**
 ```bash
 vault write auth/kubernetes/role/cert-manager bound_service_account_names=cert-manager bound_service_account_namespaces=cert-manager policies=cert-manager-policy ttl=24h audience=vault
 ```
