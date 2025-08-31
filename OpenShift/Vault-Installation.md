@@ -136,7 +136,7 @@ sudo firewall-cmd --reload
 vault secrets enable pki
 vault secrets tune -max-lease-ttl=87600h pki
 
-vault write pki/root/generate/internal common_name="vault.infra.local" alt_names="vault.infra.local" ip_sans="<vault-ip>" ttl=87600h
+vault write pki/root/generate/internal common_name="vault.example.com" alt_names="vault.example.com" ip_sans="<vault-ip>" ttl=87600h
 
 vault write pki/config/urls issuing_certificates="https://<vault-ip>:8200/v1/pki/ca" crl_distribution_points="https://<vault-ip>:8200/v1/pki/crl"
 
@@ -173,6 +173,12 @@ echo $K8S_CAB
   * Note: After create sa, check the sa to have token. `oc get sa cert-manager -n cert-manager`
   * `oc describe sa cert-manager -n cert-manager`
     * if Tokens = none **but if the `echo $SA_JWT` and `oc get sa cert-manager -n cert-manager` return value, you don't need to apply this!**
+      * Method 1:
+      ```bash
+      # Create secret with service account token
+      oc create secret generic cert-manager-vault-token -n cert-manager --from-literal=token=$(oc create token cert-manager -n cert-manager --audience=vault --duration=8760h)
+      ```
+      Method 2:
       ```bash
       kubectl apply -f - <<EOF
       apiVersion: v1
@@ -185,7 +191,7 @@ echo $K8S_CAB
       type: kubernetes.io/service-account-token
       EOF
       ```
-
+      
 ### Configure auth method in Vault
 ```bash
 vault auth enable kubernetes
@@ -278,6 +284,30 @@ openssl x509 -in /opt/vault/tls/tls.crt -text -noout | grep CA
 openssl x509 -in is_ca.crt -text -noout | grep CA 
 ```
 
+### 4.2 ClusterIssuer with secretRef:
+```yaml
+# vault-issuer.yaml
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: vault-cluster-issuer
+spec:
+  vault:
+    server: https://vault.example.com:8200
+    path: pki/sign/cert-manager
+    auth:
+      kubernetes:
+        mountPath: /v1/auth/kubernetes
+        role: cert-manager
+        secretRef:
+          name: cert-manager-vault-token
+          key: token
+```
+Verify ClusterIssuer Status
+```bash
+oc describe clusterissuer vault-cluster-issuer
+```
+
 ---
 
 ## 5. Requesting a Certificate (Test)
@@ -289,15 +319,25 @@ metadata:
   name: test-cert
   namespace: default
 spec:
-  secretName: test-cert-tls
+  secretName: test-tls
   issuerRef:
     name: vault-cluster-issuer
     kind: ClusterIssuer
-  commonName: test.default.svc.cluster.local
+  commonName: test.example.com
   dnsNames:
-    - test.default.svc.cluster.local
+    - test.example.com
+    - www.test.example.com
   duration: 24h
   renewBefore: 6h
+```
+Verify:
+```bash
+oc get certificate -n cert-manager
+oc describe certificate test-cert -n default
+```
+Check Generated Secret
+```bash
+oc get secret test-tls -n cert-manager -o yaml
 ```
 
 ---
@@ -358,6 +398,75 @@ oc delete sa cert-manager-vault -n cert-manager
 # Delete Role and RoleBinding
 oc delete role cert-manager-vault-token-role -n cert-manager
 oc delete rolebinding cert-manager-vault-token-binding -n cert-manager
+```
+
+---
+
+# Troubleshooting
+Common Issues and Solutions
+1. TLS Certificate Validation Error
+Error: `x509: cannot validate certificate for IP because it doesn't contain any IP SANs`
+
+Solution:
+
+```bash
+# Regenerate Vault certificate with IP SANs
+vault write pki/root/generate/internal \
+  common_name="vault.example.com" \
+  ip_sans="192.168.252.223" \
+  alt_names="vault.example.com" \
+  ttl=87600h
+```
+2. Authentication Errors
+Error: permission denied or service account not found
+
+Solution:
+
+```bash
+# Verify service account exists
+oc get sa cert-manager -n cert-manager
+
+# Check Vault role configuration
+vault read auth/kubernetes/role/cert-manager
+```
+3. Token Expiration
+Error: `token expired` or `permission denied`
+
+Solution:
+
+```bash
+# Renew the secret token
+oc delete secret cert-manager-vault-token -n cert-manager
+oc create secret generic cert-manager-vault-token \
+  -n cert-manager \
+  --from-literal=token=$(oc create token cert-manager -n cert-manager --audience=vault --duration=8760h)
+```
+Debug Commands
+```bash
+# Check Vault authentication
+vault login -method=kubernetes role=cert-manager
+
+# Test PKI signing
+vault write pki/sign/cert-manager common_name="test.example.com" ttl="24h"
+
+# Check cert-manager logs
+oc logs -f deployment/cert-manager -n cert-manager
+
+# Check Vault auth logs
+vault read auth/kubernetes/role/cert-manager
+```
+Maintenance
+1. Token Rotation
+Create a script for token rotation:
+
+```bash
+#!/bin/bash
+# rotate-vault-token.sh
+oc delete secret cert-manager-vault-token -n cert-manager --ignore-not-found
+oc create secret generic cert-manager-vault-token \
+  -n cert-manager \
+  --from-literal=token=$(oc create token cert-manager -n cert-manager --audience=vault --duration=8760h)
+echo "Vault token rotated successfully"
 ```
 
 ---
