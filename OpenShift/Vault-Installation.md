@@ -203,6 +203,12 @@ echo $K8S_CAB
       ```bash
       # Create secret with service account token
       oc create secret generic cert-manager-vault-token -n cert-manager --from-literal=token=$(oc create token cert-manager -n cert-manager --audience=vault --duration=8760h)
+
+      # Verify the secret was created
+      oc get secret cert-manager-vault-token -n cert-manager -o yaml
+
+      # Check the token exists
+      oc get secret cert-manager-vault-token -n cert-manager -o jsonpath='{.data.token}' | base64 -d
       ```
       Method 2:
       ```bash
