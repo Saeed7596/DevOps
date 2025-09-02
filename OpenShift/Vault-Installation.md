@@ -6,6 +6,8 @@
 - **Environment:** Air-gapped OpenShift cluster in a secure data center (e.g., banking environment).
 - **Vault Location:** Installed on a separate VM within the same data center, outside the OpenShift cluster.
 
+
+
 ---
 
 ## 1. Install Vault on a Separate VM
@@ -39,6 +41,76 @@ vault -v
 vault -autocomplete-install
 ```
 
+#### Generate New TLS and replace with the old one that vault generated.
+```bash
+sudo openssl req \
+  -newkey rsa:4096 -nodes \
+  -keyout tls.key \
+  -x509 -sha256 -days 825 \
+  -out tls.crt \
+  -subj "/CN=vault.example.com" \
+  -addext "subjectAltName = DNS:vault.example.com,IP:<ip-vault-server>"
+```
+BackUp
+```bash
+cd /opt/vault/tls
+sudo cp -a tls.crt tls.crt.bak 2>/dev/null || true
+sudo cp -a tls.key tls.key.bak 2>/dev/null || true
+# or
+sudo cp /opt/vault/tls/tls.crt /tmp/vault-ca.crt
+sudo cp /opt/vault/tls/tls.key /tmp/vault-ca.key
+```
+```bash
+sudo rm /opt/vault/tls/tls.crt
+sudo rm /opt/vault/tls/tls.key
+sudo mv tls.crt /opt/vault/tls/
+sudo mv tls.key /opt/vault/tls/
+sudo chown -R vault:vault /etc/vault.d /opt/vault
+sudo systemctl restart vault.service 
+sudo systemctl status vault.service 
+vault status 
+```
+Verify:
+
+**Expect: DNS:vault.example.com, IP Address:<ip-vault-server>**
+```bash
+openssl x509 -in /opt/vault/tls/tls.crt -noout -text | grep -A1 "Subject Alternative Name"
+```
+```bash
+
+openssl x509 -in /opt/vault/tls/tls.crt -noout -text | sed -n '/Subject:/,/X509v3 Subject Alternative Name:/p' | sed -n 's/ *X509v3 Subject Alternative Name: *//p'
+```
+
+Another way:
+Create a minimal OpenSSL config to include SANs:
+```bash
+cat >/opt/vault/tls/vault.cnf <<'EOF'
+[ req ]
+default_bits       = 4096
+distinguished_name = dn
+req_extensions     = req_ext
+prompt             = no
+
+[ dn ]
+CN = vault.example.com
+
+[ req_ext ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.1 = vault.example.com
+IP.1  = 192.168.252.223
+EOF
+```
+```bash
+cd /opt/vault/tls
+sudo cp -a tls.key tls.key.bak 2>/dev/null || true
+sudo openssl req -new -newkey rsa:4096 -nodes \
+  -keyout tls.key \
+  -out vault.csr \
+  -config vault.cnf
+```
+
 ---
 
 ### Step 2: Create Vault Configuration
@@ -47,7 +119,8 @@ vault -autocomplete-install
 # /etc/vault.d/vault.hcl
 ui = true
 
-api_addr = "https://<vault-ip>:8200"
+api_addr = "https://vault.example.com:8200"
+# api_addr = "https://<vault-ip>:8200"
 
 storage "file" {
   path = "/opt/vault/data"
@@ -130,18 +203,82 @@ sudo firewall-cmd --reload
 
 ---
 
-## 2. Enable and Configure PKI Backend
+---
 
+# 2. Config Vault
+
+## Step 0 --- Clean Slate
+
+Before starting, remove any old PKI mounts, policies, or Kubernetes auth
+configs from Vault.
+#### On the Vault server:
 ```bash
-vault secrets enable pki
+# Disable PKI engine (Delete the CA you created)
+vault secrets disable pki_int || true
+vault secrets disable pki || true
+
+# Disable Kubernetes auth (Delete auth method)
+vault auth disable kubernetes || true
+
+# Delete policy
+vault policy delete cert-manager-policy || true
+```
+Verify:
+
+``` bash
+vault secrets list
+vault auth list
+```
+
+#### On the OpenShift cluster:
+```bash
+# Delete ClusterIssuer
+oc delete clusterissuer vault-cluster-issuer
+
+# Delete ServiceAccount
+oc delete sa cert-manager-vault -n cert-manager
+
+# Delete Role and RoleBinding
+oc delete role cert-manager-vault-token-role -n cert-manager
+oc delete rolebinding cert-manager-vault-token-binding -n cert-manager
+```
+
+---
+
+## Step 1 --- Root + Intermediate PKI
+
+### 1.1 Root CA
+
+``` bash
+vault secrets enable -path=pki pki
 vault secrets tune -max-lease-ttl=87600h pki
 
-vault write pki/root/generate/internal common_name="vault.example.com" alt_names="vault.example.com,localhost" ip_sans="<vault-ip>" ttl=87600h
+vault write -format=json pki/root/generate/internal   common_name="Example Root CA"   key_type=rsa key_bits=4096   ttl=87600h | jq -r '.data.certificate' > root_ca.pem
 
-vault write pki/config/urls issuing_certificates="https://<vault-ip>:8200/v1/pki/ca" crl_distribution_points="https://<vault-ip>:8200/v1/pki/crl"
-
-vault write pki/roles/cert-manager allowed_domains="*.example.com,192.168.252.0/24,192.168.254.0/24,*.openshift.example.com,svc.cluster.local,cluster.local" allow_subdomains=true allow_ip_sans=true max_ttl="72h"
+vault write pki/config/urls   issuing_certificates="https://vault.example.com:8200/v1/pki/ca"   crl_distribution_points="https://vault.example.com:8200/v1/pki/crl"
 ```
+
+### 1.2 Intermediate CA
+
+``` bash
+vault secrets enable -path=pki_int pki
+vault secrets tune -max-lease-ttl=87600h pki_int
+
+vault write -format=json pki_int/intermediate/generate/internal   common_name="Example Issuing CA"   key_type=rsa key_bits=4096   ttl=87600h | jq -r '.data.csr' > pki_int.csr
+
+vault write -format=json pki/root/sign-intermediate csr=@pki_int.csr   format=pem_bundle ttl=43800h | jq -r '.data.certificate' > pki_int.crt
+
+vault write pki_int/intermediate/set-signed certificate=@pki_int.crt
+
+vault write pki_int/config/urls   issuing_certificates="https://vault.example.com:8200/v1/pki_int/ca"   crl_distribution_points="https://vault.example.com:8200/v1/pki_int/crl"
+```
+
+### 1.3 Role for cert-manager
+
+``` bash
+vault write pki_int/roles/cert-manager   allowed_domains="example.com,*.example.com,*.openshift.example.com,svc,*.svc,cluster.local,*.cluster.local,*.svc.cluster.local"   allow_subdomains=true   allow_ip_sans=true   max_ttl="72h"
+```
+
 
 **Note**: If you want more specific domains to be supported (e.g. apps.infra.local), add them to allowed_domains.
 * `common_name`: Same as Vault's main DNS (preferably the internal bank name or registered DNS)
@@ -177,70 +314,90 @@ spec:
 
 ---
 
-## 3. Configure Kubernetes Auth in Vault
+## Step 2 --- Kubernetes Auth (stable reviewer token)
 
-### Prerequisites
+### 2.1 Reviewer ServiceAccount
 
-```bash
-oc create sa cert-manager -n cert-manager
-oc adm policy add-cluster-role-to-user system:auth-delegator -z cert-manager -n cert-manager
+``` bash
+oc create sa vault-reviewer -n cert-manager
+oc adm policy add-cluster-role-to-user system:auth-delegator -z vault-reviewer -n cert-manager
+```
 
-export K8S_HOST=$(oc config view -o jsonpath='{.clusters[0].cluster.server}')
-export SA_JWT=$(oc create token cert-manager -n cert-manager --audience=vault)
-export K8S_CAB=$(oc get cm kube-root-ca.crt -n cert-manager -o jsonpath='{.data.ca\.crt}')
+### 2.2 Long-lived Token Secret
+
+``` yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vault-reviewer-token
+  namespace: cert-manager
+  annotations:
+    kubernetes.io/service-account.name: vault-reviewer
+type: kubernetes.io/service-account-token
+```
+
+Apply:
+
+``` bash
+oc apply -f vault-reviewer-token.yaml
+```
+
+### 2.3 Extract values
+
+``` bash
+REVIEWER_JWT=$(oc get secret vault-reviewer-token -n cert-manager -o jsonpath='{.data.token}' | base64 -d)
+K8S_CA=$(oc get secret vault-reviewer-token -n cert-manager -o jsonpath='{.data.ca\.crt}' | base64 -d)
+K8S_HOST=$(oc whoami --show-server)
 ```
 Check the variables, Should not be empyt!
 ```bash
+echo $REVIEWER_JWT
+echo $K8S_CA
 echo $K8S_HOST
-echo $SA_JWT
-echo $K8S_CAB
 ```
 
-  * Note: After create sa, check the sa to have token. `oc get sa cert-manager -n cert-manager`
-  * `oc describe sa cert-manager -n cert-manager`
-    * if Tokens = none **but if the `echo $SA_JWT` and `oc get sa cert-manager -n cert-manager` return value, you don't need to apply this!**
-      * Method 1:
-      ```bash
-      # Create secret with service account token
-      oc create secret generic cert-manager-vault-token -n cert-manager --from-literal=token=$(oc create token cert-manager -n cert-manager --audience=vault --duration=8760h)
+### 2.4 Configure Vault
 
-      # Verify the secret was created
-      oc get secret cert-manager-vault-token -n cert-manager -o yaml
-
-      # Check the token exists
-      oc get secret cert-manager-vault-token -n cert-manager -o jsonpath='{.data.token}' | base64 -d
-      ```
-      Method 2:
-      ```bash
-      kubectl apply -f - <<EOF
-      apiVersion: v1
-      kind: Secret
-      metadata:
-        name: vault-token-sa
-        namespace: cert-manager
-        annotations:
-          kubernetes.io/service-account.name: cert-manager
-      type: kubernetes.io/service-account-token
-      EOF
-      ```
-      
-### Configure auth method in Vault
-```bash
+``` bash
 vault auth enable kubernetes
 
-vault write auth/kubernetes/config token_reviewer_jwt="$SA_JWT" kubernetes_host="$K8S_HOST" kubernetes_ca_cert="$K8S_CAB" disable_local_ca_jwt=false
+vault write auth/kubernetes/config   token_reviewer_jwt="$REVIEWER_JWT"   kubernetes_host="$K8S_HOST"   kubernetes_ca_cert="$K8S_CA"   disable_local_ca_jwt=false
 ```
-```bash
-vault policy write cert-manager-policy - <<EOF
-path "pki/sign/cert-manager" {
+
+
+* Note: After create sa, check the sa to have token.
+  * `oc get sa vault-reviewer -n cert-manager`
+  * `oc describe sa vault-reviewer -n cert-manager`
+
+---
+
+## Step 3 --- Vault Policy + Role for cert-manager
+
+### 3.1 Policy
+
+``` bash
+vault policy write cert-manager-policy - <<'HCL'
+path "pki_int/sign/cert-manager" {
   capabilities = ["create", "update"]
 }
-path "pki/roles/cert-manager" {
+path "pki_int/roles/cert-manager" {
   capabilities = ["read"]
 }
-EOF
+HCL
 ```
-* ❗ Important Note: Only the `pki/sign/cert-manager` and `pki/roles/cert-manager` paths should be accessible. Avoid giving full access to `pki/*` except in testing.
+
+### 3.2 Role
+
+``` bash
+vault write auth/kubernetes/role/cert-manager   bound_service_account_names="cert-manager"   bound_service_account_namespaces="cert-manager"   policies="cert-manager-policy"   ttl="1h"
+```
+
+Or Create With audience
+```bash
+vault write auth/kubernetes/role/cert-manager   bound_service_account_names="cert-manager"   bound_service_account_namespaces="cert-manager"   policies="cert-manager-policy"   ttl="1h" audience="vault://vault-cluster-issuer"
+```
+
+**Note**: ❗ Important Note: Only the `pki/sign/cert-manager` and `pki/roles/cert-manager` paths should be accessible. Avoid giving full access to `pki/*` except in testing.
 ```bash
 vault policy write cert-manager-policy - <<EOF
 path "pki/*" {
@@ -249,14 +406,142 @@ path "pki/*" {
 EOF
 ```
 
-### **Create Vault Role**
-```bash
-vault write auth/kubernetes/role/cert-manager bound_service_account_names=cert-manager bound_service_account_namespaces=cert-manager policies=cert-manager-policy ttl=24h audience=vault
+---
+
+## Step 4 --- ClusterIssuer (Vault-backed)
+
+### 4.1 CA Bundle
+
+``` bash
+BASE64_VAULT_CA=$(base64 -w0 /opt/vault/tls/tls.crt)
+echo $BASE64_VAULT_CA
 ```
+Or
+```bash
+sudo cat /opt/vault/tls/tls.crt | base64 -w0
+```
+Verify:
+
+```bash
+openssl x509 -in /opt/vault/tls/tls.crt -text -noout | grep CA
+
+openssl x509 -in is_ca.crt -text -noout | grep CA 
+```
+
+### 4.2 ClusterIssuer YAML
+
+``` yaml
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: vault-cluster-issuer
+spec:
+  vault:
+    server: https://vault.example.com:8200
+    path: pki_int/sign/cert-manager
+    caBundle: <BASE64>
+    # Add this line to skip TLS verification (development only)
+    # skipTLSVerify: true
+    auth:
+      kubernetes:
+        mountPath: /v1/auth/kubernetes
+        role: cert-manager
+        serviceAccountRef:
+          name: cert-manager
+          namespace: cert-manager
+```
+
+### 4.3 Test Certificate
+
+``` yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: test-vault-cert
+  namespace: default
+spec:
+  secretName: test-vault-cert-tls
+  commonName: test.example.com
+  dnsNames:
+    - test.example.com
+  issuerRef:
+    kind: ClusterIssuer
+    name: vault-cluster-issuer
+```
+Apply & Watch:
+```bash
+oc apply -f test-certificate.yaml
+oc describe certificate test-vault-cert -n default | sed -n '1,120p'
+oc get certificaterequest -A | grep test-vault-cert || true
+oc get events -n default --sort-by=.lastTimestamp | tail -n 20
+```
+Success signs
+* `Certificate` becomes `Ready: True`
+* A secret `test-vault-cert-tls` appears with `tls.crt`/`tls.key`
+* The issued cert chains to your intermediate (and ultimately the root)
+
+If you hit an error, paste the CertificateRequest status and the cert-manager controller logs:
+```bash
+oc logs deploy/cert-manager -n cert-manager --tail=200
+```
+Common pitfalls I’ll help you fix fast:
+* `permission denied` → Vault role/policy mismatch (step 3)
+* `x509: unknown authority` → wrong/empty caBundle
+* `not allowed by role` → name/IP not in `pki_int/roles/cert-manager` constraints
 
 ---
 
-## 4. Define Vault Role, Rolebinding, ClusterIssuer
+### 5.2 Annotate Route
+#### Ask cert-manager for a cert (namespaced Certificate)
+```yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: demo-route-cert
+  namespace: default
+spec:
+  secretName: demo-route-tls           # cert-manager will create this Secret
+  commonName: demo.apps.openshift.sarvrayaneh.com
+  dnsNames:
+    - demo.apps.openshift.example.com
+  issuerRef:
+    kind: ClusterIssuer
+    name: vault-cluster-issuer
+```
+```bash
+oc apply -f certificate.yaml
+oc wait -n tejarat certificate/demo-route-cert --for=condition=Ready --timeout=2m
+```
+#### Put the issued PEMs into the Route
+
+Grab the key/cert/chain from the Secret cert-manager created, and place them on the Route (OpenShift embeds them in the spec):
+```bash
+TLSCRT=$(oc get secret demo-route-tls -n default -o jsonpath='{.data.tls\.crt}' | base64 -d)
+TLSKEY=$(oc get secret demo-route-tls -n default -o jsonpath='{.data.tls\.key}' | base64 -d)
+
+# (Optional) If your Secret has a full chain, you may split cert vs CA. If not,
+# leave caCertificate empty and most clients will still validate (depending on chain).
+oc patch route demo-demo-service -n default --type=merge -p "$(cat <<PATCH
+spec:
+  tls:
+    termination: edge
+    certificate: |-
+$(echo "$TLSCRT" | sed 's/^/      /')
+    key: |-
+$(echo "$TLSKEY" | sed 's/^/      /')
+PATCH
+)"
+```
+Test:
+```bash
+oc get route demo-demo-service -n default -o jsonpath='{.spec.host}{"\n"}'
+# Open https://<that-host> in your browser
+```
+
+# Finish ✔✔✔
+---
+
+## ❗ Define Vault Role, Rolebinding (**May not be needed!!!**)
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -282,42 +567,6 @@ roleRef:
   kind: Role
   name: cert-manager-token-role
   apiGroup: rbac.authorization.k8s.io
-```
-```yaml
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: vault-cluster-issuer
-spec:
-  vault:
-    server: https://<vault-ip>:8200
-    path: pki/sign/cert-manager
-    caBundle: <BASE64_ENCODED_CA_CERT>
-    # Add this line to skip TLS verification (development only)
-    skipTLSVerify: true
-    auth:
-      kubernetes:
-        mountPath: /v1/auth/kubernetes
-        # mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-        role: cert-manager
-        serviceAccountRef:
-          name: cert-manager
-          namespace: cert-manager
-```
-
-`caBundle` = the `issuing_ca` content after runnig `vault write pki/root/generate/internal`
-To get CA in base64:
-* save `<issuing_ca_content>"` as a file like `is_ca.crt`:
-```bash
-cat is_ca.crt | base64 -w0
-# Or
-echo "<issuing_ca_content>" | base64 -w0
-```
-Verify:
-```bash
-openssl x509 -in /opt/vault/tls/tls.crt -text -noout | grep CA
-
-openssl x509 -in is_ca.crt -text -noout | grep CA 
 ```
 
 ### 4.2 ClusterIssuer with secretRef:
@@ -407,33 +656,6 @@ oc get secret test-tls -n cert-manager -o yaml
 ```bash
 oc rollout restart deploy cert-manager -n cert-manager
 oc describe clusterissuer vault-cluster-issuer
-```
-
----
-
-## Delete
-#### On the Vault server:
-```bash
-# Disable PKI engine (Delete the CA you created)
-vault secrets disable pki
-
-# Disable Kubernetes auth (Delete auth method)
-vault auth disable kubernetes
-
-# Delete policy
-vault policy delete cert-manager-policy
-```
-#### On the OpenShift cluster:
-```bash
-# Delete ClusterIssuer
-oc delete clusterissuer vault-cluster-issuer
-
-# Delete ServiceAccount
-oc delete sa cert-manager-vault -n cert-manager
-
-# Delete Role and RoleBinding
-oc delete role cert-manager-vault-token-role -n cert-manager
-oc delete rolebinding cert-manager-vault-token-binding -n cert-manager
 ```
 
 ---
