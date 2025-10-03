@@ -17,6 +17,8 @@ Follow this [Link](https://docs.redhat.com/en/documentation/openshift_container_
 
 ## Steps
 
+**Note**: Version of ocp must be equal to these tool. So download the correct [version](https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/). 
+
 ### 1. Install OpenShift CLI (oc) & oc-mirror
 
 ```bash
@@ -454,6 +456,7 @@ sshKey: |
 additionalTrustBundle: |
   -----BEGIN CERTIFICATE-----
   (cert Nexus or CA internal)
+  (Use CA Trust if you are using self-sign TLS and paste the rootCA.crt here)
   -----END CERTIFICATE-----
 # Registry mirror for air-gap install
 imageDigestMirrors:
@@ -464,7 +467,7 @@ imageDigestMirrors:
     - registry.example.com/openshift/release-images
     source: quay.io/openshift-release-dev/ocp-release
 ```
-* Note: `additionalTrustBundle` must be the CA or root signer, not the server-specific TLS certificate (like Nexus or vCenter).
+* Note: `additionalTrustBundle` must be the **CA** or **root signer** (rootCA.crt), not the server-specific TLS certificate (like Nexus or vCenter).
 * Usually on the same server or in the path `/etc/ssl/certs/ca.crt`
 5. Performing the actual installation
 ```bash
