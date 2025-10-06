@@ -154,6 +154,70 @@ server {
 ```
 
 ---
+# Generate [CA trust](https://github.com/Saeed7596/DevOps/blob/main/SSL%26TLS/OpenSSL%20CA%20Trust.md)
+
+# defulat.conf - with self-sign openssl
+```conf
+server {
+    listen 80;
+    server_name nexus.example.com;
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+server {
+    listen 443 ssl;
+    server_name nexus.example.com;
+
+    client_max_body_size 5G;
+
+    location / {
+        proxy_read_timeout      300;
+        proxy_connect_timeout   300;
+        proxy_redirect          off;
+
+        proxy_set_header        Host                $http_host;
+        proxy_set_header        X-Real-IP           $remote_addr;
+        proxy_set_header        X-Forwarded-For     $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto   https;
+        proxy_set_header        X-Frame-Options     SAMEORIGIN;
+        proxy_pass http://172.17.0.1:8081;
+    }
+    ssl_certificate     /etc/nginx/certs/nexus.crt;
+    ssl_certificate_key /etc/nginx/certs/nexus.key;
+}
+
+server {
+    listen 80;
+    server_name docker.example.com;
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+server {
+    listen 443 ssl;
+    server_name docker.example.com;
+
+    client_max_body_size 5G;
+
+    location / {
+        proxy_read_timeout      300;
+        proxy_connect_timeout   300;
+        proxy_redirect          off;
+
+        proxy_set_header        Host                $http_host;
+        proxy_set_header        X-Real-IP           $remote_addr;
+        proxy_set_header        X-Forwarded-For     $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto   https;
+        proxy_set_header        X-Frame-Options     SAMEORIGIN;
+        proxy_pass http://172.17.0.1:8084;
+    }
+    ssl_certificate     /etc/nginx/certs/nexus.crt;
+    ssl_certificate_key /etc/nginx/certs/nexus.key;
+}
+```
+
+---
 
 # Use nexus for Other file
 1. **in Repositories -> Create repository -> raw (hosted)**
