@@ -308,7 +308,7 @@ curl -k http://<HTTP_server>:8080/bootstrap.ign
 ## coreos-installer install
 ```bash
 sudo coreos-installer install \
-  --ignition-url=http://172.29.97.131:8080/bootstrap.ign \
+  --ignition-url=http://<HTTP_server>:8080/bootstrap.ign \
   --insecure-ignition --copy-network \
   /dev/sda --offline
 ```
