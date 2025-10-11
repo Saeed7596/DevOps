@@ -258,6 +258,9 @@ Ignition config files are created for the `bootstrap`, `control plane`, and `com
 ├── metadata.json
 └── worker.ign
 ```
+Now you can use the ignition files again. Because these file will be expired after 24 hours.
+
+---
 
 ## We need to spin up and HTTP server. We can do this by utilizing python.
 ```bash
@@ -329,12 +332,13 @@ openshift-install wait-for bootstrap-complete --dir=install-dir --log-level=info
 
 ---
 
-```bash
-export KUBECONFIG=<installation_directory>/auth/kubeconfig
-```
+
 # After this command you should see the `console` url and kubeadmin password
 ```bash
 openshift-install wait-for install-complete --dir=install-dir --log-level=debug
+```
+```bash
+export KUBECONFIG=<installation_directory>/auth/kubeconfig
 ```
 
 ---
@@ -365,22 +369,30 @@ watch -n5 oc get clusteroperators
 ---
 
 # Scaling a user-provisioned cluster with the Bare Metal Operator
-Create a backup:
+
+
+---
+
+# Setting
+in console **`Administrator -> Cluster Setting -> Configuration ->  OperatorHub`**
+
+add this
+```yaml
+spec: 
+  disableAllDefaulSources: true
+```
+
+in console **`Administrator -> Cluster Setting -> Configuration ->  ClusterVersion details`**
+
+remove spec.channel
+```yaml
+spec:
+  channel: stable-4.17
+```
+
+---
+
+# Create a backup:
 ```bash
 cp -r install-dir install-dir-backup-$(date +%Y%m%d-%H%M)
 ```
-```bash
-openshift-install create ignition-configs --help
-```
-```bash
-openshift-install create manifests --dir install-dir
-```
-Copy `99-master-chrony.yaml` & `99-worker-chrony.yaml` to `install-dir/openshift`
-```bash
-install-dir/openshift/99-master-chrony.yaml
-install-dir/openshift/99-worker-chrony.yaml
-```
-```bash
-openshift-install create ignition-configs --dir <installation_directory> --overwrite
-```
-Now you can use the ignition files again. Because these file will be expired after 24 hours.
