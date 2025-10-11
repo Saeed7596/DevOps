@@ -119,7 +119,16 @@ ssh-add <path>/<file_name>
 #Example output
 #Identity added: /home/<you>/<path>/<file_name> (<computer_name>)
 ```
+```bash
+# Check the agent is running or not
+ps aux | grep ssh-agent
 
+# Check added keys
+ssh-add -l
+
+# kill
+ssh-agent -k
+```
 ```bash
 mkdir <installation_directory>
 ```
@@ -203,7 +212,9 @@ storage:
         rtcsync
         logdir /var/log/chrony
 ```
-
+```bash
+butane 99-master-chrony.bu -o 99-master-chrony.yaml
+```
 ---
 
 ```bash
@@ -316,7 +327,9 @@ sudo coreos-installer install \
   /dev/sda --offline
 ```
 
-Install `bootstrap` and `masters`
+Install `bootstrap` and `masters`.
+
+After install complete `reboot` the redhat coreos and `Eject` the iso file.
 
 ---
 
