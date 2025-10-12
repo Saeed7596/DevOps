@@ -387,12 +387,18 @@ watch -n5 oc get clusteroperators
 ---
 
 # Setting
+## Disabling the default OperatorHub catalog sources 
 in console **`Administrator -> Cluster Setting -> Configuration ->  OperatorHub`**
 
 add this
 ```yaml
 spec: 
   disableAllDefaulSources: true
+```
+or
+```bash
+oc patch OperatorHub cluster --type json \
+    -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
 ```
 
 in console **`Administrator -> Cluster Setting -> Configuration ->  ClusterVersion details`**
