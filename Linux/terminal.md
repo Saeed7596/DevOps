@@ -43,6 +43,30 @@ sudo -s
 ```bash
 sudo usermod -aG wheel username
 ```
+# Change username
+```bash
+sudo -i
+
+usermod -l newuser olduser
+```
+
+## Change home directory
+The `-m` parameter will move the contents of `/home/olduser` to `/home/newuser`.
+```bash
+usermod -d /home/vahid -m vahid
+```
+### Verify
+```bash
+id newuser
+echo ~newuser
+```
+
+```bash
+pkill -u olduser
+killall -u olduser
+```
+
+```
 
 ---
 
