@@ -313,6 +313,8 @@ oc mirror --verbose 3 -c imageset-config.yaml file://local-mirror
 # Installing on vSphere
 0. From the vCenter home page, download the vCenter’s root CA certificates. Click Download trusted root CA certificates in the vSphere Web Services SDK section. The `<vCenter>/certs/download.zip` file downloads. Extract the compressed file that contains the vCenter root CA certificates.
 ```bash
+sudo cp rootCA.crt /etc/pki/ca-trust/source/anchors
+
 sudo cp certs/lin/* /etc/pki/ca-trust/source/anchors
 
 sudo update-ca-trust extract
@@ -322,6 +324,16 @@ sudo update-ca-trust extract
 ssh-keygen -t rsa -N '' -f $HOME/.ssh/id_openshift
 eval "$(ssh-agent -s)"
 ssh-add $HOME/.ssh/id_openshift
+```
+```bash
+# Check the agent is running or not
+ps aux | grep ssh-agent
+
+# Check added keys
+ssh-add -l
+
+# kill
+ssh-agent -k
 ```
 2. Install `openshift-install`
 Check
@@ -337,6 +349,21 @@ wget https://mirror.openshift.com/pub/openshift-v4/amd64/dependencies/rhcos/late
 ```bash
 python3 -m http.server 8080
 ```
+if you have nexus you can create a `raw` repository and upload the `rhcos-vmware.x86_64.ova` there.
+* nexus setting:
+1. Administration → Security → Realms
+  * Make sure “Anonymous Access Realm” is in the list of active ones.
+2. Administration → Security → Anonymous
+  * Check the box “Allow anonymous users to access the server”.
+  * Set the default Role to nx-anonymous.
+3. Administration → Security → Roles
+  * Open the `nx-anonymous` role.
+  * If it doesn't exist, add a new permission for it:
+  * Type: Repository
+  * Format: raw
+  * Actions: Read
+  * Repository: The name of your raw repository (or all raw repositories)
+
 4. Create `install-config.yaml` file
 ```bash
 mkdir cluster-config
@@ -490,6 +517,31 @@ oc whoami
 
 ---
 
+# Setting
+**Disabling the default OperatorHub catalog sources**
+in console **`Administrator -> Cluster Setting -> Configuration ->  OperatorHub`**
+
+add this
+```yaml
+spec: 
+  disableAllDefaulSources: true
+```
+or
+```yamk
+oc patch OperatorHub cluster --type json \
+    -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
+```
+
+in console **`Administrator -> Cluster Setting -> Configuration ->  ClusterVersion details`**
+
+remove spec.channel
+```yaml
+spec:
+  channel: stable-4.18
+```
+
+---
+
 # Preparation a cluster
 After you have mirrored your image set to the mirror registry, you must apply the generated `ImageDigestMirrorSet` (IDMS), `ImageTagMirrorSet` (ITMS), `CatalogSource`, and `UpdateService` to the cluster.
 ```bash
@@ -558,6 +610,75 @@ https://console-openshift-console.apps.<cluster-name>.<baseDomain>
 ```bash
 curl -k https://api.openshift.<baseDomain>.com:6443/healthz
 ```
+
+---
+
+## Configuring chrony time service
+```bash
+nano 99-master-chrony.bu
+```
+```bu
+variant: openshift
+version: 4.17.0
+metadata:
+  name: 99-master-chrony 
+  labels:
+    machineconfiguration.openshift.io/role: master 
+storage:
+  files:
+  - path: /etc/chrony.conf
+    mode: 0644 
+    overwrite: true
+    contents:
+      inline: |
+        server <ntp-ip-address> iburst 
+        driftfile /var/lib/chrony/drift
+        makestep 1.0 3
+        rtcsync
+        logdir /var/log/chrony
+```
+```bash
+butane 99-master-chrony.bu -o 99-master-chrony.yaml
+```
+
+---
+
+```bash
+nano 99-worker-chrony.bu
+```
+```bu
+variant: openshift
+version: 4.17.0
+metadata:
+  name: 99-worker-chrony 
+  labels:
+    machineconfiguration.openshift.io/role: worker 
+storage:
+  files:
+  - path: /etc/chrony.conf
+    mode: 0644 
+    overwrite: true
+    contents:
+      inline: |
+        server <ntp-ip-address> iburst 
+        driftfile /var/lib/chrony/drift
+        makestep 1.0 3
+        rtcsync
+        logdir /var/log/chrony
+```
+```bash
+butane 99-worker-chrony.bu -o 99-worker-chrony.yaml
+```
+**Note**: If cluster is running, apply to the cluster.
+```bash
+oc apply -f ./99-master-chrony.yaml
+oc apply -f ./99-worker-chrony.yaml
+```
+
+---
+
+# Infra Node
+* Labeled with `node-role.kubernetes.io/infra`
 
 ---
 
