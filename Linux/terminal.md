@@ -27,6 +27,10 @@ sudo passwd username
 ```bash
 sudo usermod -aG sudo username
 ```
+### Adding the User to the sudo Group (RedHat)
+```bash
+sudo usermod -aG wheel username
+```
 ### Switch to User
 ```bash
 sudo -u username -i
@@ -43,30 +47,44 @@ sudo -s
 ```bash
 sudo usermod -aG wheel username
 ```
+
+---
+
 # Change username
 ```bash
+# Switch to root
 sudo -i
 
+# Close all saeed sessions and processes
+pkill -u olduser
+killall -u olduser
+
+who | grep olduser
+
+pkill -KILL -u olduser
+```
+```bash
 usermod -l newuser olduser
 ```
 
 ## Change home directory
 The `-m` parameter will move the contents of `/home/olduser` to `/home/newuser`.
 ```bash
-usermod -d /home/vahid -m vahid
+usermod -d /home/newuser -m newuser
 ```
 ### Verify
 ```bash
 id newuser
 echo ~newuser
 ```
-
 ```bash
-pkill -u olduser
-killall -u olduser
+grep vahid /etc/passwd
 ```
-
+Output:
+```bash
+newuser:x:1001:1001::/home/newuser:/bin/bash
 ```
+Logout and Login!
 
 ---
 
