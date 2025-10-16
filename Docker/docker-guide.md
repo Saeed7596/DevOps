@@ -167,6 +167,16 @@ docker system prune --volumes
 Are you sure you want to continue? [y/N] y
 ```
 ----------------------------------
+
+# Accses docker to user:
+```bash
+# Verify docker group
+grep docker /etc/group
+# if docker group not exist
+sudo groupadd docker
+# set access
+sudo usermod -aG docker $USER
+```
 ### Accses docker to new user:
 ```bash
 usermod -aG docker NEWUSER
