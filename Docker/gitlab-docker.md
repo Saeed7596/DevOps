@@ -112,6 +112,13 @@ nano /nginx/default.conf
 docker compose -f docker-compose.yml up -d
 ```
 -------------------------------------------
+
+```bash
+sudo docker exec -it gitlab-web-1 grep 'Password:' /etc/gitlab/initial_root_password
+```
+
+---
+
 # Move gitlab
 ```bash
 docker exec -it <gitlab container_id> /bin/bash
