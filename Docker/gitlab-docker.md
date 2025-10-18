@@ -119,6 +119,27 @@ sudo docker exec -it gitlab-web-1 grep 'Password:' /etc/gitlab/initial_root_pass
 
 ---
 
+# SSH Access to clinet pull and push
+**1. Add your public SSH Key in Gitlab**
+**User -> Preferences -> SSH Keys**
+**2. in client**
+```bash
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_rsa
+```
+```bash
+nano ~/.ssh/config
+```
+```conf
+Host gitlab.example.com
+  Host gitlab.example.com
+  User git
+  Port 2222 # Than port use in docker cpmpose
+  IdentityFile ~/.ssh/id_rsa
+```
+
+---
+
 # Move gitlab
 ```bash
 docker exec -it <gitlab container_id> /bin/bash
