@@ -473,31 +473,6 @@ spec:
 
 ---
 
-# Setting
-## Disabling the default OperatorHub catalog sources 
-in console **`Administrator -> Cluster Setting -> Configuration ->  OperatorHub`**
-
-add this
-```yaml
-spec: 
-  disableAllDefaulSources: true
-```
-or
-```bash
-oc patch OperatorHub cluster --type json \
-    -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
-```
-
-in console **`Administrator -> Cluster Setting -> Configuration ->  ClusterVersion details`**
-
-remove spec.channel
-```yaml
-spec:
-  channel: stable-4.17
-```
-
----
-
 # Create a backup:
 ```bash
 cp -r install-dir install-dir-backup-$(date +%Y%m%d-%H%M)
