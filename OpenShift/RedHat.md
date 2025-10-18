@@ -289,3 +289,17 @@ Output should be the vpn ip
 
 ---
 
+# Download rpm and move to air-gap
+In Online Client
+```bash
+mkdir -p ~/git-offline
+cd ~/git-offline
+sudo dnf install -y dnf-plugins-core
+sudo dnf download --resolve git
+```
+In air-gap Client:
+```bash
+cd git-offline
+sudo rpm -Uvh *.rpm
+```
+
