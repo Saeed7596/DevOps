@@ -130,6 +130,13 @@ Or simply use
 while true; do curl http://$(minikube ip):port; done
 ```
 Or run the python app `python3 k8s/test-hpa.py `
+
+With ab:
+```bash
+ab -n 1000 -c 100 http://url-path.com/
+```
+* `-n 1000` means: **Total number of requests**
+* `-c 100` means: **Number of concurrent requests**
 * Note: Update the `minikube ip` in code.
 ### Watch result
 ```bash
