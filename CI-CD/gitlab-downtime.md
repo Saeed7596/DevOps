@@ -10,3 +10,12 @@ docker compose --verbose -f ${CONTAINER_NAME}.compose down || true &&
 docker rmi "${NEXUS_ADDR}/${SERVICE_NAME}-${PRODUCT_NAME}-${ENVIRON}:${APP_VERSION}" || true &&
 docker compose --verbose -f ${CONTAINER_NAME}.compose up -d
 ```
+
+---
+
+# SSH with gitlab-runner
+In your destination client:
+```bash
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+```
+Copy the `~/.ssh/id_rsa` value and create the vaiable in gitlab.
