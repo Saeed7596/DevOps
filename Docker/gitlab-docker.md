@@ -543,6 +543,38 @@ When using GitLab Runner with Docker executor and pulling images from the regist
 
 ---
 
+# gitlab-runner with self-sign tls
+```bash
+openssl s_client -showcerts -connect example-gitlab.com:443 </dev/null 2>/dev/null | openssl x509 -outform PEM > gitlab-cert.crt
+```
+```bash
+sudp cp gitlab-cert.crt /srv/gitlab-runner/config/certs/
+```
+```yaml
+services:
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    container_name: gitlab-runner
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /srv/gitlab-runner/config:/etc/gitlab-runner
+      - /srv/gitlab-runner/config/certs:/etc/gitlab-runner/certs
+```
+```bash
+docker compose -f docker-compose.yaml up -d
+```
+```bash
+docker exec -it gitlab-runner gitlab-runner register --url https://example-gitlab.com \
+  --token glrt-abcDEF123456_example \
+  --tls-ca-file /etc/gitlab-runner/certs/gitlab-cert.crt
+```
+```bash
+docker exec -it gitlab-runner gitlab-runner verify
+```
+
+---
+
 # Done! ✨
 
 You can now use GitLab's built-in Container Registry to manage your Docker images efficiently.
