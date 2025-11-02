@@ -575,6 +575,45 @@ docker exec -it gitlab-runner gitlab-runner verify
 
 ---
 
+# [Gitlab LDAP](https://docs.gitlab.com/administration/auth/ldap/)
+```yaml
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:18.4.2-ce.0  
+    container_name: gitlab
+    restart: always
+    hostname: 'gitlab.example.com'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://gitlab.example.com'
+        gitlab_rails['ldap_enabled'] = true
+        gitlab_rails['ldap_servers'] = {
+          'main' => {
+            'label' => 'LDAP',
+            'host' => 'LDAP-URL.COM',
+            'port' => 389,
+            'uid' => 'sAMAccountName',
+            'encryption' => 'plain',
+            'bind_dn' => 'CN=openshift,OU=Users,OU=HQ,OU=SAEED,DC=LDAP-URL,DC=COM',
+            'password' => '<bind_user_password>', #(openshift_password)
+            'base' => 'DC=LDAP-URL,DC=COM',
+            'group_base' => 'OU=SAEED',
+            'active_directory' => true
+          }
+        }
+    ports:
+      - '8580:80'
+      - '8543:443'
+      - '5058:22'
+    volumes:
+      - '$GITLAB_HOME/config:/etc/gitlab'
+      - '$GITLAB_HOME/logs:/var/log/gitlab'
+      - '$GITLAB_HOME/data:/var/opt/gitlab'
+    shm_size: '512m'
+```
+
+---
+
 # Done! ✨
 
 You can now use GitLab's built-in Container Registry to manage your Docker images efficiently.
