@@ -338,3 +338,35 @@ chmod +x delete_image.sh
 ```bash
 ./delete_image.sh
 ```
+
+---
+
+# LDAP Integration
+## [first step](https://help.sonatype.com/en/ldap.html)
+## [second step](https://help.sonatype.com/en/ldap-integration.html)
+
+---
+
+# 1. Enable LDAP Authentication Realm
+**Settings -> Security -> Realms** 
+
+* Move the `LDAP Realm` beneath the Local Authenticating Realm in the list.
+
+---
+
+# 2. Create LDAP Connection Profile
+**Settings -> Security -> LDAP**
+
+---
+
+# 3. Create Role
+**Administration → Security → Roles**
+* Type: Nexus role
+* Applied Privileges:
+    * `nx-repository-view-docker-<repo_name>-read` → pull
+
+    * `nx-repository-view-docker-<repo_name>-add` → push
+
+    * `nx-repository-view-docker-<repo_name>-delete` → delete
+
+Assign this role to the desired LDAP user or group.
