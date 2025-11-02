@@ -35,7 +35,7 @@ spec:
         bindDN: 'CN=openshift,OU=Users,DC=example,DC=com'
         bindPassword:
           name: ldap-bind-secret
-        insecure: false
+        insecure: true
         url: 'ldaps://example.com:389/DC=example,DC=com?sAMAccountName'
       mappingMethod: claim
       name: my-ldap
