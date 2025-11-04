@@ -303,3 +303,29 @@ cd git-offline
 sudo rpm -Uvh *.rpm
 ```
 
+---
+
+# ab - Apache Benchmark
+In Online Client
+```bash
+sudo dnf install --downloadonly --downloaddir=/tmp/httpd-tools httpd-tools
+```
+```bash
+cd /tmp
+tar -czvf httpd-tools.tar.gz httpd-tools
+```
+```bash
+scp /tmp/httpd-tools.tar.gz /tmp/httpd-tools.tar.gz user@airgap:/tmp/
+```
+In air-gap Client:
+```bash
+cd /tmp
+tar -xzvf httpd-tools.tar.gz
+```
+```bash
+sudo dnf install /tmp/httpd-tools/*.rpm
+```
+```bash
+which ab
+ab -V
+```
