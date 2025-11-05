@@ -16,6 +16,108 @@ The OSI (Open Systems Interconnection) model describes seven layers for standard
 
 ---
 
+
+# The 7 Layers of the OSI Model
+
+The **OSI Model (Open Systems Interconnection)** is a conceptual framework used to understand and standardize how different networking systems communicate. It divides the communication process into **seven distinct layers**, each with specific functions and responsibilities.
+
+---
+
+## 1. Physical Layer (Layer 1)
+**Purpose:** Transmits raw bit streams over a physical medium.
+
+**Key Functions:**
+- Defines hardware elements (cables, switches, network cards).
+- Deals with voltage levels, data rates, and physical connections.
+- Converts binary data into signals (electrical, optical, or radio).
+
+**Examples:** Ethernet cables, fiber optics, hubs, repeaters.
+
+---
+
+## 2. Data Link Layer (Layer 2)
+**Purpose:** Provides node-to-node data transfer and error detection.
+
+**Key Functions:**
+- Frames data for transmission.
+- Detects and may correct errors that occur in the physical layer.
+- Uses MAC (Media Access Control) addresses.
+
+**Examples:** Switches, bridges, Ethernet (IEEE 802.3), PPP.
+
+---
+
+## 3. Network Layer (Layer 3)
+**Purpose:** Handles routing and forwarding of data packets between devices.
+
+**Key Functions:**
+- Logical addressing using IP addresses.
+- Determines the best path for data delivery.
+- Manages packet fragmentation and reassembly.
+
+**Examples:** Routers, IP (IPv4/IPv6), ICMP.
+
+---
+
+## 4. Transport Layer (Layer 4)
+**Purpose:** Ensures reliable data transfer between systems.
+
+**Key Functions:**
+- Segments data and ensures complete delivery.
+- Provides error recovery and flow control.
+- Supports both connection-oriented (TCP) and connectionless (UDP) protocols.
+
+**Examples:** TCP, UDP, SSL/TLS.
+
+---
+
+## 5. Session Layer (Layer 5)
+**Purpose:** Manages and controls the connections (sessions) between applications.
+
+**Key Functions:**
+- Establishes, maintains, and terminates sessions.
+- Synchronizes dialogue between systems.
+
+**Examples:** NetBIOS, PPTP, RPC.
+
+---
+
+## 6. Presentation Layer (Layer 6)
+**Purpose:** Translates data between the application and the network.
+
+**Key Functions:**
+- Converts data formats (encryption, compression, encoding).
+- Ensures that data from the application layer of one system can be read by the application layer of another.
+
+**Examples:** SSL, JPEG, MPEG, GIF.
+
+---
+
+## 7. Application Layer (Layer 7)
+**Purpose:** Provides network services directly to end users and applications.
+
+**Key Functions:**
+- Interfaces with software applications.
+- Handles protocols like HTTP, SMTP, FTP, DNS, and POP3.
+
+**Examples:** Web browsers, email clients, file transfer programs.
+
+---
+
+## Summary Table
+
+| Layer | Name         | Function  | Example Protocols / Devices   |
+|-------|--------------|-----------|------------------------------|
+| 7     | Application  | User interface and services - End User Layer | HTTP, FTP, IRC, SMTP, SSH, DNS |
+| 6     | Presentation | Data translation, encryption - Syntax Layer | SSL, SSH, IMAP, FTP, JPEG, MPEG |
+| 5     | Session      | Connection management - Synch & Send to Port | API's, Socket, WinSock, RPC, NetBIOS |
+| 4     | Transport    | Reliable data transfer - End-to-end Connections | TCP, UDP |
+| 3     | Network      | Routing and addressing - Packets | IP, ICMP, IPSec, IGMP, Routers |
+| 2     | Data Link    | Node-to-node delivery - Frames | Ethernet, Switch, Bridge, PPP |
+| 1     | Physical     | Transmission of bits - Physical Structure | Cables (Coax, Fiber), Wireless, Hubs, Repeaters |
+
+---
+
 ## TCP vs UDP
 
 ### **Differences between TCP and UDP**
