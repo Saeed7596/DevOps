@@ -91,7 +91,7 @@ sudo nmtui
 ```
 ### Edit ens33 -> Route -> 
 * Destination/Perfix = <source-ip/32>
-* Next Hop = <default-gateway>
+* Next Hop = default-gateway
 * Metric -> Empty
 
 ### Verify
