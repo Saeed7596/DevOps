@@ -52,3 +52,52 @@ sudo systemctl restart sshd
 ~/.ssh$ cat id_rsa.pub > authorized_keys
 and copy id_rsa in gitlab variables
 ```
+
+---
+
+# RedHat
+### Change Port 22 to 2222
+```bash
+sudo nano /etc/ssh/sshd_config
+```
+### firewall-cmd
+```bash
+sudo firewall-cmd --permanent --add-port=2222/tcp
+sudo firewall-cmd --reload
+```
+### SELinux
+```bash
+sudo semanage port -l | grep ssh
+sudo semanage -a -t ssh_port_t -p tcp 2222
+```
+### Restart ssh service
+```bash
+sudo systemctl restart sshd
+```
+### Verify
+```bash
+sudo ss -tlnp | grep sshd
+```
+
+---
+
+# Add source route to have access!
+```bash
+ip route add <source-ip/32> via <default-gateway> dev ens33
+```
+### Add Permanent
+```bash
+sudo nmtui
+```
+### Edit ens33 -> Route -> 
+* Destination/Perfix = <source-ip/32>
+* Next Hop = <default-gateway>
+* Metric -> Empty
+
+### Verify
+```bash
+ip route
+sudo nft list ruleset 
+```
+
+---
