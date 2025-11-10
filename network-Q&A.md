@@ -327,6 +327,10 @@ ip route add 5.5.5.0/24 dev eth0
 ```bash
 ip route add 10.10.10.0/24 dev eth0
 ```
+Or (It's work also too)
+```bash
+ip route add 10.10.0.0/16 dev eth0
+```
 
 **Now both directions are defined, and communication can occur successfully.**
 
