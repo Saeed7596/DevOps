@@ -278,6 +278,26 @@ Since IP addresses are stored in binary form, they are represented in a `decimal
 This means the `first 24 bits` represent the `network` portion, and the remaining `8 bits` represent the `host` portion.
 
 ---
+## Questions
+### Which of the following is a valid IP address for a network interface?
+- A) 192.168.10.0/24
+
+- B) 10.10.10.255/24
+
+- C) 256.10.10.10/24
+
+- D) 56.41.26.8/15
+
+| **Option**        | **Analysis** | **Valid?** |
+| ----------------- | -------------------------------------------------------------------------------------------------------------- | -- | 
+| `192.168.10.0/24` | **The `last octet` is `0`**, which represents the network address. It cannot be assigned to a `host`.          | ❌ |
+| `10.10.10.255/24` | **The `last octet` is `255`, which is the `broadcast address` for this subnet. It cannot be used by a host.    | ❌ |
+| `256.10.10.10/24` | Invalid, because `256` is not a valid octet value in IPv4 (the range is `0–255`).                              | ❌ |
+| `56.41.26.8/15`   | All octets are within valid range, and this address is not the network or broadcast address in the /15 subnet. | ✅ |
+
+##### ✅ Correct Answer: `56.41.26.8/15` is a valid IP address for a network interface.
+
+---
 
 ### **What is NAT (Network Address Translation)?**
 
