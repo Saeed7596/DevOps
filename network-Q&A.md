@@ -299,6 +299,80 @@ This means the `first 24 bits` represent the `network` portion, and the remainin
 
 ---
 
+## Understanding `Routing` and IP Communication
+**When all devices share IP addresses `within the same range`, they can communicate directly and ping each other without needing a router.**
+**However, if a device is located `outside` the local network, `routing is required` to reach it.**
+
+In Linux, you can view or manage routing tables using the ip route command.
+
+Example:
+```nginx
+Device A = 10.10.10.5/24
+Device B = 10.10.10.10/24
+Device C = 5.5.5.1/24
+```
+
+**Devices A and B are in the same subnet, so they can communicate directly.**
+**But A cannot reach C because they belong to different networks.**
+
+##### To add a route from A to C, we use:
+```bash
+ip route add 5.5.5.0/24 dev eth0
+```
+
+**This allows A to send packets toward the 5.5.5.0/24 network.**
+**However, since C has no return route, it can receive the packets but `cannot reply`.**
+
+**So, we must also add a route on C:**
+```bash
+ip route add 10.10.10.0/24 dev eth0
+```
+
+**Now both directions are defined, and communication can occur successfully.**
+
+---
+
+## Default Route
+
+**When a device is connected to a router, default routes are usually added automatically.**
+**To manually define a default route in Linux, use:**
+```bash
+ip route add default dev eth0
+```
+
+**The default route acts as a fallback path:**
+**If the destination IP address does not match any specific route in the routing table, the packet is sent through this default route.**
+
+##### Purpose:
+This command adds a `specific route` for a single host (identified by its exact IP address) and tells the system to send packets to that host via a particular gateway using the specified `network interface`.
+```bash
+ip route add <source-ip/32> via <default-gateway> dev eth0
+```
+* Breakdown:
+   * `<source-ip/32>` → The destination IP address with a `/32` subnet mask, meaning **`only that exact IP`** (a single host route).
+   * `via <default-gateway>` → Specifies the **`next hop (gateway)`** that should be used to reach the destination.
+   * `dev eth0` → Defines the `network interface` (e.g., eth0) through which the traffic should be sent.
+
+Example:
+```bash
+ip route add 10.10.20.5/32 via 192.168.1.1 dev eth0
+```
+* Means: To reach the host `10.10.20.5`, send packets through the gateway `192.168.1.1` using the `eth0` interface.
+  
+---
+
+## Summary of Key Concepts
+
+* `IP Address`: A `unique` identifier assigned to a device on a network. It consists of a `network part` and a `host part`.
+
+* `Subnet Mask`: Defines which portion of the IP address represents the network and which part represents the host.
+   * Example: `/24 → 255.255.255.0` means the first 24 bits are for the `network`.
+
+* `Default Gateway`: The device (usually a router) that forwards packets from the local network to external networks or the internet.
+   * If a packet’s destination is outside the local subnet, it is sent to the default gateway.
+
+---
+
 ### **What is NAT (Network Address Translation)?**
 
 NAT is a technique used to modify network address information in IP headers. It enables:
