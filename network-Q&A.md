@@ -163,6 +163,29 @@ DHCP automatically assigns IP addresses and other network configurations (subnet
 
 ---
 
+## `UDP` vs `TCP` and Addressing Types
+
+### UDP (User Datagram Protocol) is like shouting in a hall:
+
+* “Saeed, come have some ice cream!”
+* Maybe Saeed hears it, maybe he doesn’t — but you still sent the message.
+* UDP sends data without establishing a connection (`Connectionless`) and does not guarantee delivery, order, or reliability.
+
+### TCP (Transmission Control Protocol) is like having a proper conversation:
+
+* “Saeed, come have some ice cream.”
+* “Saeed, did you hear me?”
+* “Yes, I heard you.”
+* TCP ensures that data is delivered reliably, in the correct order, and that both sides confirm successful communication.(`Connection-oriented`)
+
+### There are also two common communication types:
+
+* `Unicast`: Sending data to a single, specific destination (e.g., just to Saeed).
+
+* `Broadcast`: Sending data to all devices on the local network simultaneously.
+
+---
+
 ## IP Addressing
 
 ### **What is an IP address?**
@@ -183,11 +206,11 @@ An IP (Internet Protocol) address is a unique identifier assigned to devices on 
 
 ### **IPv4 Classes Overview**
 
-| **Class** | **Range**                 | **Network Bits** | **Host Bits** |
-| --------- | ------------------------- | ---------------- | ------------- |
-| A         | 1.0.0.0 - 126.0.0.0       | 8                | 24            |
-| B         | 128.0.0.0 - 191.255.0.0   | 16               | 16            |
-| C         | 192.0.0.0 - 223.255.255.0 | 24               | 8             |
+| **Class** | **Range**                   | **Network Bits** | **Host Bits** |
+| --------- | --------------------------- | ---------------- | ------------- |
+| A         | 0.0.0.0 - 127.255.255.255   | 8                | 24            |
+| B         | 128.0.0.0 - 191.255.255.255 | 16               | 16            |
+| C         | 192.0.0.0 - 223.255.255.255 | 24               | 8             |
 
 ---
 
@@ -205,11 +228,17 @@ An IP (Internet Protocol) address is a unique identifier assigned to devices on 
 
 1. **Private IPs:**
 
-   - Not routable on the internet.
+   - Not routable on the **`internet`**.
    - Examples:
      - `10.0.0.0/8`
      - `172.16.0.0/12`
      - `192.168.0.0/16`
+
+| **Name**     | **CIDR block**  | **Address range**             | **Number of addresses** | *Classful description***               |
+| ------------ | --------------- | ----------------------------- | ----------------------- | -------------------------------------- |
+| 24-bit block	| 10.0.0.0/8      | 10.0.0.0 – 10.255.255.255     | 16777216                | Single Class A                         |
+| 20-bit block | 172.16.0.0/12   | 172.16.0.0 – 172.31.255.255   | 1048576                 | Contiguous range of 16 Class B blocks  |
+| 16-bit block | 192.168.0.0/16  | 192.168.0.0 – 192.168.255.255 | 65536                   | Contiguous range of 256 Class C blocks |
 
 2. **Loopback:** `127.0.0.1` for local testing.
 
@@ -229,6 +258,24 @@ An IP (Internet Protocol) address is a unique identifier assigned to devices on 
 ### **What is a subnet?**
 
 A subnet divides a large network into smaller, manageable sections. Each subnet has its own unique IP range, defined by a subnet mask (e.g., `255.255.255.0`).
+
+---
+
+### Structure of an IP Address
+
+#### Every IP address is divided into two parts:
+* `Network` part: Identifies the network segment and is the same for all devices within that network.
+* `Host` part: Identifies a specific device within the network and is unique to each one.
+
+Since IP addresses are stored in binary form, they are represented in a `decimal` (base-10) format for readability — for example, 192.168.1.101.
+
+##### When we write an IP address as 1`92.168.1.101/24`, the `“/24”` indicates the `subnet mask`.
+##### A `/24` means the subnet mask is `255.255.255.0`, which corresponds to `24 ones` in binary form:
+```bash
+11111111.11111111.11111111.00000000
+```
+
+This means the `first 24 bits` represent the `network` portion, and the remaining `8 bits` represent the `host` portion.
 
 ---
 
