@@ -151,13 +151,38 @@ sudo ip route add default via <gateway-ip> dev eth0
 **Purpose:** Detect any blocked traffic.
 
 ```bash
+# iptables - View traditional firewall rules
 sudo iptables -L -n -v
+
+# nftables - Show the entire structure of the new firewall
 sudo nft list ruleset
+
+# Readable firewall status (on Ubuntu and Debian)
 sudo ufw status verbose
+
+# Readable firewall status (on RedHat)
+sudo firewall-cmd --state
+sudo firewall-cmd --list-all
+sudo firewall-cmd --list-all-zones
 ```
 
 **Interpretation:**
 - DROP/REJECT rules may block outgoing/incoming packets.
+
+### Enable or disable the firewall
+```bash
+# Ubuntu
+sudo ufw enable/disable
+# RedHat
+sudo systemctl enable/disable firewalld
+```
+### Open SSH Port
+```bash
+# Ubuntu
+udo ufw allow 22/tcp
+# RedHat
+sudo firewall-cmd --permanent --add-service=ssh && sudo firewall-cmd --reload
+```
 
 ---
 
