@@ -366,7 +366,22 @@ Example:
 ip route add 10.10.20.5/32 via 192.168.1.1 dev eth0
 ```
 * Means: To reach the host `10.10.20.5`, send packets through the gateway `192.168.1.1` using the `eth0` interface.
-  
+
+### Add Permanent
+```bash
+sudo nmtui
+```
+### Edit eth0 -> Route -> 
+* Destination/Perfix = <source-ip/32>
+* Next Hop = default-gateway
+* Metric -> Empty
+
+### Verify
+```bash
+ip route
+sudo nft list ruleset 
+```
+
 ---
 
 ## Summary of Key Concepts
