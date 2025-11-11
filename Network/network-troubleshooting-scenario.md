@@ -166,12 +166,22 @@ sudo ufw status verbose
 
 ```bash
 sudo tcpdump -n -i eth0 host 8.8.8.8 -w /tmp/cap.pcap
+```
+**Note**: No packets are printed to the terminal — they are just saved to a file. You'll need to open it later with Wireshark or `tcpdump -r /tmp/cap.pcap`.
+```bash
 sudo tcpdump -n -i eth0 icmp
 ```
+**Note**: Live display of all ICMP packets (like ping) on ​​eth0 in the terminal.
 
 **Interpretation:**
 - Requests sent but no reply → remote issue.
 - No packets sent → local routing/firewall problem.
+
+### Troubleshooting specific service connectivity (e.g. SSH on port 2222).
+```bash
+sudo tcpdump -i eth0 'tcp port 2222' -nn -vv -s 0
+```
+Accurate and live display of all TCP traffic on port 2222 (for example, if SSH or a custom service is running on that port).
 
 ---
 
