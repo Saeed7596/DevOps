@@ -343,6 +343,10 @@ ip route add 10.10.0.0/16 dev eth0
 ```bash
 ip route add default dev eth0
 ```
+# 🔹 This is the common and correct way to define a Default Route.
+```bash
+sudo ip route add default via <gateway-ip> dev eth0
+```
 
 **The default route acts as a fallback path:**
 **If the destination IP address does not match any specific route in the routing table, the packet is sent through this default route.**
