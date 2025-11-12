@@ -129,3 +129,65 @@ Combine these tools logically:
 6. `tcpdump icmp` → Watch actual ping traffic.
 
 ---
+
+# 🧰 Netcat (nc) & Telnet Cheatsheet and Network Connectivity Scenario
+
+## 1. 🧾 Netcat (nc) Cheat Sheet
+
+Netcat (`nc`) is a powerful network tool used for reading, writing, and testing TCP/UDP connections.
+
+### 🔹 Basic Syntax
+```bash
+nc [options] [hostname] [port]
+```
+
+### 🔹 Common Options and Flags
+
+| Flag | Description | Example |
+|------|--------------|----------|
+| `-l` | Listen mode (server mode) | `nc -l 8080` |
+| `-p` | Specify local port | `nc -l -p 8080` |
+| `-v` | Verbose output | `nc -v 192.168.1.10 22` |
+| `-z` | Scan mode (no data sent) | `nc -zv 192.168.1.10 1-1024` |
+| `-u` | Use UDP instead of TCP | `nc -u 192.168.1.10 53` |
+| `-w` | Set timeout (in seconds) | `nc -w 3 192.168.1.10 443` |
+| `-n` | Numeric IP addresses only (no DNS lookup) | `nc -nv 192.168.1.10 80` |
+| `> file` | Save incoming data to file | `nc -l 9000 > received.txt` |
+| `< file` | Send a file | `nc 192.168.1.10 9000 < file.txt` |
+
+---
+
+## 2. 💬 Telnet Cheat Sheet
+
+Telnet is a simple TCP client used for manual connection testing to a specific host and port.
+
+### 🔹 Basic Syntax
+```bash
+telnet [hostname] [port]
+```
+
+### 🔹 Common Usage Examples
+
+| Command | Description |
+|----------|--------------|
+| `telnet 192.168.1.10 80` | Check if port 80 (HTTP) is open |
+| `telnet smtp.gmail.com 25` | Test connection to SMTP server |
+| `telnet 192.168.1.10 22` | Check SSH service availability |
+| `Ctrl + ]` then `quit` | Exit Telnet session |
+
+🧠 **Tip:** If connection succeeds:
+```
+Trying 192.168.1.10...
+Connected to 192.168.1.10.
+Escape character is '^]'.
+```
+If it fails:
+```
+Connection refused
+```
+or
+```
+Connection timed out
+```
+
+---
