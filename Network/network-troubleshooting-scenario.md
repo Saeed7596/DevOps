@@ -258,3 +258,130 @@ ss -tulnp
 
 ## Summary
 This structured process lets you isolate network issues layer by layer, from cable failures to DNS or routing problems. Use packet captures and route inspection only after confirming physical and IP-level basics.
+
+# ============================
+
+
+
+## 3. 🔧 Scenario: Testing TCP Connectivity Between Two Hosts
+
+### 🧠 Objective
+Verify if two hosts in a LAN can communicate over a specific TCP port (e.g., 8080).
+
+---
+
+### 🖥️ Environment Setup
+
+| Hostname | IP Address | Role |
+|-----------|-------------|------|
+| `server1` | 192.168.10.10 | Web Server |
+| `client1` | 192.168.10.20 | Client |
+
+---
+
+### ⚙️ Step 1: Listen on Server
+
+On **server1**:
+```bash
+sudo nc -l -p 8080
+```
+The server now waits for incoming connections on port **8080**.
+
+---
+
+### ⚙️ Step 2: Connect from Client
+
+On **client1**:
+```bash
+nc 192.168.10.10 8080
+```
+Type any message:
+```
+Hello from client
+```
+You’ll see the same message appear on the server terminal — indicating a successful connection.
+
+---
+
+### ⚙️ Step 3: Add Verbosity for Troubleshooting
+
+```bash
+nc -v 192.168.10.10 8080
+```
+
+If you see:
+```
+Connection refused
+```
+➡️ The service isn’t listening on that port.  
+If you see:
+```
+Timed out
+```
+➡️ The connection is blocked by a firewall or routing issue.
+
+---
+
+### ⚙️ Step 4: Test Using Telnet
+
+Alternative test:
+```bash
+telnet 192.168.10.10 8080
+```
+
+If successful:
+```
+Trying 192.168.10.10...
+Connected to 192.168.10.10.
+```
+
+If not:
+```
+telnet: Unable to connect to remote host: Connection refused
+```
+
+---
+
+### ⚙️ Step 5: Check Firewall Rules
+
+If connection fails:
+```bash
+sudo iptables -L -n -v
+# or
+sudo firewall-cmd --list-all
+```
+
+---
+
+### ⚙️ Step 6: Test File Transfer with Netcat
+
+On **server1**:
+```bash
+nc -l 9000 > received.txt
+```
+
+On **client1**:
+```bash
+nc 192.168.10.10 9000 < file.txt
+```
+
+✅ The file `file.txt` will be transferred to the server as `received.txt`.
+
+---
+
+## 🧭 Summary
+
+| Tool | Purpose | Notes |
+|------|----------|-------|
+| `nc` | General-purpose network testing & data transfer | Supports both TCP and UDP |
+| `telnet` | Simple TCP connectivity test | For quick service checks |
+| `iptables` / `firewall-cmd` | Firewall rule verification | Ensure the port is open |
+| `ip route` | Routing path validation | Confirms gateway or subnet reachability |
+
+---
+
+## 🔍 Quick Takeaway
+
+> **Netcat** and **Telnet** are essential diagnostic tools for network engineers.  
+> They help verify service availability, connectivity, and firewall configurations — all from the terminal.
+
