@@ -191,3 +191,19 @@ Connection timed out
 ```
 
 ---
+
+## 🧭 Summary
+
+| Tool | Purpose | Notes |
+|------|----------|-------|
+| `nc` | General-purpose network testing & data transfer | Supports both TCP and UDP |
+| `telnet` | Simple TCP connectivity test | For quick service checks |
+| `iptables` / `firewall-cmd` | Firewall rule verification | Ensure the port is open |
+| `ip route` | Routing path validation | Confirms gateway or subnet reachability |
+
+---
+
+## 🔍 Quick Takeaway
+
+> **Netcat** and **Telnet** are essential diagnostic tools for network engineers.  
+> They help verify service availability, connectivity, and firewall configurations — all from the terminal.
