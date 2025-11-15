@@ -77,6 +77,7 @@
 | ------------------- | ----------------------------------------------- |
 | `ifconfig`         | Display network interface information           |
 | `ping host`        | Send ICMP echo requests to test connectivity    |
+| `netstat -na`      | Show all ports                                  |
 | `netstat -tuln`    | Show listening ports and active connections     |
 | `curl URL`         | Fetch a URL using HTTP                          |
 | `wget URL`         | Download files from a URL                       |

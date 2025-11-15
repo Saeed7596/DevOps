@@ -114,6 +114,8 @@ nmcli device status
 nmcli device show
 ```
 ```bash
+netstat -na    # show all ports
+netstat -na | grep LISTEN
 netstat -tulnp # show usage port
 > grep -o done logfile.log | wc -l # count "done" word in log file
 ```

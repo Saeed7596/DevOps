@@ -207,3 +207,14 @@ Connection timed out
 
 > **Netcat** and **Telnet** are essential diagnostic tools for network engineers.  
 > They help verify service availability, connectivity, and firewall configurations — all from the terminal.
+
+---
+
+### Using `netstat`:
+```bash
+netstat -na #Show all ports
+netstat -tuln
+netstat -na | grep LISTEN
+netstat -ant | grep ESTABLISHED | wc -l
+```
+This will show the open TCP and UDP ports along with the services using them.

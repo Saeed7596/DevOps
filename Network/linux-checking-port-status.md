@@ -51,7 +51,9 @@ This command lists all open TCP and UDP ports.
 
 ### Using `netstat`:
 ```bash
+netstat -na #Show all ports
 netstat -tuln
+netstat -na | grep LISTEN
 netstat -ant | grep ESTABLISHED | wc -l
 ```
 This will show the open TCP and UDP ports along with the services using them.
