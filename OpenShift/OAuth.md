@@ -122,3 +122,18 @@ oc adm policy add-cluster-role-to-user cluster-reader reza
 | Cluster Roles	          | cluster-reader / cluster-admin / self-provisioner / ... | 
 | System & Operator Roles |	For specific advanced needs only                        | 
 
+---
+
+## Edit self-provisioners
+User Management -> RoleBinding 
+
+---
+
+## Delete User
+After delete user in console
+```bash
+oc get identities
+```
+```bash
+oc delete identity 'ldap_provider:...'
+```
