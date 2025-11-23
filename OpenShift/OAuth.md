@@ -40,6 +40,8 @@ spec:
       mappingMethod: claim
       name: my-ldap
       type: LDAP
+  tokenConfig:
+    accessTokenInactivityTimeout: 15m
 ```
 
 **You can check `logs` in the `openshift-authentication` pods.**
