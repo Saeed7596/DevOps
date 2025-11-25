@@ -582,6 +582,11 @@ services:
     image: gitlab/gitlab-ce:18.4.2-ce.0  
     container_name: gitlab
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "5"
     hostname: 'gitlab.example.com'
     environment:
       GITLAB_OMNIBUS_CONFIG: |
@@ -614,6 +619,12 @@ services:
 
 ---
 
+### Empty log!
+```bash
+sudo truncate -s 0 /var/lib/docker/containers/<container-id>/<container-id>-json.log
+```
+
+---
 # Done! ✨
 
 You can now use GitLab's built-in Container Registry to manage your Docker images efficiently.
