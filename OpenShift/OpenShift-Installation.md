@@ -15,6 +15,24 @@ Follow this [Link](https://docs.redhat.com/en/documentation/openshift_container_
 
 ---
 
+## In DNS Server
+| Record                                  | Type | Destination                                                        |
+|-----------------------------------------|------|--------------------------------------------------------------------|
+| `api.<cluster_name>.<base_domain>.`     | A    | point to the load balancer, like `haproxy01`, `haproxy02`          |
+| `api-int.<cluster_name>.<base_domain>.` | A    | point to the load balancer, like `haproxy01`, `haproxy02`          |
+| `*.apps.<cluster_name>.<base_domain>.`  | A    | point to the load balancer, like `haproxy01`, `haproxy02`          |
+| `app.example.com`                       | A    | point `WAF` or to the load balancer, like `haproxy01`, `haproxy02` |
+
+## Network Connetion
+| Source        | Destination |
+|---------------|-----------------------------------------------------------------------------------------|
+| Client (jump) | Access to the load balancer, like `haproxy01`, `haproxy02` on ports: `443`, `6443`      | 
+| WAF           | Access to `infra nodes`                                                                 |
+| LDAP          | `master nodes` & services like: `gitlab`, `nexus` on ports: `389`, `636`                |
+| APP DataBase  | Access to app `worker nodes` or set `EgressIP` for namespace                            |
+
+---
+
 ## Steps
 
 **Note**: Version of ocp must be equal to these tool. So download the correct [version](https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/). 
@@ -1021,6 +1039,18 @@ Whenever possible, access to nodes without using SSH, by spawning a debug pod di
 oc debug node/[node_name]
 ```
 Important note: By design, OpenShift 4 clusters are immutable and rely on Operators to apply cluster changes. In turn, this means that accessing the underlying nodes directly by SSH is not the recommended procedure. Additionally, the nodes will be tainted as accessed.
+Some useful commad to check network connection:
+```bash
+curl -v http://<TARGET_IP>:<PORT>
+```
+```bash
+nc -zv <TARGET_IP> <PORT>
+```
+```bash
+ping <TARGET_IP>
+```
+
+---
 
 Workaround
 When it is not possible to access the nodes with oc debug node command, it is possible to leverage the ssh protocol for the same:
