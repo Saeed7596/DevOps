@@ -1141,3 +1141,38 @@ sudo systemctl restart chronyd
 ```
 
 ---
+
+## Scale Up Node Resource
+```bash
+oc get nodes
+```
+**Note**: Not necessary because `drain` automatically use `cordon`
+```bash
+oc adm cordon <node_name>
+```
+```bash
+oc adm drain <node_name> --ignore-daemonsets --delete-emptydir-data
+
+oc adm drain <node_name> --grace-period 1 --ignore-daemonsets --delete-emptydir-data
+
+oc adm drain <node_name> --grace-period 1 --ignore-daemonsets --delete-emptydir-data --force
+```
+1. Shut down the virtual machine (VM) associated with the compute node. Do this in the vSphere client by right-clicking the VM and selecting `Power -> Shut Down Guest OS`. Do not shut down the VM using Power Off because it might not shut down safely.
+
+2. Edit Resources
+
+3. Save!
+
+4. Turn On the VM in vCenter.
+
+5. Wait for the node to report as `Ready`
+```bash
+oc wait --for=condition=Ready node/<node_name>
+```
+
+```bash
+oc adm uncordon <node_name>
+```
+
+---
+
