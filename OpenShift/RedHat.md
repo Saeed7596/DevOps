@@ -128,6 +128,36 @@ sudo dnf clean all
 sudo rm -rf /var/cache/dnf
 sudo dnf makecache
 ```
+
+---
+
+# Chrony in Red Hat 9.x
+```bash
+sudo nano /etc/chrony.conf 
+```
+```nano
+server <ntp-ip-address> iburst
+```
+```bash
+sudo firewall-cmd --permanent --add-port=123/udp
+
+sudo firewall-cmd --reload
+```
+```bash
+sudo systemctl status chronyd
+sudo systemctl restart chronyd
+```
+# Verify
+```bash
+chronyc sources -v 
+chronyc tracking 
+```
+You should see the internal NTP server as `NTP source` and the status will show `^*` or `^+` indicating that it is synchronized.
+
+And `Leap status` should be `Normal`.
+
+---
+
 ### Change repo
 > **Find the `dependency` in this [Site](https://rpmfind.net/linux/rpm2html/search.php)**
 #### User epel
