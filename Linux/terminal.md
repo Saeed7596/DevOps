@@ -154,6 +154,18 @@ zip -r archive_name.zip /path/to/directory
 tar -xzvf archive_name.tar.gz -C directory
 unzip archive_name.zip
 ```
+```bash
+sudo tar -cpf file-name.tar -C /path/to/directory .
+```
+* `c` = compress
+* `p` = hold premission
+* `f` = file name
+* `.` = just files in this directory
+
+```bash
+tar -xpf file-name.tar -C /dest/path/
+```
+* `x` = extract
 
 ---
 
