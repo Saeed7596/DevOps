@@ -322,6 +322,22 @@ Output should be the vpn ip
 # Download rpm and move to air-gap
 In Online Client
 ```bash
+sudo dnf install --downloadonly --downloaddir=/tmp/pkgs \
+  libvirt qemu-kvm mkisofs python3-devel jq ipmitool haproxy
+```
+```bash
+tar czvf pkgs.tar.gz /tmp/pkgs
+```
+
+on server air-gap
+```bash
+sudo dnf install -y /path/to/pkgs/*.rpm
+```
+
+---
+
+For example git
+```bash
 mkdir -p ~/git-offline
 cd ~/git-offline
 sudo dnf install -y dnf-plugins-core
