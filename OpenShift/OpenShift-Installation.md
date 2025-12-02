@@ -1142,7 +1142,7 @@ sudo systemctl restart chronyd
 
 ---
 
-## Scale Up Node Resource
+## [Scale Up Node Resource](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/updating_clusters/performing-a-cluster-update#updating-virtual-hardware-on-vsphere_updating-hardware-on-nodes-running-in-vsphere)
 ```bash
 oc get nodes
 ```
