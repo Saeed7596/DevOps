@@ -76,3 +76,75 @@ spec:
 
 ---
 
+## [Scale Up Node Resource](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/updating_clusters/performing-a-cluster-update#updating-virtual-hardware-on-vsphere_updating-hardware-on-nodes-running-in-vsphere)
+```bash
+oc get nodes
+```
+**Note**: Not necessary because `drain` automatically use `cordon`
+```bash
+oc adm cordon <node_name>
+```
+```bash
+oc adm drain <node_name> --ignore-daemonsets --delete-emptydir-data
+
+oc adm drain <node_name> --grace-period 1 --ignore-daemonsets --delete-emptydir-data
+
+oc adm drain <node_name> --grace-period 1 --ignore-daemonsets --delete-emptydir-data --force
+```
+1. Shut down the virtual machine (VM) associated with the compute node. Do this in the vSphere client by right-clicking the VM and selecting `Power -> Shut Down Guest OS`. Do not shut down the VM using Power Off because it might not shut down safely.
+
+2. Edit Resources
+
+3. Save!
+
+4. Turn On the VM in vCenter.
+
+5. Wait for the node to report as `Ready`
+```bash
+oc wait --for=condition=Ready node/<node_name>
+```
+
+```bash
+oc adm uncordon <node_name>
+```
+
+---
+
+# Monitoring
+## [Enable User Workload Monitoring](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/monitoring/configuring-user-workload-monitoring)
+
+---
+
+## Edit the `cluster-monitoring-config` `ConfigMap` object:
+
+```bash
+oc -n openshift-monitoring edit configmap cluster-monitoring-config
+```
+Add `enableUserWorkload: true` under `data/config.yaml`:
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring
+data:
+  config.yaml: |
+    enableUserWorkload: true 
+```
+
+---
+
+# Verify 
+```bash
+oc -n openshift-user-workload-monitoring get pod
+```
+```text
+NAME                                   READY   STATUS        RESTARTS   AGE
+prometheus-operator-6f7b748d5b-t7nbg   2/2     Running       0          3h
+prometheus-user-workload-0             4/4     Running       1          3h
+prometheus-user-workload-1             4/4     Running       1          3h
+thanos-ruler-user-workload-0           3/3     Running       0          3h
+thanos-ruler-user-workload-1           3/3     Running       0          3h
+```
+
+---
