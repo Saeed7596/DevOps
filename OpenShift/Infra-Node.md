@@ -1,3 +1,30 @@
+# Typical Workloads for Infra Nodes in OpenShift
+
+Infra nodes are dedicated nodes designed to isolate critical cluster services and network-facing workloads from general worker workloads.  
+Typical workloads placed on infra nodes include:
+
+- **Ingress / Router**
+  - All routes and IngressController pods
+  - Handles incoming user traffic (HTTP/HTTPS)
+
+- **Registry / Image Registry**
+  - Resource-intensive storage workloads
+  - Keeps worker nodes free for application pods
+
+- **Monitoring / Metrics / Logging**
+  - Prometheus, Alertmanager, Grafana
+  - Loki, EFK, or cluster logging components
+  - User workload monitoring (if desired on infra)
+
+- **Service Mesh Components** (Optional)
+  - OpenShift Service Mesh / Istio control plane pods
+
+- **Other critical cluster services**
+  - Cluster Operators requiring dedicated resources
+  - Certificate management pods (e.g., cert-manager)
+
+---
+
 # Infra Node Setting
 
 ## Labeled the two worker node as infra
