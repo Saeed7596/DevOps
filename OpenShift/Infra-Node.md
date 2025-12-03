@@ -112,3 +112,17 @@ They work together to protect infra nodes:
 Together, they ensure infra nodes run only the workloads they are meant to serve.
 
 ---
+
+# 🔍 Summary 
+
+| Effect           | New pod without tolerance | Old pod without tolerance | Severity  |
+|------------------|---------------------------|---------------------------|-----------|
+| NoSchedule       | ❌ It doesn't let         | ✔ Stays                  | High      |
+| PreferNoSchedule | ⚠ He prefers not to       | ✔ Stays                  | Low       |
+| NoExecute        | ❌ It doesn't let         | ❌ Deletes               | Very High |
+
+* If you want someone to not put a pod on the infra by mistake, but you haven't forced it = Use `PreferNoSchedule`.
+* If you want no pod to come unless it has tolerance = Use `NoSchedule`.
+* If you want to eject a pod even if it is on the node = Use `NoExecute`.
+
+---
