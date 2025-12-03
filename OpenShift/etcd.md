@@ -67,7 +67,7 @@ sudo scp -i id_rsa -r core@<node-ip>:/tmp/etcd-backup .
 
 ---
 
-# [etcd encrypted](https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/security_and_compliance/encrypting-etcd)
+# [etcd encrypted](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/etcd/enabling-etcd-encryption)
 
 ## Enabling etcd encryption 
 
@@ -87,7 +87,7 @@ The encryption process starts. It can take 20 minutes or longer for this process
 
 4. Verify that etcd encryption was successful.
 
-i. Review the `Encrypted` status condition for the `OpenShift API server` to verify that its resources were successfully encrypted:
+✔i. Review the `Encrypted` status condition for the `OpenShift API server` to verify that its resources were successfully encrypted:
 ```bash
 oc get openshiftapiserver -o=jsonpath='{range .items[0].status.conditions[?(@.type=="Encrypted")]}{.reason}{"\n"}{.message}{"\n"}'
 ```
@@ -98,7 +98,7 @@ All resources encrypted: routes.route.openshift.io
 ```
 If the output shows `EncryptionInProgress`, encryption is still in progress. Wait a few minutes and try again.
 
-ii. Review the `Encrypted` status condition for the `Kubernetes API server` to verify that its resources were successfully encrypted:
+✔ii. Review the `Encrypted` status condition for the `Kubernetes API server` to verify that its resources were successfully encrypted:
 ```bash
 oc get kubeapiserver -o=jsonpath='{range .items[0].status.conditions[?(@.type=="Encrypted")]}{.reason}{"\n"}{.message}{"\n"}'
 ```
@@ -109,7 +109,7 @@ All resources encrypted: secrets, configmaps
 ```
 If the output shows `EncryptionInProgress`, encryption is still in progress. Wait a few minutes and try again.
 
-iii. Review the `Encrypted` status condition for the `OpenShift OAuth API server` to verify that its resources were successfully encrypted:
+✔iii. Review the `Encrypted` status condition for the `OpenShift OAuth API server` to verify that its resources were successfully encrypted:
 ```bash
 oc get authentication.operator.openshift.io -o=jsonpath='{range .items[0].status.conditions[?(@.type=="Encrypted")]}{.reason}{"\n"}{.message}{"\n"}'
 ```
