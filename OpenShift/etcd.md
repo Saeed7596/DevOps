@@ -66,3 +66,58 @@ sudo scp -i id_rsa -r core@<node-ip>:/tmp/etcd-backup .
 ```
 
 ---
+
+# [etcd encrypted](https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/security_and_compliance/encrypting-etcd)
+
+## Enabling etcd encryption 
+
+1. Modify the `APIServer` object:
+```bash
+oc edit apiserver
+```
+2. Set the `spec.encryption.type` field to `aesgcm` or `aescbc`:
+```yaml
+spec:
+  encryption:
+    type: aesgcm 
+```
+3. Save the file to apply the changes.
+
+The encryption process starts. It can take 20 minutes or longer for this process to complete, depending on the size of the etcd database.
+
+4. Verify that etcd encryption was successful.
+
+i. Review the `Encrypted` status condition for the `OpenShift API server` to verify that its resources were successfully encrypted:
+```bash
+oc get openshiftapiserver -o=jsonpath='{range .items[0].status.conditions[?(@.type=="Encrypted")]}{.reason}{"\n"}{.message}{"\n"}'
+```
+The output shows `EncryptionCompleted` upon successful encryption:
+```text
+EncryptionCompleted
+All resources encrypted: routes.route.openshift.io
+```
+If the output shows `EncryptionInProgress`, encryption is still in progress. Wait a few minutes and try again.
+
+ii. Review the `Encrypted` status condition for the `Kubernetes API server` to verify that its resources were successfully encrypted:
+```bash
+oc get kubeapiserver -o=jsonpath='{range .items[0].status.conditions[?(@.type=="Encrypted")]}{.reason}{"\n"}{.message}{"\n"}'
+```
+The output shows `EncryptionCompleted` upon successful encryption:
+```text
+EncryptionCompleted
+All resources encrypted: secrets, configmaps
+```
+If the output shows `EncryptionInProgress`, encryption is still in progress. Wait a few minutes and try again.
+
+iii. Review the `Encrypted` status condition for the `OpenShift OAuth API server` to verify that its resources were successfully encrypted:
+```bash
+oc get authentication.operator.openshift.io -o=jsonpath='{range .items[0].status.conditions[?(@.type=="Encrypted")]}{.reason}{"\n"}{.message}{"\n"}'
+```
+The output shows `EncryptionCompleted` upon successful encryption:
+```text
+EncryptionCompleted
+All resources encrypted: oauthaccesstokens.oauth.openshift.io, oauthauthorizetokens.oauth.openshift.io
+```
+If the output shows `EncryptionInProgress`, encryption is still in progress. Wait a few minutes and try again.
+
+---
