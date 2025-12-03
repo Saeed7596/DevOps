@@ -968,11 +968,10 @@ spec:
 
 ---
 
+## 🚀 OpenShift Cluster Update Steps
 ## ✅ Prerequisites
 1. Take a full etcd backup
-```bash
-oc adm cluster-backup /backup/path
-```
+
 2. Check version compatibility
 Versions should be directly upgradeable. In the case of 4.16 → 4.17, this is usually not a problem.
 ```bash
@@ -1026,9 +1025,6 @@ watch oc get nodes
 #### 📥 Rollback
 * OpenShift does not officially support rollback version.
 * The only way to rollback: restore etcd from a backup taken before the upgrade
-```bash
-oc adm cluster-restore /backup/path
-```
 
 ---
 
