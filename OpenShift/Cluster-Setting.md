@@ -80,10 +80,12 @@ spec:
 ```bash
 oc get nodes
 ```
-**Note**: Not necessary because `drain` automatically use `cordon`
+#### **Note**: For master node, run this command and not necessary use `drain`
 ```bash
-oc adm cordon <node_name>
+oc adm cordon <control_plane_node>
 ```
+#### For worker node
+**Note**: Not necessary to run `oc adm cordon <node_name>` because `drain` automatically use `cordon`
 ```bash
 oc adm drain <node_name> --ignore-daemonsets --delete-emptydir-data
 
