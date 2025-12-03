@@ -7,9 +7,26 @@
 Check `cluster-monitonig-config` configMaps in `openshift-monitoring` namespace: 
 * [Doc](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/monitoring/configuring-user-workload-monitoring)
 ```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring
 data:
   config.yaml: |
-    enableUserWorkload: true
+    enableUserWorkload: true 
+```
+### Verify 
+```bash
+oc -n openshift-user-workload-monitoring get pod
+```
+```text
+NAME                                   READY   STATUS        RESTARTS   AGE
+prometheus-operator-6f7b748d5b-t7nbg   2/2     Running       0          3h
+prometheus-user-workload-0             4/4     Running       1          3h
+prometheus-user-workload-1             4/4     Running       1          3h
+thanos-ruler-user-workload-0           3/3     Running       0          3h
+thanos-ruler-user-workload-1           3/3     Running       0          3h
 ```
 
 ---
