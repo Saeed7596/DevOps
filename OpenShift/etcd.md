@@ -47,3 +47,22 @@ If etcd encryption is enabled, it is recommended to store this second file separ
 Keep in mind that etcd encryption only encrypts values, not keys. This means that resource types, namespaces, and object names are unencrypted.
 
 ---
+
+### Move backup files
+1. In oc debug mode:
+### Move backup files
+1. In oc debug mode:
+```bash
+mkdir -p /tmp/etcd-backup
+cp /home/core/assets/backup/snapshot_<datetimestamp>.db /tmp/etcd-backup/
+cp /home/core/assets/backup/static_kuberesources_<datetimestamp> /tmp/etcd-backup/
+
+chmod 644 /tmp/snapshot_<datetimestamp>.db
+chmod 644 /tmp/static_kuberesources_<datetimestamp>.tar.gz
+```
+2. In your host:
+```bash
+sudo scp -i id_rsa -r core@<node-ip>:/tmp/etcd-backup .
+```
+
+---
