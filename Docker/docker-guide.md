@@ -181,6 +181,7 @@ sudo usermod -aG docker $USER
 ```bash
 usermod -aG docker NEWUSER
 ```
+**Note**: The System must be `reboot`.✔
 
 ------------------------------------
 
