@@ -31,6 +31,10 @@ You can check whether the proxy is enabled by reviewing the output of `oc get pr
     ```bash
     /usr/local/bin/cluster-backup.sh /home/core/assets/backup
     ```
+    Output:
+   ```text
+   snapshot db and kube resources are successfully saved to /home/core/assets/backup
+   ```
 In this example, two files are created in the `/home/core/assets/backup/` directory on the control plane host:
 
 * `snapshot_<datetimestamp>.db`: This file is the etcd snapshot. The `cluster-backup.sh` script confirms its validity.
