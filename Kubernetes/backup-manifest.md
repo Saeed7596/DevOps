@@ -159,6 +159,56 @@ chmod +x backup-manifest.sh
 ###
 
 # Advance Script
+## Install Tools
+```sh
+nano install-tools.sh
+```
+```sh
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+echo "[INFO] Updating system..."
+sudo dnf -y update
+
+echo "[INFO] Installing core packages..."
+sudo dnf -y install curl wget tar gzip jq git which
+
+# -----------------------------
+# Install yq
+# -----------------------------
+if ! command -v yq >/dev/null 2>&1; then
+    echo "[INFO] Installing yq..."
+    YQ_BINARY="yq_linux_amd64"
+    curl -L -o yq "https://github.com/mikefarah/yq/releases/latest/download/${YQ_BINARY}"
+    chmod +x yq
+    sudo mv yq /usr/local/bin/
+else
+    echo "[INFO] yq already installed"
+fi
+
+# -----------------------------
+# Install GNU parallel
+# -----------------------------
+if ! command -v parallel >/dev/null 2>&1; then
+    echo "[INFO] Installing GNU parallel..."
+    sudo dnf -y install parallel
+else
+    echo "[INFO] parallel already installed"
+fi
+
+echo "[INFO] All tools installed successfully!"
+```
+Make a executable file
+```sh
+chmod +x install-tools.sh
+```
+```sh
+./install-tools.sh
+```
+
+---
+
 ```sh
 nano backup-manifests.sh
 ```
