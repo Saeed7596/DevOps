@@ -366,9 +366,9 @@ fi
 # Namespaces
 # -----------------------------
 if [ "$IS_OPENSHIFT" = true ]; then
-  mapfile -t NAMESPACES < <(kubectl get projects -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || true)
+  mapfile -t NAMESPACES < <(kubectl get projects -o json | jq -r '.items[].metadata.name')
 else
-  mapfile -t NAMESPACES < <(kubectl get ns -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || true)
+  mapfile -t NAMESPACES < <(kubectl get ns -o json | jq -r '.items[].metadata.name')
 fi
 
 if [ "${#NAMESPACES[@]}" -eq 0 ]; then
