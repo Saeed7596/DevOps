@@ -883,3 +883,224 @@ chmod +x restore.sh
 ```sh
 ./restore.sh
 ```
+
+---
+
+# Specific Namespace
+```sh
+nano backup-namespace.sh
+```
+```sh
+#!/usr/bin/env bash
+# backup-namespace.sh - Backup a single Kubernetes/OpenShift namespace
+# Usage: ./backup-namespace.sh <NAMESPACE_NAME> [--no-clean]
+# Requires: kubectl, (optional: yq for robust YAML cleaning)
+
+set -euo pipefail
+IFS=$'\n\t'
+
+# -----------------------------
+# Configuration & Input
+# -----------------------------
+if [ -z "${1:-}" ]; then
+  echo "Usage: $0 <NAMESPACE_NAME> [--no-clean]" >&2
+  exit 1
+fi
+
+TARGET_NAMESPACE="$1"
+OUT_PREFIX="${TARGET_NAMESPACE}-backup"
+COMPRESS=true
+CLEAN_YAML=true
+
+# Parse flags
+shift
+while (( "$#" )); do
+  case "$1" in
+    --no-clean) CLEAN_YAML=false; shift;;
+    --no-compress) COMPRESS=false; shift;;
+    *) echo "Unknown arg: $1" >&2; exit 2;;
+  esac
+done
+
+# -----------------------------
+# Tool Detection
+# -----------------------------
+command -v kubectl >/dev/null 2>&1 || { echo "ERROR: kubectl not found" >&2; exit 2; }
+HAS_YQ=false; command -v yq >/dev/null 2>&1 && HAS_YQ=true
+
+if [ "$CLEAN_YAML" = true ] && [ "$HAS_YQ" = false ]; then
+  echo "NOTE: yq not found. Using best-effort YAML cleaner. Install yq for robust cleaning." >&2
+fi
+
+# -----------------------------
+# Setup & Logging
+# -----------------------------
+SCRIPT_START=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+OUT_DIR="${OUT_PREFIX}-$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$OUT_DIR/$TARGET_NAMESPACE"
+LOGFILE="$OUT_DIR/backup.log"
+
+log() { printf '[%s] %s\n' "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" "$*" | tee -a "$LOGFILE"; }
+
+log "INFO: Backup started for namespace: $TARGET_NAMESPACE"
+log "INFO: Output directory: $OUT_DIR"
+log "INFO: YQ: $HAS_YQ, Clean YAML: $CLEAN_YAML"
+
+# Check if namespace exists
+if ! kubectl get ns "$TARGET_NAMESPACE" >/dev/null 2>&1; then
+    log "FATAL: Namespace '$TARGET_NAMESPACE' not found."
+    rmdir "$OUT_DIR/$TARGET_NAMESPACE" 2>/dev/null || true
+    rmdir "$OUT_DIR" 2>/dev/null || true
+    exit 1
+fi
+
+# -----------------------------
+# YAML Cleaner (Essential for Restorability)
+# -----------------------------
+clean_yaml() {
+  if [ "$CLEAN_YAML" = false ]; then
+    cat
+    return 0
+  fi
+
+  if [ "$HAS_YQ" = true ]; then
+    # Use yq to remove runtime fields
+    yq eval 'del(.metadata.managedFields, .metadata.uid, .metadata.resourceVersion, .metadata.creationTimestamp, .metadata.annotations."kubectl.kubernetes.io/last-applied-configuration", .status)' -
+  else
+    # Best-effort fallback using awk
+    awk '
+      BEGIN {in_status=0}
+      /^\s*status:/ { in_status=1; next }
+      in_status && /^[^[:space:]]/ { in_status=0 }
+      in_status { next }
+      /managedFields:/ { next }
+      /^\s*uid:/ { next }
+      /^\s*resourceVersion:/ { next }
+      /^\s*creationTimestamp:/ { next }
+      /kubectl.kubernetes.io\/last-applied-configuration/ { next }
+      { print }
+    ' -
+  fi
+}
+
+# -----------------------------
+# Resource Discovery & Filter
+# -----------------------------
+log "INFO: Discovering namespaced API resources..."
+mapfile -t NAMESPACED_RESOURCES < <(kubectl api-resources --verbs=list --namespaced -o name 2>/dev/null || true)
+
+# Filter out non-essential/volatile resources
+exclude_namespaced_regex='^(events|pods|tokenreviews|selfsubjectaccessreviews|subjectaccessreviews|bindings)$'
+
+filter_resources() {
+  printf '%s\n' "$@" | grep -vE "$exclude_namespaced_regex" || true
+}
+
+mapfile -t NAMESPACED_RESOURCES < <(filter_resources "${NAMESPACED_RESOURCES[@]}")
+
+log "INFO: Discovered $(echo "${NAMESPACED_RESOURCES[@]}" | wc -w) resources for backup (excluding pods, events, etc.)"
+
+# -----------------------------
+# Execution & Backup Loop
+# -----------------------------
+SUCCESS_COUNT=0
+FAILED_COUNT=0
+EMPTY_COUNT=0
+
+for res in "${NAMESPACED_RESOURCES[@]}"; do
+    FILE_NAME="${res//\//_}.yaml"
+    OUT_PATH="$OUT_DIR/$TARGET_NAMESPACE/$FILE_NAME"
+
+    # 1. Quick check for existing instances to skip if empty
+    if ! kubectl get "$res" -n "$TARGET_NAMESPACE" --no-headers -o custom-columns=NAME:.metadata.name --request-timeout=10s 2>/dev/null | head -n1 >/dev/null 2>&1; then
+        log "SKIP: $res (no instances found)"
+        EMPTY_COUNT=$((EMPTY_COUNT+1))
+        continue
+    fi
+
+    # 2. Attempt to fetch and clean YAML
+    if kubectl get "$res" -n "$TARGET_NAMESPACE" -o yaml --request-timeout=30s 2>/dev/null | clean_yaml > "${OUT_PATH}.tmp"; then
+        # Check for empty file after cleaning
+        if [ ! -s "${OUT_PATH}.tmp" ]; then
+            log "EMPTY: $res (resulting file is empty after cleaning)"
+            rm -f "${OUT_PATH}.tmp"
+            EMPTY_COUNT=$((EMPTY_COUNT+1))
+            continue
+        fi
+
+        # Atomic move for final file
+        mv "${OUT_PATH}.tmp" "$OUT_PATH"
+        log "SUCCESS: $res saved to $FILE_NAME"
+        SUCCESS_COUNT=$((SUCCESS_COUNT+1))
+    else
+        log "FAILED: $res (kubectl get failed)"
+        rm -f "${OUT_PATH}.tmp" 2>/dev/null || true
+        FAILED_COUNT=$((FAILED_COUNT+1))
+    fi
+done
+
+# -----------------------------
+# Smart Cleanup & Summary
+# -----------------------------
+log "INFO: Starting SMART Cleanup (removing empty files)..."
+deleted_count=0
+# Remove files that only contain 'items: []' or are zero size
+mapfile -t candidate_files < <(find "$OUT_DIR" -type f -name '*.yaml' -size 0 -print -o -exec grep -lE '^\s*items:\s*\[\]\s*$' {} \;)
+for f in "${candidate_files[@]}"; do
+    rm -f "$f" && deleted_count=$((deleted_count+1)) || true
+done
+
+log "INFO: Cleanup results: $deleted_count empty/zero-size files removed."
+
+BACKUP_SIZE=$(du -sh "$OUT_DIR" | cut -f1 || echo "0")
+
+cat > "$OUT_DIR/backup-summary.txt" <<EOF
+Namespace Backup Report
+=========================
+
+Target Namespace: $TARGET_NAMESPACE
+Start: $SCRIPT_START
+End: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+Output: $OUT_DIR
+Size: $BACKUP_SIZE
+
+Resources:
+Success: $SUCCESS_COUNT
+Failed: $FAILED_COUNT
+Skipped/Empty: $EMPTY_COUNT
+Total Files: $(find "$OUT_DIR" -type f -name '*.yaml' | wc -l || echo 0)
+EOF
+
+log "INFO: Backup finished. Success: $SUCCESS_COUNT, Failed: $FAILED_COUNT, Skipped/Empty: $EMPTY_COUNT."
+
+# -----------------------------
+# Compression
+# -----------------------------
+if [ "$COMPRESS" = true ]; then
+  TARFILE="${OUT_DIR}.tar.gz"
+  log "INFO: Creating archive $TARFILE ..."
+  if tar -czf "$TARFILE" -C "$(dirname "$OUT_DIR")" "$(basename "$OUT_DIR")"; then
+    TAR_SIZE=$(du -h "$TARFILE" | cut -f1)
+    log "INFO: Archive created: $TARFILE ($TAR_SIZE)"
+    rm -rf "$OUT_DIR"
+  else
+    log "ERROR: Failed to create archive. Keeping directory."
+  fi
+fi
+
+echo ""
+echo "---"
+echo "Backup location:"
+if [ "$COMPRESS" = true ] && [ -f "${TARFILE:-}" ]; then
+  echo "**$TARFILE**"
+else
+  echo "**$OUT_DIR**"
+fi
+echo "---"
+```
+```sh
+chmod +x backup-namespace.sh
+```
+```sh
+./backup-namespace.sh my-production-namespace
+```
