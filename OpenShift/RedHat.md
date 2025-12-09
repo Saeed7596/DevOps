@@ -42,6 +42,12 @@ sudo dnf clean all
 sudo dnf repolist
 sudo dnf update
 ```
+# Refresh
+```bash
+sudo subscription-manager status
+sudo subscription-manager refresh
+sudo subscription-manager register --username <USER> --password <PASS>
+```
 # Un-registering a system
 ```bash
 sudo subscription-manager remove --all
@@ -165,51 +171,148 @@ And `Leap status` should be `Normal`.
 sudo dnf install epel-release
 sudo dnf update
 ```
-#### Or Use AlmaLinux repo
+#### Or Use Rocky repo
 ```bash
-nano fix-repo.sh
+nano smart-update.sh
 ```
 ```sh
-#!/bin/bash
+#!/usr/bin/env bash
+# smart-update.sh - Attempts RHEL registration first, falls back to Rocky Linux 9 mirrors if subscription fails.
 
-echo "[INFO] Switching Repositories to AlmaLinux Mirrors..."
+set -euo pipefail
+IFS=$'\n\t'
 
-sudo rm -f /etc/yum.repos.d/*.repo
+# -----------------------------
+# Configuration
+# -----------------------------
+RHEL_USER="${1:-}"
+RHEL_PASS="${2:-}"
+LOG_FILE="./smart_update_$(date +%Y%m%d%H%M%S).log"
 
-cat <<EOF | sudo tee /etc/yum.repos.d/almalinux.repo
+exec 3>&1 1>>${LOG_FILE} 2>&1
+echo "--- Starting Smart Update Script ---"
+echo "Log file: ${LOG_FILE}"
+
+# -----------------------------
+# Prerequisites Check
+# -----------------------------
+if [ -z "$RHEL_USER" ] || [ -z "$RHEL_PASS" ]; then
+    echo "FATAL: Usage: $0 <RHEL_USERNAME> <RHEL_PASSWORD>" >&3
+    exit 1
+fi
+
+command -v subscription-manager >/dev/null 2>&1 || { echo "FATAL: 'subscription-manager' not found." >&3; exit 1; }
+command -v dnf >/dev/null 2>&1 || { echo "FATAL: 'dnf' not found." >&3; exit 1; }
+
+# -----------------------------
+# Functions
+# -----------------------------
+
+# Function to attempt RHEL registration and subscription
+attempt_rhel_register() {
+    echo "INFO: Attempting to register system with Red Hat..." >&3
+
+    # 1. Unregister any existing subscriptions (clean slate)
+    if sudo subscription-manager status | grep -q 'Current status: Subscribed'; then
+        echo "INFO: Unregistering previous subscription."
+        sudo subscription-manager unregister
+    fi
+
+    # 2. Register and Auto-Attach
+    if sudo subscription-manager register --username "$RHEL_USER" --password "$RHEL_PASS" --auto-attach; then
+        echo "SUCCESS: System successfully registered and subscribed to RHEL." >&3
+        return 0
+    else
+        echo "WARNING: RHEL registration failed. Subscription credentials or status invalid." >&3
+        return 1
+    fi
+}
+
+# Function to switch to Rocky Linux repositories
+switch_to_rocky_linux() {
+    echo "INFO: Switching repositories to Rocky Linux 9 mirrors (Fallback Mode)..." >&3
+    
+    # Clean up RHEL repositories files created by subscription-manager
+    # Note: We don't remove all *.repo, just the ones created by RHEL.
+    sudo rm -f /etc/yum.repos.d/redhat.repo /etc/yum.repos.d/rhel-*.repo /etc/yum.repos.d/rhui-*.repo
+
+    # Add Rocky Linux 9 repositories
+    cat <<EOF | sudo tee /etc/yum.repos.d/rockylinux-fallback.repo
 [baseos]
-name=AlmaLinux BaseOS
-baseurl=https://repo.almalinux.org/almalinux/9/BaseOS/x86_64/os/
+name=Rocky Linux 9 - BaseOS
+baseurl=https://download.rockylinux.org/pub/rocky/9/BaseOS/x86_64/os/
 enabled=1
 gpgcheck=0
 
 [appstream]
-name=AlmaLinux AppStream
-baseurl=https://repo.almalinux.org/almalinux/9/AppStream/x86_64/os/
+name=Rocky Linux 9 - AppStream
+baseurl=https://download.rockylinux.org/pub/rocky/9/AppStream/x86_64/os/
 enabled=1
 gpgcheck=0
 
 [extras]
-name=AlmaLinux Extras
-baseurl=https://repo.almalinux.org/almalinux/9/extras/x86_64/os/
+name=Rocky Linux 9 - Extras
+baseurl=https://download.rockylinux.org/pub/rocky/9/extras/x86_64/os/
 enabled=1
 gpgcheck=0
 EOF
+    echo "INFO: Rocky Linux repositories added."
+}
 
-echo "[INFO] Cleaning cache..."
-sudo dnf clean all
+# Function to perform the final update
+perform_update() {
+    echo "INFO: Cleaning DNF cache and updating system..." >&3
+    sudo dnf clean all
+    sudo dnf makecache
 
-echo "[INFO] Making cache..."
-sudo dnf makecache
+    if sudo dnf update -y; then
+        echo "SUCCESS: System update completed." >&3
+        return 0
+    else
+        echo "FATAL: DNF update failed. Check the log file for details." >&3
+        return 1
+    fi
+}
 
-echo "[INFO] Updating system..."
-sudo dnf update -y
+# -----------------------------
+# Main Logic
+# -----------------------------
 
-echo "------ Done ------"
+# Phase 1: Try RHEL Subscription
+if attempt_rhel_register; then
+    # SUCCESS PATH: RHEL is registered, repositories are configured by subscription-manager
+    # Ensure any previous fallback repos are removed just in case
+    sudo rm -f /etc/yum.repos.d/rockylinux-fallback.repo || true
+    
+    echo "INFO: Proceeding with RHEL official repositories." >&3
+    perform_update
+    
+    # Keep the system registered after update
+    echo "INFO: RHEL path finished. System remains subscribed." >&3
+    
+else
+    # FAILURE PATH: RHEL subscription failed
+    switch_to_rocky_linux
+    
+    # We must unregister the failed attempt to ensure subscription-manager does not interfere
+    # This step is crucial if the registration attempt created temporary files or configurations.
+    sudo subscription-manager unregister 2>/dev/null || true
+    
+    echo "INFO: Proceeding with Rocky Linux fallback repositories." >&3
+    perform_update
+    
+    # Clean up: Remove the temporary Rocky Linux repo file and unregister the system
+    echo "INFO: Fallback path finished. Please resolve RHEL subscription issue." >&3
+    # Optional: Remove Rocky Linux repo file after update
+    # sudo rm -f /etc/yum.repos.d/rockylinux-fallback.repo
+
+fi
+
+echo "--- Script Finished ---" >&3
 ```
 ```bash
-chmod +x fix-repo.sh
-./fix-repo.sh
+chmod +x smart-update.sh
+./smart-update.sh "YourRHELUsername" "YourRHELPassword"
 ```
 
 ---
