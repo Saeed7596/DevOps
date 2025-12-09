@@ -177,32 +177,16 @@ nano smart-update.sh
 ```
 ```sh
 #!/usr/bin/env bash
-# smart-update.sh - Attempts RHEL registration first, falls back to Rocky Linux 9 mirrors if subscription fails.
+# smart-repo-setup.sh - Attempts RHEL registration, falls back to Rocky Linux 9 if subscription fails.
 
-set -euo pipefail
-IFS=$'\n\t'
-
-# -----------------------------
-# Configuration
-# -----------------------------
-RHEL_USER="${1:-}"
-RHEL_PASS="${2:-}"
-LOG_FILE="./smart_update_$(date +%Y%m%d%H%M%S).log"
-
-exec 3>&1 1>>${LOG_FILE} 2>&1
-echo "--- Starting Smart Update Script ---"
-echo "Log file: ${LOG_FILE}"
+set -eo pipefail # 'e' will exit immediately if a command exits with a non-zero status.
 
 # -----------------------------
-# Prerequisites Check
+# Input Handling (Interactive)
 # -----------------------------
-if [ -z "$RHEL_USER" ] || [ -z "$RHEL_PASS" ]; then
-    echo "FATAL: Usage: $0 <RHEL_USERNAME> <RHEL_PASSWORD>" >&3
-    exit 1
-fi
-
-command -v subscription-manager >/dev/null 2>&1 || { echo "FATAL: 'subscription-manager' not found." >&3; exit 1; }
-command -v dnf >/dev/null 2>&1 || { echo "FATAL: 'dnf' not found." >&3; exit 1; }
+read -p "RHEL Username: " RHEL_USER
+read -sp "RHEL Password: " RHEL_PASS
+echo # Newline after password entry
 
 # -----------------------------
 # Functions
@@ -210,34 +194,33 @@ command -v dnf >/dev/null 2>&1 || { echo "FATAL: 'dnf' not found." >&3; exit 1; 
 
 # Function to attempt RHEL registration and subscription
 attempt_rhel_register() {
-    echo "INFO: Attempting to register system with Red Hat..." >&3
+    echo "--- Attempting RHEL Registration ---"
 
     # 1. Unregister any existing subscriptions (clean slate)
-    if sudo subscription-manager status | grep -q 'Current status: Subscribed'; then
-        echo "INFO: Unregistering previous subscription."
+    if sudo subscription-manager status 2>/dev/null | grep -q 'Current status: Subscribed'; then
+        echo "--> Unregistering previous subscription."
         sudo subscription-manager unregister
     fi
 
     # 2. Register and Auto-Attach
     if sudo subscription-manager register --username "$RHEL_USER" --password "$RHEL_PASS" --auto-attach; then
-        echo "SUCCESS: System successfully registered and subscribed to RHEL." >&3
+        echo "✅ SUCCESS: System successfully registered and subscribed to RHEL."
         return 0
     else
-        echo "WARNING: RHEL registration failed. Subscription credentials or status invalid." >&3
+        echo "⚠️ WARNING: RHEL registration failed. Preparing for fallback."
         return 1
     fi
 }
 
 # Function to switch to Rocky Linux repositories
 switch_to_rocky_linux() {
-    echo "INFO: Switching repositories to Rocky Linux 9 mirrors (Fallback Mode)..." >&3
+    echo "--- Switching to Rocky Linux 9 (Fallback) ---"
     
-    # Clean up RHEL repositories files created by subscription-manager
-    # Note: We don't remove all *.repo, just the ones created by RHEL.
-    sudo rm -f /etc/yum.repos.d/redhat.repo /etc/yum.repos.d/rhel-*.repo /etc/yum.repos.d/rhui-*.repo
+    # Clean up RHEL repository files 
+    sudo rm -f /etc/yum.repos.d/redhat.repo /etc/yum.repos.d/rhel-*.repo /etc/yum.repos.d/rhui-*.repo || true
 
     # Add Rocky Linux 9 repositories
-    cat <<EOF | sudo tee /etc/yum.repos.d/rockylinux-fallback.repo
+    cat <<EOF | sudo tee /etc/yum.repos.d/rockylinux-fallback.repo > /dev/null
 [baseos]
 name=Rocky Linux 9 - BaseOS
 baseurl=https://download.rockylinux.org/pub/rocky/9/BaseOS/x86_64/os/
@@ -256,22 +239,17 @@ baseurl=https://download.rockylinux.org/pub/rocky/9/extras/x86_64/os/
 enabled=1
 gpgcheck=0
 EOF
-    echo "INFO: Rocky Linux repositories added."
+    echo "✅ SUCCESS: Rocky Linux 9 repositories added as fallback."
 }
 
-# Function to perform the final update
-perform_update() {
-    echo "INFO: Cleaning DNF cache and updating system..." >&3
+# Function to clean and build DNF cache
+clean_and_makecache() {
+    echo "--- Preparing DNF Cache ---"
+    echo "--> Cleaning DNF metadata cache..."
     sudo dnf clean all
+    echo "--> Building new cache from active repositories..."
     sudo dnf makecache
-
-    if sudo dnf update -y; then
-        echo "SUCCESS: System update completed." >&3
-        return 0
-    else
-        echo "FATAL: DNF update failed. Check the log file for details." >&3
-        return 1
-    fi
+    echo "✅ Cache prepared."
 }
 
 # -----------------------------
@@ -280,35 +258,31 @@ perform_update() {
 
 # Phase 1: Try RHEL Subscription
 if attempt_rhel_register; then
-    # SUCCESS PATH: RHEL is registered, repositories are configured by subscription-manager
-    # Ensure any previous fallback repos are removed just in case
+    # SUCCESS PATH: RHEL is registered
+    
+    # Ensure any previous fallback repos are removed
     sudo rm -f /etc/yum.repos.d/rockylinux-fallback.repo || true
     
-    echo "INFO: Proceeding with RHEL official repositories." >&3
-    perform_update
-    
-    # Keep the system registered after update
-    echo "INFO: RHEL path finished. System remains subscribed." >&3
+    clean_and_makecache
+    echo "--------------------------------------------------------"
+    echo "✅ CONGRATULATIONS: You are using official RHEL repositories."
     
 else
     # FAILURE PATH: RHEL subscription failed
     switch_to_rocky_linux
     
-    # We must unregister the failed attempt to ensure subscription-manager does not interfere
-    # This step is crucial if the registration attempt created temporary files or configurations.
+    # Unregister the failed attempt to ensure subscription-manager does not interfere
     sudo subscription-manager unregister 2>/dev/null || true
     
-    echo "INFO: Proceeding with Rocky Linux fallback repositories." >&3
-    perform_update
-    
-    # Clean up: Remove the temporary Rocky Linux repo file and unregister the system
-    echo "INFO: Fallback path finished. Please resolve RHEL subscription issue." >&3
-    # Optional: Remove Rocky Linux repo file after update
-    # sudo rm -f /etc/yum.repos.d/rockylinux-fallback.repo
-
+    clean_and_makecache
+    echo "--------------------------------------------------------"
+    echo "⚠️ FALLBACK MODE: Using Rocky Linux 9 mirrors."
 fi
 
-echo "--- Script Finished ---" >&3
+echo "--- FINAL STEP ---"
+echo "You can now safely update your system using the following command:"
+echo "    sudo dnf update -y"
+echo "--------------------------------------------------------"
 ```
 ```bash
 chmod +x smart-update.sh
