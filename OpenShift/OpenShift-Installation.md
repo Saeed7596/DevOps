@@ -555,37 +555,14 @@ oc whoami
 
 ---
 
-# Setting
-**Disabling the default OperatorHub catalog sources**
-in console **`Administrator -> Cluster Setting -> Configuration ->  OperatorHub`**
-
-add this
-```yaml
-spec: 
-  disableAllDefaulSources: true
-```
-or
-```yamk
-oc patch OperatorHub cluster --type json \
-    -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
-```
-
-in console **`Administrator -> Cluster Setting -> Configuration ->  ClusterVersion details`**
-
-remove spec.channel
-```yaml
-spec:
-  channel: stable-4.18
-```
-
----
-
 # Preparation a cluster
 After you have mirrored your image set to the mirror registry, you must apply the generated `ImageDigestMirrorSet` (IDMS), `ImageTagMirrorSet` (ITMS), `CatalogSource`, and `UpdateService` to the cluster.
 ```bash
 oc apply -f <path_to_oc-mirror_workspace>/working-dir/cluster-resources
 ```
-**Note**: If wants to apply new cluster-resources, you should keep the old one and then copy all cluster-resources file to another directory like `merged-cluster-resources` then apply!
+
+### **Note**: 
+* If wants to apply new cluster-resources, you should keep the old one and then copy all cluster-resources file to another directory like `merged-cluster-resources` then apply!
 ```bash
 cp <path_to_oc-mirror_workspace>/working-dir/cluster-resources/* ~/merged-cluster-resources
 ```
@@ -593,7 +570,7 @@ cp <path_to_oc-mirror_workspace>/working-dir/cluster-resources/* ~/merged-cluste
 oc apply -f merged-cluster-resources/
 ```
 
-Verification
+### Verification
 ```bash
 oc get imagedigestmirrorset
 oc get imagetagmirrorset
@@ -603,33 +580,40 @@ oc get catalogsource -n openshift-marketplace
 ---
 
 # Test Cluster
-Node status:
+1. Check Cluster
 ```bash
-oc get nodes
-```
-Check the entire cluster status:
-```bash
-oc get clusteroperators
-```
-All must be in Available and True status.
-
-Check API and DNS status:
-```bash
+# nodes and versions
+oc get nodes -o wide
+oc describe node <node-name>
 oc get clusterversion
+
+# Pods
+oc get pods -A
+oc get projects
+
+# DNS status
 oc get co dns
 oc get co kube-apiserver
+
+# cluster operators health
+oc get co
+oc get clusteroperators
+
+# etcd endpoints status (run on master where etcd pod exists)
+oc -n openshift-etcd get pods
+oc -n openshift-etcd exec -it etcd-<pod> -- etcdctl endpoint status --cluster
 ```
-Log Status
+* All must be in Running, Available and True status.
+
+2. Log Status
 ```bash
 oc adm must-gather
 ```
-This command collects all the logs necessary for debugging the cluster.
+* This command collects all the logs necessary for debugging the cluster.
 
-Final Test
+3. Check API Server healthz
 ```bash
-oc get pods -A
-oc get projects
-oc describe node <node-name>
+curl -k https://api.openshift.<baseDomain>.com:6443/healthz
 ```
 
 ---
@@ -640,13 +624,6 @@ oc get route console -n openshift-console -o jsonpath='{.spec.host}'
 ```
 ```js
 https://console-openshift-console.apps.<cluster-name>.<baseDomain>
-```
-
----
-
-# Check API Server healthz
-```bash
-curl -k https://api.openshift.<baseDomain>.com:6443/healthz
 ```
 
 ---
@@ -884,7 +861,7 @@ mirror:
   helm: {}
 ```
 Get two version:
-```bash
+```yaml
 kind: ImageSetConfiguration
 apiVersion: mirror.openshift.io/v2alpha1
 mirror:
