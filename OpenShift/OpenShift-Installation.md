@@ -208,39 +208,59 @@ mirror:
 ```
 oc-mirror v2 with operator Sample:
 ```yaml
-
 kind: ImageSetConfiguration
 apiVersion: mirror.openshift.io/v2alpha1
 mirror:
   platform:
     channels:
-    - name: stable-4.18
+    - name: stable-4.19
       type: ocp
+      minVersion: 4.19.14
+      maxVersion: 4.19.14
+    graph: true
   operators:
-  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.19
     packages:
-    - name: openshift-gitops-operator
+    - name: cluster-logging 
       channels:
-      - name: gitops-1.16
-    - name: servicemeshoperator
+      - name: stable-6.3
+    - name: cluster-observability-operator 
       channels:
       - name: stable
-    - name: loki-operator
+    - name: container-security-operator
       channels:
-      - name: stable-6.2
-    - name: cluster-logging
+      - name: stable-3.15
+    - name: devspaces
       channels:
-      - name: stable-6.2
-    - name: redhat-oadp-operator 
+      - name: stable
+    - name: devworkspace-operator
       channels:
-      - name: stable-1.4
+      - name: fast
+    - name: file-integrity-operator
+      channels:
+      - name: stable
+    - name: kiali-ossm
+      channels:
+      - name: stable
+    - name: loki-operator 
+      channels:
+      - name: stable-6.3
+    - name: netobserv-operator 
+      channels:
+      - name: stable
     - name: openshift-cert-manager-operator
       channels:
       - name: stable-v1
-    - name: container-security-operator
+    - name: openshift-gitops-operator
       channels:
-      - name: stable-3.14
-    - name: cluster-observability-operator
+      - name: latest
+    - name: redhat-oadp-operator 
+      channels:
+      - name: stable
+    - name: servicemeshoperator 
+      channels:
+      - name: stable
+    - name: tempo-product 
       channels:
       - name: stable
   helm: {}
