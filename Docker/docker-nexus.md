@@ -234,6 +234,21 @@ Download File wirh `curl`
 curl -u admin:yourpassword http://nexus.local:8081/repository/raw-files/myfolder/myfile.zip -O
 ```
 
+if you have nexus you can create a `raw` repository and upload the `files` there.
+* nexus setting:
+1. Administration → Security → Realms
+  * Make sure “Anonymous Access Realm” is in the list of active ones.
+2. Administration → Security → Anonymous
+  * Check the box “Allow anonymous users to access the server”.
+  * Set the default Role to nx-anonymous.
+3. Administration → Security → Roles
+  * Open the `nx-anonymous` role.
+  * If it doesn't exist, add a new permission for it:
+  * Type: Repository
+  * Format: raw
+  * Actions: Read
+  * Repository: The name of your raw repository (or all raw repositories)
+
 ---
 
 # Delete a Specific Docker Image:
