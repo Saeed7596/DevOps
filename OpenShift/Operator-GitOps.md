@@ -34,7 +34,9 @@ oc label namespace <namespace-name> argocd.argoproj.io/managed-by=openshift-gito
 # In Argo CD UI:
 ## 1. Create Project
 ### **Settings → Projects → New Project**
-edit the Project → DESTINATIONS → namespace
+edit the Project → DESTINATIONS → namespace = `*`
+* Source Repositories
+* Scope Repositories
 
 ### 2. **Settings → Add Repository certificates and know hosts**
 ### 2.1. ADD SSH KNOWN HOSTS
@@ -48,10 +50,11 @@ Copy and Paste the valuse of `/tmp/gitlab_known_hosts`
 ### 2.2. ADD TLS CERTIFICATE
 Download the `pem` tls file from url of your gitlab (`gitlab.example.com`).
 
-### 3. Create ArgoCD Application:
+### 3.1. Create ArgoCD Application:
 **Settings → Repositories → Connect Repo**
 **REPOSITORY** → `ssh://git@gitlab.example.com:2222/user/test.git`
 **Private SSH Key** value is the that private key that you use in `install-config.yaml`
+
 ```bash
 cat ~/.ssh/id_openshift
 ```
@@ -86,6 +89,28 @@ oc adm policy add-role-to-user edit \
   system:serviceaccount:openshift-gitops:openshift-gitops-argocd-application-controller \
   -n <namespace-name>
 ```
+
+---
+
+### 3.2. Create ArgoCD Application with CLI:
+* namespace `openshift-gitops`
+* Workload → Pods → `openshift-gitops-server-...` → Terminal
+    ```bash
+    argocd login openshift-gitops-server
+    ```
+    ```text
+    username: admin
+    password: in `<argo_CD_instance_name>-cluster` secret
+    ```
+    ```bash
+    for i in <directory_name_in_gitlab> ; do argocd create \
+        --server openshift-gitops-server \
+        --dest-server https://kubernetes.default.svc \
+        appname-$i --project <argocd-project> \
+        --repo https://username:password@gitlab.example.com/user/test.git \
+        --revision <branch_name> --path $i \
+        --dest-namespace <namespece> --insecure --config ./conf ; doen 
+    ```
 
 ---
 
