@@ -103,14 +103,25 @@ oc adm policy add-role-to-user edit \
     password: in `<argo_CD_instance_name>-cluster` secret
     ```
     ```bash
-    for i in <directory_name_in_gitlab> ; do argocd create \
+    for i in <directory_names_in_gitlab>; do
+      argocd app create appname-BRANCH-$i \
         --server openshift-gitops-server \
         --dest-server https://kubernetes.default.svc \
-        appname-$i --project <argocd-project> \
+        --project <argocd-project> \
         --repo https://username:password@gitlab.example.com/user/test.git \
-        --revision <branch_name> --path $i \
-        --dest-namespace <namespece> --insecure --config ./conf ; doen 
+        --revision <branch_name> \
+        --path $i \
+        --dest-namespace <namespace> \
+        --insecure \
+        --config ./conf
+    done
     ```
+### 3.3. Verification
+```bash
+argocd app list | grep appname
+
+oc get applications.argoproj.io -n openshift-gitops
+```
 
 ---
 
