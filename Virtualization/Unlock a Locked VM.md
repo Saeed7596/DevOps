@@ -8,8 +8,6 @@
 
 5. Perform suggested troubleshooting before you unlock the virtual machine.
 
-6. Navigate to the Summary tab of the virtual machine.
-
-A Virtual Machine Locked Alarm appears.
+6. Navigate to the Summary tab of the virtual machine. <br /> A Virtual Machine Locked Alarm appears.
 
 7. Select Unlock VM from the Actions drop-down menu on the right side.
