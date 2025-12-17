@@ -24,4 +24,12 @@
 | `:---` | Align column to left in tables |
 | `:---:` | Align column to center in tables |
 | `---:` | Align column to right in tables |
+| `two or more spaces` | line break |
+| `<br />` | line break |
 
+---
+
+# Example:
+This is a **formatted paragraph** with *multiple* styles.<br />
+It contains a `code snippet` and a [link to example](https://example.com).<br />
+All while maintaining proper line breaks.
