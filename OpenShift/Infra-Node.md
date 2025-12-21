@@ -221,6 +221,15 @@ oc rollout history deployment/oauth-openshift -n openshift-authentication
 
 ---
 
+# Verification
+```
+oc adm top nodes
+
+oc get pods -A -o wide | grep infra
+```
+
+---
+
 # Taint and Toleration Note❗❗❗
 ```yaml
 tolerations:
