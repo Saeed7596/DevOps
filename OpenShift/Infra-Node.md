@@ -27,7 +27,7 @@ Typical workloads placed on infra nodes include:
 
 # Infra Node Setting
 
-## Labeled the two worker node as infra
+## Designated two worker nodes as infra nodes
 ```bash
 oc label node <node_name> node-role.kubernetes.io/infra=""
 
@@ -37,16 +37,21 @@ oc label node worker-1 node-role.kubernetes.io/infra=""
 
 oc get nodes -L node-role.kubernetes.io/infra
 ```
-
-## 1. Ingress Route.
-Note: After applying these changes, update your `HAProxy` configuration so that ports `80` and `443` point to the `IP addresses` of these `infra nodes`.
 ## Taint these node
 ```bash
 oc adm taint nodes worker-0 node-role.kubernetes.io/infra:NoSchedule
 oc adm taint nodes worker-1 node-role.kubernetes.io/infra:NoSchedule
 ```
+## Note: After applying these changes, update your `HAProxy` configuration so that ports `80` and `443` point to the `IP addresses` of these `infra nodes`. <br />
 
----
+# 1. Ingress Route.
+Ensure router replicas >= number of infra nodes (recommended: 2)
+```bash
+oc get deployment router-default -n openshift-ingress
+```
+```bash
+oc scale deployment/router-default -n openshift-ingress --replicas=2
+```
 
 ## Edit ingress controller
 **In console -> Administrator -> Cluster Settings -> Configuration -> ingress controller**
@@ -70,6 +75,148 @@ spec:
 ## Make sure all pods are up on the `infra nodes`.
 ```bash
 oc get pods -n openshift-ingress -o wide
+```
+
+---
+
+# 2. Cluster Monitoring
+## Edit configmap or created first.
+```bash
+oc edit configmap cluster-monitoring-config -n openshift-monitoring
+```
+```yaml
+data:
+  config.yaml: |
+    enableUserWorkload: true
+
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - key: "node-role.kubernetes.io/infra"
+      operator: "Exists"
+      effect: "NoSchedule"
+
+    prometheusK8s:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - key: "node-role.kubernetes.io/infra"
+        operator: "Exists"
+        effect: "NoSchedule"
+
+    alertmanagerMain:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - key: "node-role.kubernetes.io/infra"
+        operator: "Exists"
+        effect: "NoSchedule"
+
+    prometheusOperator:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - key: "node-role.kubernetes.io/infra"
+        operator: "Exists"
+        effect: "NoSchedule"
+```
+
+## Verification
+```bash
+oc get pods -n openshift-monitoring -o wide
+
+# ClusterOperator
+oc get co monitoring
+```
+## Edit User Workload
+```bash
+oc edit configmap user-workload-monitoring-config -n openshift-user-workload-monitoring
+```
+```yaml
+data:
+  config.yaml: |
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - key: node-role.kubernetes.io/infra
+      operator: Exists
+      effect: NoSchedule
+```
+## Verification
+```bash
+oc get pods -n openshift-user-workload-monitoring -o wide
+```
+
+---
+
+# 3. Image Registry
+**Note**: Ensure the image registry uses persistent storage (PVC).<br />
+Do NOT use emptyDir in production.
+```bash
+oc get configs.imageregistry.operator.openshift.io cluster -o yaml | grep -A5 storage:
+```
+If `emptyDir` → this document is incomplete for prod
+
+## Edit
+```bash
+oc edit configs.imageregistry.operator.openshift.io cluster
+```
+```yaml
+spec:
+  nodeSelector:
+    node-role.kubernetes.io/infra: ""
+  tolerations:
+  - key: "node-role.kubernetes.io/infra"
+    operator: "Exists"
+    effect: "NoSchedule"
+```
+## Verification
+```bash
+oc get pods -n openshift-image-registry -o wide
+
+# Registry health
+oc get co image-registry
+```
+
+---
+
+# 4. OAuth is controlled by `Deployment`.
+## Edit
+```bash
+oc patch deployment oauth-openshift \
+  -n openshift-authentication \
+  --type=merge \
+  -p '{
+    "spec": {
+      "template": {
+        "spec": {
+          "nodeSelector": {
+            "node-role.kubernetes.io/infra": ""
+          },
+          "tolerations": [{
+            "key": "node-role.kubernetes.io/infra",
+            "operator": "Exists",
+            "effect": "NoSchedule"
+          }]
+        }
+      }
+    }
+  }'
+```
+## Verification
+```bash
+oc get pods -n openshift-authentication -o wide
+oc get co authentication
+```
+## Note
+After upgrades, re-verify oauth-openshift deployment node placement.<br />
+OAuth deployment is operator-managed and may be reconciled during upgrades.<br />
+Check after Upgrade
+```bash
+oc get pods -n openshift-authentication -o wide
+```
+```bash
+oc rollout history deployment/oauth-openshift -n openshift-authentication
 ```
 
 ---
