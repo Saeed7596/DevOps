@@ -94,14 +94,18 @@ oc edit configmap cluster-monitoring-config -n openshift-monitoring
 ```yaml
 data:
   config.yaml: |
+    <component>
+      tolerations:
+        <tolerations-specification>
+```
+## Find Component
+```bash
+oc get pods -n openshift-monitoring
+```
+```yaml
+data:
+  config.yaml: |
     enableUserWorkload: true
-
-    nodeSelector:
-      node-role.kubernetes.io/infra: ""
-    tolerations:
-    - key: "node-role.kubernetes.io/infra"
-      operator: "Exists"
-      effect: "NoSchedule"
 
     prometheusK8s:
       nodeSelector:
@@ -126,6 +130,55 @@ data:
       - key: "node-role.kubernetes.io/infra"
         operator: "Exists"
         effect: "NoSchedule"
+
+    kubeStateMetrics:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - key: "node-role.kubernetes.io/infra"
+        operator: "Exists"
+        effect: "NoSchedule"
+
+    openshiftStateMetrics:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - key: "node-role.kubernetes.io/infra"
+        operator: "Exists"
+        effect: "NoSchedule"
+
+    metricsServer:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - key: "node-role.kubernetes.io/infra"
+        operator: "Exists"
+        effect: "NoSchedule"
+
+    monitoringPlugin:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - key: "node-role.kubernetes.io/infra"
+        operator: "Exists"
+        effect: "NoSchedule"
+
+    thanosQuerier:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - key: "node-role.kubernetes.io/infra"
+        operator: "Exists"
+        effect: "NoSchedule"
+```
+
+## Delete Pod (if needed)
+```
+oc project openshift-monitoring
+
+oc get pods -o wide
+
+oc get pods -o name | xargs oc delete
 ```
 
 ## Verification
@@ -135,6 +188,13 @@ oc get pods -n openshift-monitoring -o wide
 # ClusterOperator
 oc get co monitoring
 ```
+## Log
+```bash
+oc logs -f prometheus-operator-... -n openshift-monitoring
+```
+
+---
+
 ## Edit User Workload
 ```bash
 oc edit configmap user-workload-monitoring-config -n openshift-user-workload-monitoring
@@ -142,12 +202,46 @@ oc edit configmap user-workload-monitoring-config -n openshift-user-workload-mon
 ```yaml
 data:
   config.yaml: |
-    nodeSelector:
-      node-role.kubernetes.io/infra: ""
-    tolerations:
-    - key: node-role.kubernetes.io/infra
-      operator: Exists
-      effect: NoSchedule
+    prometheusOperator:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - key: "node-role.kubernetes.io/infra"
+        operator: "Exists"
+        effect: "NoSchedule"
+    prometheus:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - key: "node-role.kubernetes.io/infra"
+        operator: "Exists"
+        effect: "NoSchedule"
+    thanosRuler:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - key: "node-role.kubernetes.io/infra"
+        operator: "Exists"
+        effect: "NoSchedule"
+```
+## Enable alerts custom
+```bash
+alertmanager:
+  enabled: true
+  nodeSelector:
+    node-role.kubernetes.io/infra: ""
+  tolerations:
+  - key: "node-role.kubernetes.io/infra"
+    operator: "Exists"
+    effect: "NoSchedule"
+```
+## Delete Pod (id needed)
+```
+oc project openshift-monitoring
+
+oc get pods -o wide
+
+oc get pods -o name | xargs oc delete
 ```
 ## Verification
 ```bash
