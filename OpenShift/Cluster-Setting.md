@@ -136,6 +136,20 @@ data:
 
 ---
 
+## Enable alerts custom
+```bash
+alertmanager:
+  enabled: true
+  nodeSelector:
+    node-role.kubernetes.io/infra: ""
+  tolerations:
+  - key: "node-role.kubernetes.io/infra"
+    operator: "Exists"
+    effect: "NoSchedule"
+```
+
+---
+
 # Verify 
 ```bash
 oc -n openshift-user-workload-monitoring get pod
