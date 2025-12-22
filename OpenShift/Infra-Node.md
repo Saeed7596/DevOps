@@ -257,8 +257,37 @@ Do NOT use emptyDir in production.
 oc get configs.imageregistry.operator.openshift.io cluster -o yaml | grep -A5 storage:
 ```
 If `emptyDir` → this document is incomplete for prod
+## Enable image-registry
+### Create PVC
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: image-registry-storage
+  namespace: openshift-image-registry
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: thin-csi  # storageClass vSphere
+```
+## Edit Image Registry Operator
+```bash
+oc edit configs.imageregistry.operator.openshift.io cluster
+```
+```yaml
+spec:
+  managementState: Managed
+  storage:
+    pvc:
+      claim: image-registry-storage
+```
 
-## Edit
+---
+
+## Edit 
 ```bash
 oc edit configs.imageregistry.operator.openshift.io cluster
 ```
