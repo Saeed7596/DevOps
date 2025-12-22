@@ -302,6 +302,7 @@ spec:
 ```
 ## Verification
 ```bash
+# image-registry pods must be on infra
 oc get pods -n openshift-image-registry -o wide
 
 # Registry health
