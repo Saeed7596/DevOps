@@ -36,13 +36,20 @@ oc label node worker-1 node-role.kubernetes.io/infra=""
 
 
 oc get nodes -L node-role.kubernetes.io/infra
+
+oc get nodes -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.metadata.labels["node-role.kubernetes.io/infra"]}{"\n"}{end}'
 ```
 ## Taint these node
 ```bash
 oc adm taint nodes worker-0 node-role.kubernetes.io/infra:NoSchedule
 oc adm taint nodes worker-1 node-role.kubernetes.io/infra:NoSchedule
 ```
+```bash
+oc describe node <node-name> | grep Taints
+```
 ## Note: After applying these changes, update your `HAProxy` configuration so that ports `80` and `443` point to the `IP addresses` of these `infra nodes`. <br />
+
+---
 
 # 1. Ingress Route.
 Ensure router replicas >= number of infra nodes (recommended: 2)
@@ -221,11 +228,13 @@ oc rollout history deployment/oauth-openshift -n openshift-authentication
 
 ---
 
-# Verification
+# Overall Verification
 ```
 oc adm top nodes
 
 oc get pods -A -o wide | grep infra
+
+oc get co
 ```
 
 ---
