@@ -28,6 +28,9 @@ storage:
 ```bash
 kubectl create -f my-cluster.yaml
 ```
+```bash
+kubectl -n rook-ceph get cephcluster 
+```
 
 ---
 
@@ -39,7 +42,15 @@ kubectl get pods -n rook-ceph
 please refer to the [Ceph common issues](https://rook.io/docs/rook/latest-release/Troubleshooting/ceph-common-issues/) for more details and potential solutions.<br />
 
 To verify that the cluster is in a healthy state, connect to the [Rook toolbox](https://rook.io/docs/rook/latest-release/Troubleshooting/ceph-toolbox/) and run the `ceph status` command.
-
+```bash
+kubectl create -f toolbox.yaml
+```
+```bash
+kubectl -n rook-ceph exec -it deploy/rook-ceph-tools -- bash
+```
+```bash
+kubectl -n rook-ceph exec -it $(kubectl -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{.items[0].metadata.name}') -- bash
+```
 * All mons should be in quorum
 * A mgr should be active
 * At least three OSDs should be up and in
@@ -200,3 +211,5 @@ oc create -f my-cluster.yaml
 ```
 
 ---
+
+## [Cleanup](https://rook.io/docs/rook/latest-release/Getting-Started/ceph-teardown/)
