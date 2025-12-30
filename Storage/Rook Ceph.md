@@ -17,13 +17,28 @@ cp cluster.yaml my-cluster.yaml
 
 nano my-cluster.yaml
 ```
-You must have already created the `sdb` partition.
+You must have already created the `sdb` partition.<br />
+And the the `sdb` must be zapped!
 ```yaml
 storage:
   useAllNodes: true
   useAllDevices: false
   devices: 
     - name: "sdb"
+```
+Or You can use this:<br />
+First find the `sdb` path.
+```bash
+ls -l /dev/disk/by-path/
+```
+```yaml
+  storage:
+    useAllNodes: false
+    useAllDevices: false
+    nodes:
+      - name: <node-name>
+        devices:
+          - name: "/dev/disk/by-id/ata-ST4000DM004-XXXX" # devices can be specified using full udev paths
 ```
 ```bash
 kubectl create -f my-cluster.yaml
@@ -45,6 +60,7 @@ To verify that the cluster is in a healthy state, connect to the [Rook toolbox](
 ```bash
 kubectl create -f toolbox.yaml
 ```
+Usage:
 ```bash
 kubectl -n rook-ceph exec -it deploy/rook-ceph-tools -- bash
 ```
@@ -98,7 +114,7 @@ nano my-filesystem.yaml
 apiVersion: ceph.rook.io/v1
 kind: CephFilesystem
 metadata:
-  name: myfs
+  name: myfs # If change this name, change in csi subvolume group too 
   namespace: rook-ceph
 spec:
   metadataPool:
@@ -112,6 +128,26 @@ spec:
   metadataServer:
     activeCount: 1
     activeStandby: true
+---
+# create default csi subvolume group
+apiVersion: ceph.rook.io/v1
+kind: CephFilesystemSubVolumeGroup
+metadata:
+  name: myfs-csi # lets keep the svg crd name same as `filesystem name + csi` for the default csi svg
+  namespace: rook-ceph # namespace:cluster
+spec:
+  # The name of the subvolume group. If not set, the default is the name of the subvolumeGroup CR.
+  name: csi
+  # filesystemName is the metadata name of the CephFilesystem CR where the subvolume group will be created
+  filesystemName: myfs
+  # reference https://docs.ceph.com/en/latest/cephfs/fs-volumes/#pinning-subvolumes-and-subvolume-groups
+  # only one out of (export, distributed, random) can be set at a time
+  # by default pinning is set with value: distributed=1
+  # for disabling default values set (distributed=0)
+  pinning:
+    distributed: 1 # distributed=<0, 1> (disabled=0)
+    # export:                 # export=<0-256> (disabled=-1)
+    # random:                 # random=[0.0, 1.0](disabled=0.0)
 ```
 ```bash
 kubectl create -f my-filesystem.yaml
@@ -119,6 +155,8 @@ kubectl create -f my-filesystem.yaml
 ## Verify
 ```bash
 kubectl -n rook-ceph get pod -l app=rook-ceph-mds
+
+kubectl -n rook-ceph get cephfilesystem
 ```
 
 ---
