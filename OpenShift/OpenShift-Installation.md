@@ -78,6 +78,23 @@ else
   echo "OpenShift Install already installed."
 fi
 ```
+1.2. Enabling tab completion 
+```bash
+oc completion bash > oc_bash_completion
+
+sudo cp oc_bash_completion /etc/bash_completion.d/
+```
+```bash
+cat >>~/.zshrc<<EOF
+if [ $commands[oc] ]; then
+  source <(oc completion zsh)
+  compdef _oc oc
+fi
+EOF
+```
+Tab completion is enabled when you open a new terminal.
+
+---
 
 ### 2. Install Docker (if not installed)
 ```bash
