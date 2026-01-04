@@ -64,6 +64,9 @@ mirror:
     - name: kiali-ossm
       channels:
       - name: stable
+    - name: kubevirt-hyperconverged
+      channels:
+      - name: stable
     - name: loki-operator 
       channels:
       - name: stable-6.2
