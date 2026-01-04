@@ -237,3 +237,9 @@ sudo update-ca-trust
 ```
 
 ---
+
+# PATH
+* Place the `binary` files in a directory that is on your `PATH`.
+```bash
+echo $PATH
+```
