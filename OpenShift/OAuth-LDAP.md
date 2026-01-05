@@ -1,4 +1,4 @@
-# OAuth
+# OAuth [LDAP](https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html-single/authentication_and_authorization/index#configuring-ldap-identity-provider)
 ## Check Access to Active Directory LDAP:
 ```bash
 nc -vz <ip-ldap> 389
@@ -47,6 +47,7 @@ spec:
 **You can check `logs` in the `openshift-authentication` pods.**
 
 ---
+# [RBAC Overview](https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html-single/authentication_and_authorization/index#authorization-overview_using-rbac)
 
 # OpenShift RBAC Roles Reference
 
@@ -139,3 +140,11 @@ oc get identities
 ```bash
 oc delete identity 'ldap_provider:...'
 ```
+
+---
+
+# [Removing the kubeadmin user](https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html-single/authentication_and_authorization/index#removing-kubeadmin)
+
+---
+
+# [Security Context Constraints - SCC](https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html-single/authentication_and_authorization/index#security-context-constraints-about_configuring-internal-oauth)
