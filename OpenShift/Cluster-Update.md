@@ -1,90 +1,147 @@
-#### 🛠️ Step 2: Create resources on the air-gap cluster
-2.1 Define ImageContentSourcePolicy (ICSP)
-```yaml
-apiVersion: operator.openshift.io/v1alpha1
-kind: ImageContentSourcePolicy
-metadata:
-  name: mirror-4-17
-spec:
-  repositoryDigestMirrors:
-    - mirrors:
-        - registry.example.com/ocp/release
-      source: quay.io/openshift-release-dev/ocp-release
-    - mirrors:
-        - registry.example.com/ocp/release-images
-      source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+# Mirrored Configuration
+```bash
+cd ocp4-18/working-dir/cluster-resources/
+
+ls
+cc-redhat-operator-index-v4-18.yaml  cs-redhat-operator-index-v4-18.yaml  idms-oc-mirror.yaml  itms-oc-mirror.yaml  signature-configmap.json  signature-configmap.yaml
 ```
-2.2 Defining CatalogSource for operators
+
+---
+
+```bash
+cat cc-redhat-operator-index-v4-18.yaml 
+```
+```yaml
+apiVersion: olm.operatorframework.io/v1
+kind: ClusterCatalog
+metadata:
+  name: cc-redhat-operator-index-v4-18
+spec:
+  priority: 0
+  source:
+    image:
+      ref: registry.example.com/redhat/redhat-operator-index:v4.18
+    type: Image
+status: {}
+```
+
+---
+
+```bash
+cat cs-redhat-operator-index-v4-18.yaml 
+```
 ```yaml
 apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
 metadata:
-  name: redhat-operators
+  name: cs-redhat-operator-index-v4-18
   namespace: openshift-marketplace
 spec:
+  image: registry.example.com/redhat/redhat-operator-index:v4.18
   sourceType: grpc
-  image: registry.example.com/olm/redhat-operator-index:v4.17
-  displayName: Red Hat Operators
-  publisher: Red Hat
+status: {}
 ```
-
 
 ---
 
-## 🚀 OpenShift Cluster Update Steps
-## ✅ Prerequisites
-1. Take a full etcd backup
+```bash
+cat idms-oc-mirror.yaml 
+```
+```yaml
+---
+apiVersion: config.openshift.io/v1
+kind: ImageDigestMirrorSet
+metadata:
+  name: idms-release-0
+spec:
+  imageDigestMirrors:
+  - mirrors:
+    - registry.example.com/openshift/release
+    source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+  - mirrors:
+    - registry.example.com/openshift/release-images
+    source: quay.io/openshift-release-dev/ocp-release
+status: {}
+---
+apiVersion: config.openshift.io/v1
+kind: ImageDigestMirrorSet
+metadata:
+  name: idms-operator-0
+spec:
+  imageDigestMirrors:
+  - mirrors:
+    - registry.example.com/openshift-service-mesh
+    source: registry.redhat.io/openshift-service-mesh
+  - mirrors:
+    - registry.example.com/openshift-gitops-1
+    source: registry.redhat.io/openshift-gitops-1
+  - mirrors:
+    - registry.example.com/openshift4
+    source: registry.redhat.io/openshift4
+  - mirrors:
+    - registry.example.com/network-observability
+    source: registry.redhat.io/network-observability
+  - mirrors:
+    - registry.example.com/rhel9
+    source: registry.redhat.io/rhel9
+  - mirrors:
+    - registry.example.com/openshift-logging
+    source: registry.redhat.io/openshift-logging
+  - mirrors:
+    - registry.example.com/cluster-observability-operator
+    source: registry.redhat.io/cluster-observability-operator
+status: {}
+```
 
-2. Check version compatibility
-Versions should be directly upgradeable. In the case of 4.16 → 4.17, this is usually not a problem.
+---
+
 ```bash
-oc adm upgrade --allow-explicit-upgrade --to-image <release-image>
+cat itms-oc-mirror.yaml 
 ```
-3. Check out the Cluster.
-```bash
-oc get clusterversion
-oc get clusteroperators
-oc get nodes
+```yaml
+---
+apiVersion: config.openshift.io/v1
+kind: ImageTagMirrorSet
+metadata:
+  name: itms-operator-0
+spec:
+  imageTagMirrors:
+  - mirrors:
+    - registry.example.com/openshift4
+    source: registry.redhat.io/openshift4
+status: {}
+---
+apiVersion: config.openshift.io/v1
+kind: ImageTagMirrorSet
+metadata:
+  name: itms-release-0
+spec:
+  imageTagMirrors:
+  - mirrors:
+    - registry.example.com/openshift/release-images
+    source: quay.io/openshift-release-dev/ocp-release
+status: {}
 ```
 
-## 🚀 OpenShift Cluster Update Steps
-#### 🧩 Step 1: Check the available versions
-```bash
-oc adm upgrade
-```
-Or to see suggested versions:
-```bash
-oc adm upgrade --to-latest
-```
-#### 📦 Step 2: Apply the upgrade channel (optional)
-If the channel is wrong (e.g. it's on `stable-4.16` and you want to go to `4.17`):
-```bash
-oc patch clusterversion version --type merge -p '{"spec": {"channel": "stable-4.17"}}'
-```
-#### ⬆️ Step 3: Start the upgrade
-If version `4.17.35` was listed:
-```bash
-oc adm upgrade --to=4.17.35
-```
-If you are doing it locally or air-gap, you can give an explicit image:
-```bash
-oc adm upgrade --to-image=quay.io/openshift-release-dev/ocp-release@sha256:<digest>
-# or
-oc adm upgrade --to-image=registry.example.com/ocp/release@sha256:<digest>
-```
-#### 🔍 Step 4: Monitor the upgrade status
-```bash
-watch oc get clusterversion
-watch oc get clusteroperators
-watch oc get nodes
-```
-✅ When everything is `Available=True`, `Progressing=False`, `Degraded=False`, the upgrade is complete.
+---
 
-#### 📘 Important Notes
-* First, the Control Plane (Master) Nodes are upgraded.
-* Then the Worker Nodes are upgraded with drain and reboot respectively.
-* During the process, Pods may be moved (Planned Disruption).
-
-#### 📥 Rollback
-* OpenShift does not officially support rollback version.
-* The only way to rollback: restore etcd from a backup taken before the upgrade
+```bash
+cat signature-configmap.json 
+```
+```json
+{"kind":"ConfigMap","apiVersion":"v1","metadata":{"name":"mirrored-release-signatures","namespace":"openshift-config-managed","labels":{"release.openshift.io/verification-signatures":""}},"binaryData":{"sha256-5e06105a6ba80d04eb5d8d3f9a672fb743ce4710876d99a375c2d9f7b7eaa783-1":"owGbwMvMwMEoOU9/4l9n2UDG0wf6khgyiqzlq5WSizJLMpMTc5SsFKqVMnMT01PBrJT85OzUIt3cxLzMtNTiEt2UzHQgBZRSKs5INDI1szJNNTAzNDBNNEtKtDBIMTBJTTJNsUgxTrNMNDM3SksyNzFOTjUxNzSwMDdLsbRMNDY3TTZKsUwzTzJPTUw0tzBWqtVRUCqpLABZp5RYkp+bmayQnJ9XkpiZl1qkUJyZnpdYUlqUqgRUlZmSmleSWVKJ7LCi1LTUotS8ZLD2wtLESr3MfP38gtS84ozMtBKgdE5qYnGqbkpqmX5+cgGMb2WiZ2ihZ2SgW2FhFm9molQLckR+QUlmfh40BJKLUoGOKQKZGpSaouCRWKLgDzQ1GGSqQjDQVZl56QqOpSUZ+cBwq1Qw0DPQMwQa08kkw8LAyMHAxsoECl..."}}
+```
+```bash
+cat signature-configmap.yaml 
+```
+```yaml
+apiVersion: v1
+binaryData:
+  sha256-5e06105a6ba80d04eb5d8d3f9a672fb743ce4710876d99a375c2d9f7b7eaa783-1: owGbwMvMwMEoOU9/4l9n2UDG0wf6khgyiqzlq5WSizJLMpMTc5SsFKqVMnMT01PBrJT85OzUIt3cxLzMtNTiEt2UzHQgBZRSKs5INDI1szJNNTAzNDBNNEtKtDBIMTBJTTJNsUgxTrNMNDM3SksyNzFOTjUxNzSwMDdLsbRMNDY3TTZKsUwzTzJPTUw0tzBWqtVRUCqpLABZp5RYkp+bmayQnJ9XkpiZl1qkUJyZnpdYUlqUqgRUlZmSmleSWVKJ7LCi1LTUotS8ZLD2wtLESr3MfP38gtS84ozMtBKgdE5qYnGqbkpqmX5+cgGMb2WiZ2ihZ2SgW2FhFm9molQLckR+QUlmfh40BJKLUoGOKQKZGpSaouCRWKLgDzQ1GGSqQjDQVZl56QqOpSUZ+cBwq1Qw0DPQMwQa08kkw8LAyMHAxsoECl...
+kind: ConfigMap
+metadata:
+  labels:
+    release.openshift.io/verification-signatures: ""
+  name: mirrored-release-signatures
+  namespace: openshift-config-managed
+```

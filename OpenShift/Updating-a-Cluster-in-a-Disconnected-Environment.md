@@ -178,4 +178,149 @@ You can use the OpenShift Container Platform web console to create an OpenShift 
 
 ---
 
-# 2. Updating a cluster in a disconnected environment without the OpenShift Update Service
+# ✅ 2. Updating a cluster in a disconnected environment without the OpenShift Update Service
+
+## Prerequisites
+1. Take a full etcd backup
+2. You have updated all Operators previously installed through Operator Lifecycle Manager (OLM) to a version that is compatible with your target release. Updating the Operators ensures they have a valid update path when the default OperatorHub catalogs switch from the current minor version to the next during a cluster update. See [Updating installed Operators](https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html-single/operators/#olm-upgrading-operators) for more information on how to check compatibility and, if necessary, update the installed Operators.
+
+## Pausing a MachineHealthCheck resource 
+During the update process, nodes in the cluster might become temporarily unavailable. In the case of worker nodes, the `MachineHealthCheck` resources might identify such nodes as unhealthy and reboot them. **To avoid rebooting** such nodes, pause all the `MachineHealthCheck` resources before updating the cluster.
+
+1. To list all the available `MachineHealthCheck` resources that you want to pause, run the following command:
+```bash
+oc get machinehealthcheck -n openshift-machine-api
+```
+2. To pause the machine health checks, add the `cluster.x-k8s.io/paused=""` annotation to the `MachineHealthCheck` resource. Run the following command:
+```bash
+oc -n openshift-machine-api annotate mhc <mhc-name> cluster.x-k8s.io/paused=""
+```
+The annotated `MachineHealthCheck` resource resembles the following YAML file:
+```yaml
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineHealthCheck
+metadata:
+  name: example
+  namespace: openshift-machine-api
+  annotations:
+    cluster.x-k8s.io/paused: ""
+spec:
+  selector:
+    matchLabels:
+      role: worker
+  unhealthyConditions:
+  - type:    "Ready"
+    status:  "Unknown"
+    timeout: "300s"
+  - type:    "Ready"
+    status:  "False"
+    timeout: "300s"
+  maxUnhealthy: "40%"
+status:
+  currentHealthy: 5
+  expectedMachines: 5
+```
+#### **Important**
+Resume the machine health checks after updating the cluster. To resume the check, remove the pause annotation from the MachineHealthCheck resource by running the following command:
+```bash
+oc -n openshift-machine-api annotate mhc <mhc-name> cluster.x-k8s.io/paused-
+```
+
+## Retrieving a release image digest 
+In order to update a cluster in a **disconnected environment** using the `oc adm upgrade` command with the `--to-image` option, you must reference the sha256 digest that corresponds to your targeted release image
+
+1. Run the following command on a device that is connected to the internet:
+```bash
+oc adm release info -o 'jsonpath={.digest}{"\n"}' quay.io/openshift-release-dev/ocp-release:${OCP_RELEASE_VERSION}-${ARCHITECTURE}
+```
+For `{OCP_RELEASE_VERSION}`, specify the version of OpenShift Container Platform to which you want to update, such as `4.18.30`.  
+For `{ARCHITECTURE}`, specify the architecture of the cluster, such as `x86_64`, `aarch64`, `s390x`, or `ppc64le`.
+```bash
+oc adm release info -o 'jsonpath={.digest}{"\n"}' quay.io/openshift-release-dev/ocp-release:4.18.x-x86_64
+```
+Example output
+```text
+sha256:a8bfba3b6dddd1a2fbbead7dac65fe4fb8335089e4e7cae327f3bad334add31d
+```
+
+## ✅ Find your digest in you local registry (**Nexus**)
+```bash
+oc adm release info \
+  registry.example.com/openshift/release-images:4.18.0-x86_64 \
+  -o 'jsonpath={.digest}{"\n"}'
+```
+Compare the output with the value of:
+```bash
+cat /home/<user>/local-mirror/working-dir/cluster-resources/signature-configmap.yaml`
+```
+
+2. Copy the sha256 digest for use when updating your cluster.
+
+## Updating the disconnected cluster
+#### Prerequisites
+* You mirrored the images for the new release to your registry.
+* You applied the release image signature ConfigMap for the new release to your cluster.
+  ```
+  Note
+  The release image signature config map allows the Cluster Version Operator (CVO) to ensure the integrity of release images by verifying that the actual image signatures match the expected signatures.
+  ```
+* You obtained the sha256 digest for your targeted release image.
+* You installed the OpenShift CLI (`oc`).
+* You paused all `MachineHealthCheck` resources.
+
+#### Procedure
+
+Update the cluster:
+```bash
+oc adm upgrade --allow-explicit-upgrade --to-image <defined_registry>/<defined_repository>@<digest>
+```
+Where:  
+`<defined_registry>`  
+Specifies the name of the mirror registry you mirrored your images to.  
+`<defined_repository>`  
+Specifies the name of the image repository you want to use on the mirror registry.  
+`<digest>`  
+Specifies the sha256 digest for the targeted release image, for example, `sha256:81154f5c03294534e1eaf0319bef7a601134f891689ccede5d705ef659aa8c92`.
+```bash
+oc adm upgrade --allow-explicit-upgrade --to-image=registry.example.com/openshift/release-images@sha256:5e06105a6ba80d04eb5d8d3f9a672fb743ce4710876d99a375c2d9f7b7eaa783 
+```
+
+---
+
+Note  
+See **"Mirroring OpenShift Container Platform images"** to review how your mirror registry and repository names are defined.  
+If you used an `ImageContentSourcePolicy` or `ImageDigestMirrorSet`, you can use the canonical registry and repository names instead of the names you defined. The canonical registry name is `quay.io` and the canonical repository name is `openshift-release-dev/ocp-release`.  
+You can only configure global pull secrets for clusters that have an `ImageContentSourcePolicy`, `ImageDigestMirrorSet`, or `ImageTagMirrorSet` object. You cannot add a pull secret to a project.
+
+---
+
+# Mirrored Configuration
+To check that the mirrored configuration settings are applied, do the following on one of the nodes.
+```bash
+oc get imagecontentsourcepolicy -o yaml
+
+oc get imagedigestmirrorset -o yaml
+```
+```bash
+oc get nodes
+```
+```bash
+oc debug node/<node-name>
+```
+```bash
+chroot /host
+
+cat /etc/containers/registries.conf
+```
+
+---
+
+# 🔍 Monitor the upgrade status
+```bash
+watch oc get clusterversion
+watch oc get clusteroperators
+watch oc get mcp
+watch oc get nodes
+```
+✅ When everything is `Available=True`, `Progressing=False`, `Degraded=False`, the upgrade is complete.
+
