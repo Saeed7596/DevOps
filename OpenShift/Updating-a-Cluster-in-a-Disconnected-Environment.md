@@ -181,8 +181,14 @@ You can use the OpenShift Container Platform web console to create an OpenShift 
 # ✅ 2. Updating a cluster in a disconnected environment without the OpenShift Update Service
 
 ## Prerequisites
-1. Take a full etcd backup
+1. Take a full [etcd backup](https://github.com/Saeed7596/DevOps/blob/main/OpenShift/etcd.md)
 2. You have updated all Operators previously installed through Operator Lifecycle Manager (OLM) to a version that is compatible with your target release. Updating the Operators ensures they have a valid update path when the default OperatorHub catalogs switch from the current minor version to the next during a cluster update. See [Updating installed Operators](https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html-single/operators/#olm-upgrading-operators) for more information on how to check compatibility and, if necessary, update the installed Operators.
+
+# Steps
+1. pause MHC
+2. upgrade cluster
+3. verify MCP Updated
+4. unpause MHC
 
 ## Pausing a MachineHealthCheck resource 
 During the update process, nodes in the cluster might become temporarily unavailable. In the case of worker nodes, the `MachineHealthCheck` resources might identify such nodes as unhealthy and reboot them. **To avoid rebooting** such nodes, pause all the `MachineHealthCheck` resources before updating the cluster.
@@ -194,6 +200,11 @@ oc get machinehealthcheck -n openshift-machine-api
 2. To pause the machine health checks, add the `cluster.x-k8s.io/paused=""` annotation to the `MachineHealthCheck` resource. Run the following command:
 ```bash
 oc -n openshift-machine-api annotate mhc <mhc-name> cluster.x-k8s.io/paused=""
+```
+```bash
+for m in $(oc get mhc -n openshift-machine-api -o name); do
+  oc -n openshift-machine-api annotate $m cluster.x-k8s.io/paused=""
+done
 ```
 The annotated `MachineHealthCheck` resource resembles the following YAML file:
 ```yaml
@@ -244,6 +255,10 @@ sha256:a8bfba3b6dddd1a2fbbead7dac65fe4fb8335089e4e7cae327f3bad334add31d
 ```
 
 ## ✅ Find your digest in you local registry (**Nexus**)
+```bash
+cp nexus-ca.pem /etc/pki/ca-trust/source/anchors/
+update-ca-trust extract
+```
 ```bash
 oc adm release info \
   registry.example.com/openshift/release-images:4.18.0-x86_64 \
@@ -322,5 +337,12 @@ watch oc get clusteroperators
 watch oc get mcp
 watch oc get nodes
 ```
+```bash
+oc get mhc -n openshift-machine-api
+oc get machines -n openshift-machine-api
+```
 ✅ When everything is `Available=True`, `Progressing=False`, `Degraded=False`, the upgrade is complete.
 
+```bash
+oc logs -n openshift-cluster-version deployment/cluster-version-operator -f
+```
