@@ -45,6 +45,21 @@ Before proceeding with the installation, you must create an account on [Red Hat'
    # tar -xvf oc.tar.gz -C /usr/local/bin/
    # chmod +x /usr/local/bin/oc
    ```
+   Enabling tab completion 
+   ```sh
+   oc completion bash > oc_bash_completion
+
+   sudo cp oc_bash_completion /etc/bash_completion.d/
+   ```
+   ```sh
+   cat >>~/.zshrc<<EOF
+   if [ $commands[oc] ]; then
+     source <(oc completion zsh)
+     compdef _oc oc
+   fi
+   EOF
+   ```
+   Tab completion is enabled when you open a new terminal.
 2. **Deploy OpenShift Sandbox (Lightweight test environment)**:
    ```sh
    curl -LO https://developers.redhat.com/content-gateway/rest/mirror/pub/openshift-v4/clients/crc/latest/crc-linux-amd64.tar.xz
