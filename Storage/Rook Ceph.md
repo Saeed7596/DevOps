@@ -38,11 +38,13 @@ ls -l /dev/disk/by-path/
     nodes:
       - name: <node-name>
         devices:
-          - name: "/dev/disk/by-id/ata-ST4000DM004-XXXX" # devices can be specified using full udev paths
+          - name: "/dev/disk/by-path/pci-0000:02:03-scsi-0:0:0:0" # devices can be specified using full udev paths
+          # - name: "/dev/disk/by-id/ata-ST4000DM004-XXXX" # devices can be specified using full udev paths
 ```
 ```bash
 kubectl create -f my-cluster.yaml
 ```
+Verify cepfcluster
 ```bash
 kubectl -n rook-ceph get cephcluster 
 ```
