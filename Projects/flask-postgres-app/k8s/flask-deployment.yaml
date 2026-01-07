@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: flask-app
-        image: registry.sarvrayaneh.com/test/flask-app:v1
+        image: registry.example.com/test/flask-app:v1
         imagePullPolicy: Always
         resources:
           requests:

@@ -63,10 +63,10 @@ Sample
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: mellat-test
+  name: test
   namespace: openshift-gitops
 spec:
-  project: mellat-test-proj # create AppProject in argoCD
+  project: test-proj # create AppProject in argoCD
   source:
     repoURL: 'ssh://git@gitlab.example.com:2222/user/test.git'
     targetRevision: main

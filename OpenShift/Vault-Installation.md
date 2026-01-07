@@ -501,7 +501,7 @@ metadata:
   namespace: default
 spec:
   secretName: demo-route-tls           # cert-manager will create this Secret
-  commonName: demo.apps.openshift.sarvrayaneh.com
+  commonName: demo.apps.openshift.example.com
   dnsNames:
     - demo.apps.openshift.example.com
   issuerRef:
@@ -510,7 +510,7 @@ spec:
 ```
 ```bash
 oc apply -f certificate.yaml
-oc wait -n tejarat certificate/demo-route-cert --for=condition=Ready --timeout=2m
+oc wait -n default certificate/demo-route-cert --for=condition=Ready --timeout=2m
 ```
 #### Put the issued PEMs into the Route
 

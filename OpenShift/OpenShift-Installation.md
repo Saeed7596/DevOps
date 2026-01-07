@@ -324,9 +324,9 @@ oc mirror -c <image_set_config_yaml> --from file://<oc_mirror_workspace_path> do
 Before creating VM and Google Storage Bucket, you must enable API s that are intended for allowing communication between GCP resources inside your project!**
 ```bash
 cd local-mirror/
-gsutil cp mirror_000001.tar gs://sarv-dev-ops-bucket-01/
+gsutil cp mirror_000001.tar gs://dev-ops-bucket-01/
 tar -czvf working-dir.tar.gz working-dir/
-gsutil cp working-dir.tar.gz gs://sarv-dev-ops-bucket-01/
+gsutil cp working-dir.tar.gz gs://dev-ops-bucket-01/
 ```
 ### Partially Disconnected Mode
 If you have a system that has access to the Internet and the target registry:
