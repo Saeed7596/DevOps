@@ -132,3 +132,40 @@ oc get applications.argoproj.io -n openshift-gitops
       imagePullSecrets:
         - name: nexus
 ```
+
+---
+
+# ArgoCD Image Updater
+Use this to automate the image tag manifest file in your Gitlab.
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: test
+  namespace: openshift-gitops
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: frontend=registry.example.com/frontend:latest
+    argocd-image-updater.argoproj.io/frontend.update-strategy: latest
+    argocd-image-updater.argoproj.io/write-back-method: git
+    argocd-image-updater.argoproj.io/write-back-repository: https://gitlab.example.com/user/test.git
+    argocd-image-updater.argoproj.io/frontend.git-branch: main
+    argocd-image-updater.argoproj.io/frontend.force-update: "true"
+    argocd-image-updater.argoproj.io/write-back-target: kustomization
+spec:
+  project: default # create AppProject in argoCD
+  source:
+    repoURL: https://gitlab.example.com/user/test.git
+    targetRevision: main
+    path: k8s
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: namespace-name
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - Validate=true
+```
