@@ -605,6 +605,9 @@ This method ensures that all old registry entries are added to the new files and
 ```bash
 vimdiff old.yaml new.yaml +"windo diffget!" +wq
 ```
+```bash
+diff -u old.yaml new.yaml
+```
 4. Apply the new one:
 ```bash
 oc apply -f <path_to_new_oc-mirror_workspace>/working-dir/cluster-resources/
