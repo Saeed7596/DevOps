@@ -109,8 +109,33 @@ ls /home/<user>/local-mirror/working-dir/cluster-resources/
 
 cc-redhat-operator-index-v4-18.yaml  cs-redhat-operator-index-v4-18.yaml  idms-oc-mirror.yaml  itms-oc-mirror.yaml  signature-configmap.json  signature-configmap.yaml
 ```
+
+### **Note**: 
+* If wants to apply new **cluster-resources**
+* you should keep the old one `/working-dir/cluster-resources/*`
+* important file is `ImageDigestMirrorSet` (IDMS) - `idms-oc-mirror.yaml`
+* Before apply the new one you should merge it with the old one.
+* then apply!
+1. Create a backup from old version:
 ```bash
-oc apply -f <path_to_oc-mirror_workspace>/working-dir/cluster-resources
+mkdir -p ~/ocp<version>-backup/cluster-resources
+
+cp -r <path_to_old_oc-mirror_workspace>/working-dir/cluster-resources/* ~/ocp<version>-backup/cluster-resources
+
+cat <path_to_old_oc-mirror_workspace>/working-dir/cluster-resources/idms-oc-mirror.yaml
+```
+2. Find Diff:
+```bash
+diff -y ~/ocp<version>-backup/cluster-resourcesidms-oc-mirror.yaml \
+     <path_to_new_oc-mirror_workspace>/working-dir/cluster-resources/idms-oc-mirror.yaml
+```
+3. Merge!
+```bash
+nano <path_to_new_oc-mirror_workspace>/working-dir/cluster-resources/idms-oc-mirror.yaml
+```
+4. Apply the new one:
+```bash
+oc apply -f <path_to_new_oc-mirror_workspace>/working-dir/cluster-resources/
 ```
 
 ---
