@@ -133,6 +133,10 @@ diff -y ~/ocp<version>-backup/cluster-resourcesidms-oc-mirror.yaml \
 ```bash
 nano <path_to_new_oc-mirror_workspace>/working-dir/cluster-resources/idms-oc-mirror.yaml
 ```
+This method ensures that all old registry entries are added to the new files and nothing is removed from the new files.
+```bash
+vimdiff old.yaml new.yaml +"windo diffget!" +wq
+```
 4. Apply the new one:
 ```bash
 oc apply -f <path_to_new_oc-mirror_workspace>/working-dir/cluster-resources/
