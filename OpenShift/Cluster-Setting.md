@@ -40,42 +40,6 @@ spec:
 
 ---
 
-# CronJob fot etcd ❗❗❗
-```bash
-apiVersion: batch/v1
-kind: CronJob
-metadata:
-  name: etcd-snapshot
-  namespace: openshift-etcd
-spec:
-  schedule: "0 */6 * * *"
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          serviceAccountName: etcd
-          containers:
-          - name: snapshot
-            image: registry.access.redhat.com/ubi8/etcd:latest
-            command:
-            - /bin/sh
-            - -c
-            - |
-              ETCDCTL_API=3 etcdctl snapshot save /backup/snap-$(date +%Y%m%d%H%M).db \
-                --endpoints=https://127.0.0.1:2379 --cacert=/etc/etcd/ca.crt \
-                --cert=/etc/etcd/etcd-client.crt --key=/etc/etcd/etcd-client.key
-            volumeMounts:
-            - mountPath: /backup
-              name: backup
-          restartPolicy: OnFailure
-          volumes:
-          - name: backup
-            persistentVolumeClaim:
-              claimName: etcd-backup-pvc
-```
-
----
-
 ## [Scale Up Node Resource](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/updating_clusters/performing-a-cluster-update#updating-virtual-hardware-on-vsphere_updating-hardware-on-nodes-running-in-vsphere)
 ```bash
 oc get nodes
@@ -137,7 +101,7 @@ data:
 ---
 
 ## Enable alerts custom
-```bash
+```yaml
 alertmanager:
   enabled: true
   nodeSelector:
@@ -164,3 +128,39 @@ thanos-ruler-user-workload-1           3/3     Running       0          3h
 ```
 
 ---
+
+---
+
+# CronJob fot etcd ❗❗❗
+```bash
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: etcd-snapshot
+  namespace: openshift-etcd
+spec:
+  schedule: "0 */6 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: etcd
+          containers:
+          - name: snapshot
+            image: registry.access.redhat.com/ubi8/etcd:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              ETCDCTL_API=3 etcdctl snapshot save /backup/snap-$(date +%Y%m%d%H%M).db \
+                --endpoints=https://127.0.0.1:2379 --cacert=/etc/etcd/ca.crt \
+                --cert=/etc/etcd/etcd-client.crt --key=/etc/etcd/etcd-client.key
+            volumeMounts:
+            - mountPath: /backup
+              name: backup
+          restartPolicy: OnFailure
+          volumes:
+          - name: backup
+            persistentVolumeClaim:
+              claimName: etcd-backup-pvc
+```
