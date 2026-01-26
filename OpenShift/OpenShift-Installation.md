@@ -578,7 +578,9 @@ After you have mirrored your image set to the mirror registry, you must apply th
 oc apply -f <path_to_oc-mirror_workspace>/working-dir/cluster-resources
 ```
 
-### **Note**: 
+---
+
+### **Note**: CAN NOT MERGE SKIP THIS SECTION❗❗❗
 * If wants to apply new **cluster-resources**
 * you should keep the old one `/working-dir/cluster-resources/*`
 * important file is `ImageDigestMirrorSet` (IDMS) - `idms-oc-mirror.yaml`
@@ -612,6 +614,8 @@ diff -u old.yaml new.yaml
 ```bash
 oc apply -f <path_to_new_oc-mirror_workspace>/working-dir/cluster-resources/
 ```
+
+---
 
 ### Verification
 ```bash
@@ -735,7 +739,7 @@ oc apply -f ./99-worker-chrony.yaml
 
 ---
 
-# Infra Node
+# [Infra Node](https://github.com/Saeed7596/DevOps/blob/main/OpenShift/Infra-Node.md)
 * Labeled with `node-role.kubernetes.io/infra`
 
 ---
