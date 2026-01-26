@@ -346,6 +346,9 @@ watch oc get nodes
 ```
 ```bash
 oc get mhc -n openshift-machine-api
+
+oc -n openshift-machine-api annotate mhc <mhc-name> cluster.x-k8s.io/paused-
+
 oc get machines -n openshift-machine-api
 ```
 ✅ When everything is `Available=True`, `Progressing=False`, `Degraded=False`, the upgrade is complete.
