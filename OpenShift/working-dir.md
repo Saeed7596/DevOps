@@ -3,7 +3,13 @@
 cd ocp4-18/working-dir/cluster-resources/
 
 ls
-cc-redhat-operator-index-v4-18.yaml  cs-redhat-operator-index-v4-18.yaml  idms-oc-mirror.yaml  itms-oc-mirror.yaml  signature-configmap.json  signature-configmap.yaml
+cc-redhat-operator-index-v4-18.yaml
+cs-redhat-operator-index-v4-18.yaml
+idms-oc-mirror.yaml
+itms-oc-mirror.yaml
+signature-configmap.json
+signature-configmap.yaml
+updateService.yaml
 ```
 
 ---
