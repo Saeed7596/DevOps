@@ -181,7 +181,11 @@ imageDigestSources:
   - docker.example.com/<local_repository_name>/release
   source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
 ```
-
+Create a backup:
+```bash
+cp -r <installation_directory> install-dir-backup-$(date +%Y%m%d-%H%M)
+```
+Create manidest files:
 ```bash
 openshift-install create manifests --dir <installation_directory>
 ```
