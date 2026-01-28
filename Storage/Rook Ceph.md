@@ -206,10 +206,28 @@ kubectl create -f my-storageclass.yaml
 
 ---
 
+# Provision Block Storage
+```bash
+kubectl create -f deploy/examples/csi/rbd/storageclass.yaml
+```
+
+---
+
 ## [Openshift](https://rook.io/docs/rook/latest-release/Getting-Started/ceph-openshift/)
 ```bash
-oc create -f crds.yaml -f common.yaml -f csi-operator.yaml
+oc create -f crds.yaml -f common.yaml 
+# in openshift don't apply this file
+# oc create -f csi-operator.yaml
+
+# After apply this file, the csi must be created.
 oc create -f operator-openshift.yaml
+# Verify the csi
+oc -n rook-ceph get pods | grep csi
+# Output:
+# rook-ceph-csi-rbd-provisioner-*
+# rook-ceph-csi-cephfs-provisioner-*
+# rook-ceph-csi-rbd-node-*
+# rook-ceph-csi-cephfs-node-*
 ```
 ```bash
 cp cluster.yaml my-cluster.yaml
