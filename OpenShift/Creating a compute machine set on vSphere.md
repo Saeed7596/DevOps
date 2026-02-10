@@ -125,6 +125,25 @@ oc get ipaddressclaim -n openshift-machine-api
 
 ---
 
+# Seprate Teams
+1. Label the node
+```bash
+oc label node <node_name> node-role.kubernetes.io/team-a=""
+```
+2. Add `nodeAffinity` in manifest files
+```yaml
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node-role.kubernetes.io/team-a
+            operator: Exists
+```
+
+---
+
 # [Control Plane MachineSets](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/machine_management/managing-control-plane-machines#cpmso-about)
 
 ---
