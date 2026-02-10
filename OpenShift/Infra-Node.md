@@ -1,3 +1,5 @@
+# [Good Docs about infra](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/machine_management/creating-infrastructure-machinesets)
+
 # Typical Workloads for Infra Nodes in OpenShift
 
 Infra nodes are dedicated nodes designed to isolate critical cluster services and network-facing workloads from general worker workloads.  
