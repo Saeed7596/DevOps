@@ -141,6 +141,10 @@ spec:
           - key: node-role.kubernetes.io/team-a
             operator: Exists
 ```
+3. Verify (the pods of team-a must be in selected nodes)
+```bash
+oc get pods -n <team-a namespace> -o wide
+```
 
 ---
 
