@@ -25,11 +25,12 @@ Follow this [Link](https://docs.redhat.com/en/documentation/openshift_container_
 
 ## Network Connetion
 | Source        | Destination |
-|---------------|-----------------------------------------------------------------------------------------|
-| Client (jump) | Access to the load balancer, like `haproxy01`, `haproxy02` on ports: `443`, `6443`      | 
-| WAF           | Access to `infra nodes`                                                                 |
-| LDAP          | `master nodes` & services like: `gitlab`, `nexus` on ports: `389`, `636`                |
-| APP DataBase  | Access to app `worker nodes` or set `EgressIP` for namespace                            |
+|---------------|-------------------------------------------------------------------------------------------|
+| Client (jump) | Access to the load balancer, like `haproxy01`, `haproxy02` on ports: `443`, `6443`        | 
+| WAF           | Access to `infra nodes`                                                                   |
+| LDAP          | `master nodes` & services like: `gitlab`, `nexus` on ports: `389`, `636`                  |
+| APP DataBase  | Access to app `worker nodes` or set `EgressIP` for namespace                              |
+| Operators     | Access to `infra nodes` - like ` Red Hat OpenShift Logging Operator` for sent to `Splunk` |
 
 ---
 
