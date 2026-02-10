@@ -356,3 +356,28 @@ oc get machines -n openshift-machine-api
 ```bash
 oc logs -n openshift-cluster-version deployment/cluster-version-operator -f
 ```
+
+---
+
+# Update Note❗
+1. 1. Lock the machine status.
+```bash
+oc -n openshift-machine-api annotate mhc <mhc-name> cluster.x-k8s.io/paused=""
+```
+2. Backup list (required)
+```bash
+oc get machine -n openshift-machine-api -o wide > machines.before
+oc get ipaddressclaim -n openshift-machine-api -o yaml > ipclaims.before.yaml
+oc get ipaddress -n openshift-machine-api -o yaml > ipaddresses.before.yaml
+```
+3. Verify that no Machine is being replaced.
+```bash
+oc get machine -n openshift-machine-api
+oc get events -n openshift-machine-api | grep -i delete
+```
+4. What to check after upgrading?
+```bash
+oc get nodes
+oc get machine -n openshift-machine-api
+oc get ipaddressclaim -n openshift-machine-api
+```
