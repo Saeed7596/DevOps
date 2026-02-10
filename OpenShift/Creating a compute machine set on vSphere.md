@@ -122,3 +122,11 @@ oc get nodes
 oc get machine -n openshift-machine-api
 oc get ipaddressclaim -n openshift-machine-api
 ```
+
+---
+
+# [Control Plane MachineSets](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/machine_management/managing-control-plane-machines#cpmso-about)
+
+---
+
+# [Update Red Hat Core OS](https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/machine_configuration/mco-update-boot-images)
