@@ -218,7 +218,7 @@ oc rsh deployments/minio-server mc alias set myminio http://localhost:9000 minio
 # Create an access-policy file
 $ cat >bucket-access-policy.json <<EOF
 {
-    "Version": "2026-02-21",
+    "Version": "2012-10-17",
     "Statement": [
         {
              "Action": ["s3:*"],
