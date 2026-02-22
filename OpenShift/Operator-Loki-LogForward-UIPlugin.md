@@ -517,7 +517,7 @@ spec:
           token:
             key: hecToken
             secretName: vector-splunk-secret
-        url: 172.26.103.203:8088
+        url: https://172.26.103.203:8088
       type: splunk
   pipelines:
     - inputRefs:
