@@ -486,6 +486,15 @@ collector-scv4z   1/1     Running   0          3d19h
 ```
 # ClusterLogForwarder 
 ```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vector-splunk-secret
+  namespace: openshift-logging
+stringData:
+  hecToken: 719vbj-7166jj-...
+```
+```yaml
 # first install cluster logging operator
 apiVersion: observability.openshift.io/v1
 kind: ClusterLogForwarder
@@ -533,8 +542,6 @@ spec:
   serviceAccount:
     name: collector
 ```
-
----
 
 ---
 
