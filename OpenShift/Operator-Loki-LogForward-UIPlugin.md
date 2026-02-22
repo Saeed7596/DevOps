@@ -485,14 +485,8 @@ collector-s858j   1/1     Running   0          3d19h
 collector-scv4z   1/1     Running   0          3d19h
 ```
 # ClusterLogForwarder 
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: vector-splunk-secret
-  namespace: openshift-logging
-stringData:
-  hecToken: 719vbj-7166jj-...
+```bash
+oc -n openshift-logging create secret generic vector-splunk-secret --from-literal hecToken=<HEC_Token>
 ```
 ```yaml
 # first install cluster logging operator
