@@ -488,6 +488,10 @@ collector-scv4z   1/1     Running   0          3d19h
 ---
 
 # [ClusterLogForwarder](https://docs.redhat.com/en/documentation/red_hat_openshift_logging/6.3/html/configuring_logging/configuring-log-forwarding#logging-forward-splunk-http-event-collector_configuring-log-forwarding) 
+
+# Other Helpful Links:
+* [OpenShift Log Forwarding to Splunk](https://community.splunk.com/t5/Dashboards-Visualizations/OpenShift-Log-Forwarding-to-Splunk/m-p/635672)
+
 ```bash
 oc -n openshift-logging create secret generic vector-splunk-secret --from-literal hecToken=<HEC_Token>
 ```
