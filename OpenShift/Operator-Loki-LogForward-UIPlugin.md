@@ -484,7 +484,10 @@ collector-fnbgr   1/1     Running   0          3d19h
 collector-s858j   1/1     Running   0          3d19h
 collector-scv4z   1/1     Running   0          3d19h
 ```
-# ClusterLogForwarder 
+
+---
+
+# [ClusterLogForwarder](https://docs.redhat.com/en/documentation/red_hat_openshift_logging/6.3/html/configuring_logging/configuring-log-forwarding#logging-forward-splunk-http-event-collector_configuring-log-forwarding) 
 ```bash
 oc -n openshift-logging create secret generic vector-splunk-secret --from-literal hecToken=<HEC_Token>
 ```
