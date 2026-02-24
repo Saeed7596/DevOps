@@ -30,7 +30,8 @@ Follow this [Link](https://docs.redhat.com/en/documentation/openshift_container_
 | WAF           | Access to `infra nodes`                                                                   |
 | LDAP          | `master nodes` & services like: `gitlab`, `nexus` on ports: `389`, `636`                  |
 | APP DataBase  | Access to app `worker nodes` or set `EgressIP` for namespace                              |
-| Operators     | Access to `infra nodes` - like ` Red Hat OpenShift Logging Operator` for sent to `Splunk` |
+| Operators     | Access to `infra nodes`                                                                   |
+| Splunk        | Access to `all ndoes` - `Red Hat OpenShift Logging Operator` for sent to `Splunk`         |
 
 ---
 
