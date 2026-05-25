@@ -28,6 +28,10 @@ Navigate to the directory containing the transferred `.rpm` files and run the lo
 cd /path/to/extracted/rhel9-updates
 sudo dnf localinstall *.rpm -y
 ```
+ignore repository 
+```bash
+sudo dnf install --disablerepo="*" ./*.rpm --allowerasing -y
+```
 
 ---
 
