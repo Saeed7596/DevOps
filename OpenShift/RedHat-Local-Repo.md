@@ -25,6 +25,7 @@ tar -czvf rhel9-updates.tar.gz /tmp/rhel9-updates
 ### Step 3: Install Updates (In the Air-Gapped Environment)
 Navigate to the directory containing the transferred `.rpm` files and run the local installation command:
 ```bash
+sudo tar -xzvf rhel9-updates.tar.gz -C /path/to/extracted/rhel9-updates
 cd /path/to/extracted/rhel9-updates
 sudo dnf localinstall *.rpm -y
 ```
