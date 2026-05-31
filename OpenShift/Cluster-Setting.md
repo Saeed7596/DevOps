@@ -129,6 +129,9 @@ thanos-ruler-user-workload-1           3/3     Running       0          3h
 
 ---
 
+# [AlertManager](https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/postinstallation_configuration/configuring-alert-notifications)
+
+
 ---
 
 # CronJob fot etcd ❗❗❗
