@@ -39,6 +39,8 @@
    - [StorageClass RBD](#storageclass-rbd)
 8. [Verification](#8-verification)
 9. [Troubleshooting](#9-troubleshooting)
+10. [Ceph Dashboard](#10-ceph-dashboard)
+11. [Cleanup](#11-cleanup)
 
 ---
 
@@ -251,6 +253,14 @@ oc get crd | grep csi.ceph.io
 # Expected:
 # cephconnections.csi.ceph.io
 # operatorconfigs.csi.ceph.io
+```
+```bash
+oc -n rook-ceph get pods | grep csi
+# Expected:
+# rook-ceph-csi-rbd-provisioner-*
+# rook-ceph-csi-cephfs-provisioner-*
+# rook-ceph-csi-rbd-node-*
+# rook-ceph-csi-cephfs-node-*
 ```
 
 ---
@@ -753,6 +763,71 @@ oc create -f toolbox.yaml
 oc apply  -f storageclass-rbd.yaml      # includes CephBlockPool
 # → patch StorageProfile for OCP-Virt
 ```
+
+---
+
+## 10. [Ceph Dashboard](https://rook.io/docs/rook/latest-release/Storage-Configuration/Monitoring/ceph-dashboard)
+
+### Check the dashboard service
+```bash
+oc get svc -n rook-ceph | grep dashboard
+
+# You will see something like:
+rook-ceph-mgr-dashboard   ClusterIP   172.30.x.x   <none>   8443/TCP
+```
+By default it is `ClusterIP` — not accessible from outside. You need to expose it.
+### Create OpenShift Route
+```bash
+# Create a route to expose the dashboard
+oc create route passthrough rook-ceph-dashboard \
+  --service=rook-ceph-mgr-dashboard \
+  --namespace=rook-ceph \
+  --port=8443
+
+# Get the route URL
+oc get route rook-ceph-dashboard -n rook-ceph
+
+# Expected:
+NAME                   HOST
+rook-ceph-dashboard    rook-ceph-dashboard-rook-ceph.apps.ocp-bm.example.com
+```
+### Open in browser:
+[https://rook-ceph-dashboard-rook-ceph.apps.ocp-bm.example.com](https://rook-ceph-dashboard-rook-ceph.apps.ocp-bm.example.com)
+
+### Get the Dashboard Password
+The admin password is stored in a secret:
+```bash
+# Get the password
+oc get secret rook-ceph-dashboard-password \
+  -n rook-ceph \
+  -o jsonpath='{.data.password}' | base64 -d && echo
+```
+```bash
+Username: admin
+Password: <output from above command>
+```
+
+### Verify Dashboard is Enabled in CephCluster
+If the route returns nothing, confirm dashboard is enabled:
+```bash
+oc get cephcluster rook-ceph -n rook-ceph \
+  -o jsonpath='{.spec.dashboard}'
+```
+Expected:
+```json
+json{"enabled":true,"ssl":true}
+```
+If not enabled, patch it:
+```bash
+oc patch cephcluster rook-ceph -n rook-ceph \
+  --type=merge \
+  -p '{"spec":{"dashboard":{"enabled":true,"ssl":true}}}'
+```
+
+---
+
+### 11. [Cleanup](https://rook.io/docs/rook/latest-release/Getting-Started/ceph-teardown/)
+If you want to cleanup just follow the documents.
 
 ---
 
