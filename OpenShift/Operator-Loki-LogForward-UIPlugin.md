@@ -607,7 +607,7 @@ spec:
           token:
             from: serviceAccount
         target:
-          name: lokistack-mellat
+          name: lokistack-example
           namespace: openshift-logging
       tls:
         ca:
