@@ -339,7 +339,7 @@ oc delete ns $MINIO_NAMESPACE
 apiVersion: loki.grafana.com/v1
 kind: LokiStack
 metadata:
-  name: lokistack-mellat
+  name: lokistack-example
   namespace: openshift-logging
   labels:
     app: logging
@@ -352,6 +352,8 @@ spec:
         ingestionBurstSize: 16
       queries:
         queryTimeout: 3m
+      retention: 
+        days: 180
   managementState: Managed
   size: 1x.small
   storage:
@@ -496,7 +498,6 @@ collector-scv4z   1/1     Running   0          3d19h
 oc -n openshift-logging create secret generic vector-splunk-secret --from-literal hecToken=<HEC_Token>
 ```
 ```yaml
-# first install cluster logging operator
 apiVersion: observability.openshift.io/v1
 kind: ClusterLogForwarder
 metadata:
@@ -507,6 +508,37 @@ spec:
     tolerations:
       - effect: NoSchedule
         key: node-role.kubernetes.io/infra
+    filters:
+      - drop:
+          - test: 
+            - field: .log_type
+              notMatches: ^application$
+        name: keep-app-logs
+        type: drop
+      - drop:
+          - test: 
+            - field: .kubernetes.namespace
+              notMatches: ^(wallet|wallet-samt)$
+        name: keep-wallet-namespaces
+        type: drop
+      - drop:
+          - test: 
+            - field: .kubernetes.pod_name
+              matches: ^dispatcher$
+            - field: .message
+              notMatches: '"type"\s*:\s*"DISPATCHER_LOG"'
+        name: keep-dispatcher-logs
+        type: drop
+      - drop:
+          - test: 
+            - field: .level
+              matches: ^(INFO|DEBUG|WARN|UNKNOWN)$
+            - field: .severity
+              matches: ^(INFO|DEBUG|WARN|UNKNOWN)$
+            - field: .structured.level
+              matches: ^(INFO|DEBUG|WARN|UNKNOWN)$
+        name: drop-log-level-severity
+        type: drop
   managementState: Managed
   outputs:
     - lokiStack:
@@ -514,9 +546,13 @@ spec:
           token:
             from: serviceAccount
         target:
-          name: lokistack-mellat
+          name: lokistack-example
           namespace: openshift-logging
       name: default-lokistack
+      tls:
+        ca:
+          configMapName: openshift-service-ca.crt
+          key: service-ca.crt
       type: lokiStack
     - name: splunk-receiver
       splunk:
@@ -525,9 +561,16 @@ spec:
             key: hecToken
             secretName: vector-splunk-secret
         url: https://172.26.103.203:8088
+      tls:
+        insecureSkipVerify: true
       type: splunk
   pipelines:
-    - inputRefs:
+    - filterRefs:
+        - keep-app-logs
+        - keep-wallet-namespaces
+        - keep-dispatcher-logs
+        - drop-log-level-severity
+      inputRefs:
         - application
         - audit
         - infrastructure
@@ -562,6 +605,6 @@ spec:
         key: node-role.kubernetes.io/infra
   logging:
     lokiStack:
-      name: lokistack-mellat
+      name: lokistack-example
   type: Logging
 ```
