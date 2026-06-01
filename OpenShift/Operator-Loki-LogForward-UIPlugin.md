@@ -639,7 +639,7 @@ spec:
       inputRefs:
         - wallet-logs
       filterRefs:
-        - namespace-gate
+        - namespace-gate            # must be first — narrows scope before other filters
         - dispatcher-content-gate
         - severity-gate
       outputRefs:
