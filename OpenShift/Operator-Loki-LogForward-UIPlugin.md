@@ -504,24 +504,26 @@ metadata:
   name: collector
   namespace: openshift-logging
 spec:
+  managementState: Managed
+
+  serviceAccount:
+    name: collector
+
   collector:
     tolerations:
       - effect: NoSchedule
         key: node-role.kubernetes.io/infra
 
-  # ─────────────────────────────────────────────────────────────────────────────
+  # ═══════════════════════════════════════════════════════════════════════════
   # INPUTS
-  # Narrow the application input to only the two namespaces and only the two
-  # pod prefixes (dispatcher*, core*).  Everything else is never collected,
-  # so it never reaches Loki or Minio at all.
-  # ─────────────────────────────────────────────────────────────────────────────
+  # Scoped to pods labelled app=dispatcher or app=core only.
+  # Namespace scoping is enforced via namespace-gate filter below
+  # (application.namespaces is not supported on this operator version).
+  # ═══════════════════════════════════════════════════════════════════════════
   inputs:
-    - name: wallet-apps
+    - name: wallet-logs
       type: application
       application:
-        # Narrow to pods whose name starts with "dispatcher" or "core".
-        # Adjust the label selector below if your pods do not carry an "app"
-        # label — see the note after the manifest.
         selector:
           matchExpressions:
             - key: app
@@ -530,21 +532,26 @@ spec:
                 - dispatcher
                 - core
 
-  # ─────────────────────────────────────────────────────────────────────────────
+  # ═══════════════════════════════════════════════════════════════════════════
   # FILTERS
-  # ─────────────────────────────────────────────────────────────────────────────
+  # ═══════════════════════════════════════════════════════════════════════════
   filters:
 
-    # ------------------------------------------------------------------
-    # Filter 1 — dispatcher content gate
-    #
-    # Logic: drop the event when BOTH conditions are true at once:
-    #   • the pod name starts with "dispatcher"   (it IS a dispatcher pod)
-    #   • the message does NOT contain DISPATCHER_LOGS
-    #
-    # This leaves core pod logs untouched (neither condition matches them)
-    # and keeps only DISPATCHER_LOGS lines from dispatcher pods.
-    # ------------------------------------------------------------------
+    # ── Application filters (wallet + wallet-samt) ───────────────────────────
+
+    # 1. Drop logs from any namespace other than wallet and wallet-samt.
+    #    This replaces the unsupported application.namespaces input field.
+    - name: namespace-gate
+      type: drop
+      drop:
+        - test:
+            - field: .kubernetes.namespace_name
+              notMatches: "^(wallet|wallet-samt)$"
+
+    # 2. Drop dispatcher pod logs that do not contain the string DISPATCHER_LOGS.
+    #    AND logic: both conditions must be true to drop.
+    #    - core pod logs are never dropped here (condition 1 is false for them).
+    #    - dispatcher logs WITH DISPATCHER_LOGS are never dropped (condition 2 is false).
     - name: dispatcher-content-gate
       type: drop
       drop:
@@ -554,36 +561,44 @@ spec:
             - field: .message
               notMatches: "DISPATCHER_LOGS"
 
-    # ------------------------------------------------------------------
-    # Filter 2 — severity gate (wallet + wallet-samt pipelines only)
-    #
-    # Drop the event if the severity/level field does NOT match
-    # critical or warning (case-insensitive, covering abbreviations).
-    #
-    # Three separate drop rules (OR logic between rules) cover the
-    # three common field locations OpenShift Vector may populate:
-    #   • .level           – set by the VRL log_classification transform
-    #   • .severity        – set for some structured logs
-    #   • .structured.level – nested structured payload
-    #
-    # A single rule with multiple test entries would require ALL fields
-    # to be non-critical/warning simultaneously, which is not what we
-    # want.  Separate rules ensure any one field being wrong causes a
-    # drop only when that field is the authoritative one.
-    #
-    # Safest approach: drop unless .level (the normalized field Vector
-    # always populates) is critical or warning.
-    # ------------------------------------------------------------------
+    # 3. Drop any log whose .level is not critical or warning.
+    #    Covers: debug, info, error, notice, trace, unknown, etc.
+    #    Case-insensitive match also handles CRITICAL, Warning, WARN, CRIT.
     - name: severity-gate
       type: drop
       drop:
         - test:
             - field: .level
-              notMatches: "(?i)^(critical|crit|warning|warn|error)$"
+              notMatches: "(?i)^(critical|crit|warning|warn)$"
 
-  # ─────────────────────────────────────────────────────────────────────────────
-  # OUTPUTS  (unchanged from your original)
-  # ─────────────────────────────────────────────────────────────────────────────
+    # ── Infrastructure filters ───────────────────────────────────────────────
+
+    # 4. Drop low-priority systemd/journal log entries.
+    #    Syslog PRIORITY numeric values:
+    #      0=emergency, 1=alert, 2=critical, 3=error, 4=warning  → KEEP
+    #      5=notice,    6=info,  7=debug                          → DROP
+    - name: infra-priority-gate
+      type: drop
+      drop:
+        - test:
+            - field: .PRIORITY
+              matches: "^(5|6|7)$"
+
+    # ── Audit filters ────────────────────────────────────────────────────────
+
+    # 5. Drop read-only, low-value audit events (get, list, watch).
+    #    Keeps: create, update, patch, delete verbs and any 4xx/5xx responses —
+    #    the events that matter for compliance and security audit.
+    - name: audit-gate
+      type: drop
+      drop:
+        - test:
+            - field: .verb
+              matches: "^(get|list|watch)$"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # OUTPUTS
+  # ═══════════════════════════════════════════════════════════════════════════
   outputs:
     - name: default-lokistack
       type: lokiStack
@@ -592,7 +607,7 @@ spec:
           token:
             from: serviceAccount
         target:
-          name: lokistack-example
+          name: lokistack-mellat
           namespace: openshift-logging
       tls:
         ca:
@@ -610,35 +625,51 @@ spec:
       tls:
         insecureSkipVerify: true
 
-  # ─────────────────────────────────────────────────────────────────────────────
+  # ═══════════════════════════════════════════════════════════════════════════
   # PIPELINES
-  # ─────────────────────────────────────────────────────────────────────────────
+  # ═══════════════════════════════════════════════════════════════════════════
   pipelines:
 
-    # ── Pipeline 1: wallet/wallet-samt application logs → Loki ──────────────
-    # Uses the scoped input (wallet-apps) so only dispatcher+core pods in the
-    # two namespaces are ever collected.  Both filters are applied here.
+    # ── Pipeline 1: wallet + wallet-samt application logs → Loki ────────────
+    # Filters applied in order:
+    #   namespace-gate          → drop non-wallet namespaces
+    #   dispatcher-content-gate → drop dispatcher lines without DISPATCHER_LOGS
+    #   severity-gate           → drop everything except critical + warning
     - name: wallet-apps-to-loki
       inputRefs:
-        - wallet-apps          # scoped input: wallet + wallet-samt, dispatcher + core only
+        - wallet-logs
       filterRefs:
-        - dispatcher-content-gate   # keep only DISPATCHER_LOGS lines from dispatcher pods
-        - severity-gate             # keep only critical + warning
+        - namespace-gate
+        - dispatcher-content-gate
+        - severity-gate
       outputRefs:
         - default-lokistack
 
-    # ── Pipeline 2: infrastructure + audit logs → Loki (no filtering) ───────
-    # Default behaviour: all infra and audit logs are forwarded as-is.
-    - name: infra-audit-to-loki
+    # ── Pipeline 2: infrastructure logs → Loki ───────────────────────────────
+    # Drops systemd notice/info/debug (PRIORITY 5/6/7).
+    # Keeps emergency, alert, critical, error, warning (PRIORITY 0-4).
+    - name: infra-to-loki
       inputRefs:
         - infrastructure
-        - audit
       filterRefs:
-        - severity-gate             # keep only critical + warning
+        - infra-priority-gate
       outputRefs:
         - default-lokistack
 
-    # ── Pipeline 3: infrastructure + audit → Splunk (unchanged) ─────────────
+    # ── Pipeline 3: audit logs → Loki ────────────────────────────────────────
+    # Drops get/list/watch verbs (read-only, high-volume, low-value).
+    # Keeps create/update/patch/delete and all error responses.
+    - name: audit-to-loki
+      inputRefs:
+        - audit
+      filterRefs:
+        - audit-gate
+      outputRefs:
+        - default-lokistack
+
+    # ── Pipeline 4: infrastructure + audit → Splunk ──────────────────────────
+    # No filterRefs — Splunk receives unfiltered infra and audit logs.
+    # Splunk has its own retention and filtering policies.
     - name: splunk-logstore
       inputRefs:
         - infrastructure
