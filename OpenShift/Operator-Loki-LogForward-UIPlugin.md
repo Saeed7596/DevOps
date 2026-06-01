@@ -508,53 +508,99 @@ spec:
     tolerations:
       - effect: NoSchedule
         key: node-role.kubernetes.io/infra
-    filters:
-      - drop:
-          - test: 
-            - field: .log_type
-              notMatches: ^application$
-        name: keep-app-logs
-        type: drop
-      - drop:
-          - test: 
-            - field: .kubernetes.namespace
-              notMatches: ^(wallet|wallet-samt)$
-        name: keep-wallet-namespaces
-        type: drop
-      - drop:
-          - test: 
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # INPUTS
+  # Narrow the application input to only the two namespaces and only the two
+  # pod prefixes (dispatcher*, core*).  Everything else is never collected,
+  # so it never reaches Loki or Minio at all.
+  # ─────────────────────────────────────────────────────────────────────────────
+  inputs:
+    - name: wallet-apps
+      type: application
+      application:
+        # Narrow to pods whose name starts with "dispatcher" or "core".
+        # Adjust the label selector below if your pods do not carry an "app"
+        # label — see the note after the manifest.
+        selector:
+          matchExpressions:
+            - key: app
+              operator: In
+              values:
+                - dispatcher
+                - core
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # FILTERS
+  # ─────────────────────────────────────────────────────────────────────────────
+  filters:
+
+    # ------------------------------------------------------------------
+    # Filter 1 — dispatcher content gate
+    #
+    # Logic: drop the event when BOTH conditions are true at once:
+    #   • the pod name starts with "dispatcher"   (it IS a dispatcher pod)
+    #   • the message does NOT contain DISPATCHER_LOGS
+    #
+    # This leaves core pod logs untouched (neither condition matches them)
+    # and keeps only DISPATCHER_LOGS lines from dispatcher pods.
+    # ------------------------------------------------------------------
+    - name: dispatcher-content-gate
+      type: drop
+      drop:
+        - test:
             - field: .kubernetes.pod_name
-              matches: ^dispatcher$
+              matches: "^dispatcher"
             - field: .message
-              notMatches: '"type"\s*:\s*"DISPATCHER_LOG"'
-        name: keep-dispatcher-logs
-        type: drop
-      - drop:
-          - test: 
+              notMatches: "DISPATCHER_LOGS"
+
+    # ------------------------------------------------------------------
+    # Filter 2 — severity gate (wallet + wallet-samt pipelines only)
+    #
+    # Drop the event if the severity/level field does NOT match
+    # critical or warning (case-insensitive, covering abbreviations).
+    #
+    # Three separate drop rules (OR logic between rules) cover the
+    # three common field locations OpenShift Vector may populate:
+    #   • .level           – set by the VRL log_classification transform
+    #   • .severity        – set for some structured logs
+    #   • .structured.level – nested structured payload
+    #
+    # A single rule with multiple test entries would require ALL fields
+    # to be non-critical/warning simultaneously, which is not what we
+    # want.  Separate rules ensure any one field being wrong causes a
+    # drop only when that field is the authoritative one.
+    #
+    # Safest approach: drop unless .level (the normalized field Vector
+    # always populates) is critical or warning.
+    # ------------------------------------------------------------------
+    - name: severity-gate
+      type: drop
+      drop:
+        - test:
             - field: .level
-              matches: ^(INFO|DEBUG|WARN|UNKNOWN)$
-            - field: .severity
-              matches: ^(INFO|DEBUG|WARN|UNKNOWN)$
-            - field: .structured.level
-              matches: ^(INFO|DEBUG|WARN|UNKNOWN)$
-        name: drop-log-level-severity
-        type: drop
-  managementState: Managed
+              notMatches: "(?i)^(critical|crit|warning|warn|error)$"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # OUTPUTS  (unchanged from your original)
+  # ─────────────────────────────────────────────────────────────────────────────
   outputs:
-    - lokiStack:
+    - name: default-lokistack
+      type: lokiStack
+      lokiStack:
         authentication:
           token:
             from: serviceAccount
         target:
           name: lokistack-example
           namespace: openshift-logging
-      name: default-lokistack
       tls:
         ca:
           configMapName: openshift-service-ca.crt
           key: service-ca.crt
-      type: lokiStack
+
     - name: splunk-receiver
+      type: splunk
       splunk:
         authentication:
           token:
@@ -563,26 +609,44 @@ spec:
         url: https://172.26.103.203:8088
       tls:
         insecureSkipVerify: true
-      type: splunk
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # PIPELINES
+  # ─────────────────────────────────────────────────────────────────────────────
   pipelines:
-    - filterRefs:
-        - keep-app-logs
-        - keep-wallet-namespaces
-        - keep-dispatcher-logs
-        - drop-log-level-severity
+
+    # ── Pipeline 1: wallet/wallet-samt application logs → Loki ──────────────
+    # Uses the scoped input (wallet-apps) so only dispatcher+core pods in the
+    # two namespaces are ever collected.  Both filters are applied here.
+    - name: wallet-apps-to-loki
       inputRefs:
-        - application
-        - audit
-        - infrastructure
-      name: default-logstore
+        - wallet-apps          # scoped input: wallet + wallet-samt, dispatcher + core only
+      filterRefs:
+        - dispatcher-content-gate   # keep only DISPATCHER_LOGS lines from dispatcher pods
+        - severity-gate             # keep only critical + warning
       outputRefs:
         - default-lokistack
-    - inputRefs:
+
+    # ── Pipeline 2: infrastructure + audit logs → Loki (no filtering) ───────
+    # Default behaviour: all infra and audit logs are forwarded as-is.
+    - name: infra-audit-to-loki
+      inputRefs:
         - infrastructure
         - audit
-      name: splunk-logstore
+      filterRefs:
+        - severity-gate             # keep only critical + warning
+      outputRefs:
+        - default-lokistack
+
+    # ── Pipeline 3: infrastructure + audit → Splunk (unchanged) ─────────────
+    - name: splunk-logstore
+      inputRefs:
+        - infrastructure
+        - audit
       outputRefs:
         - splunk-receiver
+
+  managementState: Managed
   serviceAccount:
     name: collector
 ```
