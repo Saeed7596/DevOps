@@ -35,7 +35,7 @@ Follow this [Link](https://docs.redhat.com/en/documentation/openshift_container_
 
 ---
 
-## Steps
+## [Preparing your mirror host](https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html/disconnected_environments/mirroring-in-disconnected-environments#installing-preparing-mirror)
 
 **Note**: Version of ocp must be equal to these tool. So download the correct [version](https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/). 
 
@@ -165,6 +165,10 @@ source ~/.bashrc
     }
   }
   ```
+
+  Note: If you haven't already, merge your Red Hat pull secret with your Quay credentials:
+  `cat ~/.docker/config.json  # or $XDG_RUNTIME_DIR/containers/auth.json`
+
   Save `auth.json` in this path:
   ```bash
   mkdir -p $XDG_RUNTIME_DIR/containers && cp ./auths.json $XDG_RUNTIME_DIR/containers/auth.json
