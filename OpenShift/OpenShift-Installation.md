@@ -339,14 +339,27 @@ If you have a system that has access to the Internet and the target registry:
 ```bash
 oc mirror --config=./imageset-config.yaml docker://registry.example.com:5000 --v2
 ```
-### Fully Disconnected Mode
+
+---
+
+# Fully Disconnected Mode
 If your system has access to the internet but not to the target registry:
   1. Save the images as a .tar file:​
   ```bash
   oc mirror --config=./imageset-config.yaml file://local-mirror --v2
   ```
-  2. Transfer the .tar file to the disconnected environment.
-  3. In the disconnected environment, transfer the images to the destination registry:​
+  ```bash
+  oc mirror --config=./imageset-config.yaml file://local-mirror --image-timeout 3h0m0s --v2
+  ```
+  2. Transfer files to the disconnected environment.
+  3. After completion, inside local-mirror/ you will find:
+  * `mirror_000001.tar`
+  * `working-dir` directory
+  Compress the working directory:
+  ```bash
+  tar -czvf working-dir.tar.gz working-dir/
+  ```
+  4. In the disconnected environment, transfer the images to the destination registry:​
   ```bash
   # v2
   oc mirror -c imageset-config.yaml --from file://<file_path> docker://<mirror_registry_url> --v2
