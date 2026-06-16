@@ -385,3 +385,8 @@ chmod +x delete_image.sh
     * `nx-repository-view-docker-<repo_name>-delete` → delete
 
 Assign this role to the desired LDAP user or group.
+
+---
+
+# Add self-sign certificate
+**Settings -> Security -> SSL Certificate -> Paste the url address -> Load Certificate** 
