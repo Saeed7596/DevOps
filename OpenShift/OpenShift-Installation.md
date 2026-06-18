@@ -206,6 +206,18 @@ oc mirror list operators --catalog=registry.redhat.io/redhat/redhat-operator-ind
 ```bash
 oc mirror init > imageset-config.yaml
 ```
+
+---
+
+# `docker login` and `oc mirror` read credentials from different locations:
+| Tool | Default credential store |
+|------|--------------------------|
+| `docker login` | `~/.docker/config.json` |
+| `oc mirror --v1` | `~/.docker/config.json` or `${XDG_RUNTIME_DIR}/containers/auth.json` |
+| `oc mirror --v2` | `~/.docker/config.json` or `${XDG_RUNTIME_DIR}/containers/auth.json` |
+
+---
+
 ⚠ Customize imageset-config.yaml as needed (OpenShift version, target registry, match `catalog and openshift version`, etc.)
 YAML Sample:
 ```yaml
