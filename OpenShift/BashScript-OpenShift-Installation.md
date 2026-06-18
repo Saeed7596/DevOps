@@ -99,8 +99,8 @@ if [[ ! command -v docker ]]; then
 
 mkdir -p $HOME/.docker
 cat $HOME/downloads/pull-secret.txt | jq . > $HOME/.docker/config.json
-export DOCKER_CONFIG=$HOME/.docker/config.json
-echo 'export DOCKER_CONFIG=$HOME/.docker/config.json' >> ~/.bashrc
+export DOCKER_CONFIG=$HOME/.docker/
+echo 'export DOCKER_CONFIG=$HOME/.docker/' >> ~/.bashrc
 source ~/.bashrc
 
 sudo usermod -aG docker $USER
