@@ -233,6 +233,12 @@ podman run -d --rm -p 50051:50051 \
   --name catalog-v419 \
   registry.redhat.io/redhat/redhat-operator-index:v4.19
 
+# Install grpcurl on RHEL/CentOS
+dnf install grpcurl
+
+# or download directly
+https://github.com/fullstorydev/grpcurl/releases
+
 # List all packages
 grpcurl -plaintext localhost:50051 \
   api.Registry/ListPackages
