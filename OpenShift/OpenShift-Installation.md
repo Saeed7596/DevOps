@@ -228,10 +228,9 @@ oc mirror list operators --catalog=registry.redhat.io/redhat/redhat-operator-ind
 ## Option B — Use `grpcurl` to query the catalog directly (v2-compatible)  
 This is the proper v2-era approach. Run the catalog image locally and query it:
 ```bash
+# docker or podman
 # Pull and run the catalog index locally
-podman run -d --rm -p 50051:50051 \
-  --name catalog-v419 \
-  registry.redhat.io/redhat/redhat-operator-index:v4.19
+podman run -d --rm -p 50051:50051 --name catalog-v419 registry.redhat.io/redhat/redhat-operator-index:v4.19
 
 # Install grpcurl on RHEL/CentOS
 dnf install grpcurl
@@ -240,12 +239,10 @@ dnf install grpcurl
 https://github.com/fullstorydev/grpcurl/releases
 
 # List all packages
-grpcurl -plaintext localhost:50051 \
-  api.Registry/ListPackages
+grpcurl -plaintext localhost:50051 api.Registry/ListPackages
 
 # Get channel info for a specific package
-grpcurl -plaintext -d '{"name":"cluster-logging"}' \
-  localhost:50051 api.Registry/GetPackage
+grpcurl -plaintext -d '{"name":"cluster-logging"}' localhost:50051 api.Registry/GetPackage
 
 # Clean up
 podman stop catalog-v419
