@@ -249,6 +249,17 @@ Browse to:
 [https://catalog.redhat.com/software/containers/search](https://catalog.redhat.com/software/containers/search)
 Search for `redhat-operator-index` → select the `v4.19` tag → you can inspect the package list. Alternatively, the operator-specific pages show supported channels directly.
 
+## Option C — Use `opm`
+```bash
+curl -L https://github.com/operator-framework/operator-registry/releases/latest/download/linux-amd64-opm -o opm
+chmod +x opm
+sudo mv opm /usr/local/bin/
+
+podman pull registry.redhat.io/redhat/redhat-operator-index:v4.19
+
+opm render registry.redhat.io/redhat/redhat-operator-index:v4.19 | jq -r 'select(.schema == "olm.channel") | "\(.package):\(.name)"' | sort
+```
+
 ---
 
 ⚠ Customize imageset-config.yaml as needed (OpenShift version, target registry, match `catalog and openshift version`, etc.)
