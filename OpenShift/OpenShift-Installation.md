@@ -218,6 +218,12 @@ oc mirror init > imageset-config.yaml
 
 ---
 
+# Another way to Find the channel of operators
+Use the Red Hat Ecosystem Catalog web UI (no tooling needed)  
+[https://catalog.redhat.com/software/containers/search](https://catalog.redhat.com/software/containers/search)
+
+---
+
 ⚠ Customize imageset-config.yaml as needed (OpenShift version, target registry, match `catalog and openshift version`, etc.)
 YAML Sample:
 ```yaml
