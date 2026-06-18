@@ -218,9 +218,36 @@ oc mirror init > imageset-config.yaml
 
 ---
 
-# Another way to Find the channel of operators
-Use the Red Hat Ecosystem Catalog web UI (no tooling needed)  
+# How to discover operator channels without oc mirror list
+You have three good options:
+## Option A — Use `oc mirror v1` with fixed auth (quickest)
+Once auth is fixed via podman login:
+```bash
+oc mirror list operators --catalog=registry.redhat.io/redhat/redhat-operator-index:v4.19 --package=cluster-logging --v1
+```
+## Option B — Use `grpcurl` to query the catalog directly (v2-compatible)  
+This is the proper v2-era approach. Run the catalog image locally and query it:
+```bash
+# Pull and run the catalog index locally
+podman run -d --rm -p 50051:50051 \
+  --name catalog-v419 \
+  registry.redhat.io/redhat/redhat-operator-index:v4.19
+
+# List all packages
+grpcurl -plaintext localhost:50051 \
+  api.Registry/ListPackages
+
+# Get channel info for a specific package
+grpcurl -plaintext -d '{"name":"cluster-logging"}' \
+  localhost:50051 api.Registry/GetPackage
+
+# Clean up
+podman stop catalog-v419
+```
+## Option C — Use the Red Hat Ecosystem Catalog web UI (no tooling needed)
+Browse to:
 [https://catalog.redhat.com/software/containers/search](https://catalog.redhat.com/software/containers/search)
+Search for `redhat-operator-index` → select the `v4.19` tag → you can inspect the package list. Alternatively, the operator-specific pages show supported channels directly.
 
 ---
 
