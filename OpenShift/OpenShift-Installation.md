@@ -198,10 +198,14 @@ oc mirror list operators --catalogs --version=4.18
 Find the available packages within the selected catalog
 ```bash
 oc mirror list operators --catalog=registry.redhat.io/redhat/redhat-operator-index:v4.18
+
+oc mirror list operators --catalog=registry.redhat.io/redhat/redhat-operator-index:v4.18 --v1
 ```
 Find channels for the selected package
 ```bash
-oc mirror list operators --catalog=registry.redhat.io/redhat/redhat-operator-index:v4.18 --package=rhods-operator
+oc mirror list operators --catalog=registry.redhat.io/redhat/redhat-operator-index:v4.18 --package=cluster-logging
+
+oc mirror list operators --catalog=registry.redhat.io/redhat/redhat-operator-index:v4.19 --package=cluster-logging --v1
 ```
 ```bash
 oc mirror init > imageset-config.yaml
