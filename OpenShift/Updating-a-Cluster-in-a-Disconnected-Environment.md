@@ -29,26 +29,26 @@ apiVersion: mirror.openshift.io/v2alpha1
 mirror:
   platform:
     channels:
-    - name: stable-4.18
+    - name: stable-4.20
       type: ocp
-      minVersion: 4.18.30
-      maxVersion: 4.18.30
+      minVersion: 4.20.23
+      maxVersion: 4.20.23
     graph: true
   operators:
-  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.20
     packages:
     - name: cincinnati-operator
       channels:
       - name: v1
     - name: cluster-logging 
       channels:
-      - name: stable-6.2
+      - name: stable-6.5
     - name: cluster-observability-operator 
       channels:
       - name: stable
     - name: container-security-operator
       channels:
-      - name: stable-3.14
+      - name: stable-3.17
     - name: devspaces
       channels:
       - name: stable
@@ -69,7 +69,7 @@ mirror:
       - name: stable
     - name: loki-operator 
       channels:
-      - name: stable-6.2
+      - name: stable-6.5
     - name: netobserv-operator 
       channels:
       - name: stable
@@ -84,8 +84,8 @@ mirror:
       - name: stable
     - name: redhat-oadp-operator 
       channels:
-      - name: stable-1.4
-    - name: servicemeshoperator 
+      - name: stable
+    - name: servicemeshoperator3 
       channels:
       - name: stable
     - name: tempo-product 
